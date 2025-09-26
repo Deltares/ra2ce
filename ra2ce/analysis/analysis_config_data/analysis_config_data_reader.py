@@ -85,8 +85,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         _config_data.project.name = _parent_dir.name
 
-        # self._copy_output_files(ini_file, _config_data)
-
         return _config_data
 
     def _remove_none_values(self) -> None:
