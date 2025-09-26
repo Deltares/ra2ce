@@ -11,8 +11,8 @@ class TestShpNetworkWrapper:
     def test_init(self):
         # 1.Define test data.
         _config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
         )
 
         # 2. Run test.

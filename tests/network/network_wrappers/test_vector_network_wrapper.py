@@ -46,8 +46,8 @@ class TestVectorNetworkWrapper:
     def test_initialize(self):
         # 1. Define test data.
         _config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
         )
         _config_data.network.primary_file = [Path("dummy_primary")]
         _config_data.network.directed = False
@@ -140,8 +140,8 @@ class TestVectorNetworkWrapper:
     def test_get_undirected_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # Given
         _config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
         )
         _config_data.network.file_id = "dummy_file_id"
         _config_data.network.link_type_column = "dummy_type_column"
@@ -160,8 +160,8 @@ class TestVectorNetworkWrapper:
     def test_get_direct_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # Given
         _config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
         )
         _config_data.network.file_id = "dummy_file_id"
         _config_data.network.link_type_column = "dummy_type_column"
