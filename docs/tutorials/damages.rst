@@ -63,7 +63,7 @@ Expected Annual Damage (EAD)
 
 While single-event damages are valuable, decision-making often requires a **risk perspective**.
 RA2CE therefore supports the computation of
-:doc:`Expected Annual Damage (EAD) <damages.EAD>`:
+:doc:`Expected Annual Damage (EAD) <damages_EAD>`:
 
 - Hazard scenarios are combined with their **annual exceedance probabilities (AEP)**.
 - Damages across events are aggregated to obtain the long-term average expected damage.
