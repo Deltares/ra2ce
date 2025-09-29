@@ -1,5 +1,4 @@
 import shutil
-from os import name
 from typing import Any, Callable, Iterator
 
 import pytest
@@ -162,9 +161,9 @@ class TestAnalysisConfigDataValidator:
         [
             pytest.param(_option, id=str(_option.name))
             for _option in 
-            filter(lambda x: x.name.lower() != "invalid", [ale for ale in AnalysisLossesEnum if ale != AnalysisLossesEnum.MULTI_LINK_LOSSES]
-            + [ade for ade in AnalysisDamagesEnum]
-            + [ae for ae in AnalysisEnum])
+            [ale for ale in AnalysisLossesEnum.list_valid_options() if ale != AnalysisLossesEnum.MULTI_LINK_LOSSES]
+            + [ade for ade in AnalysisDamagesEnum.list_valid_options()]
+            + [ae for ae in AnalysisEnum.list_valid_options()]
         ],
     )
     def test_validate_given_shp_network_without_id_when_any_valid_analysis_given_then_succeeds(
