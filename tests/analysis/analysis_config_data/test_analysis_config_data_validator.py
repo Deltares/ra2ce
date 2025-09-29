@@ -1,10 +1,13 @@
 import shutil
+from os import name
+from typing import Callable, Iterator
 
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDamages,
+    AnalysisSectionLosses,
     ProjectSection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
@@ -13,10 +16,15 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkSection
 from tests import test_results
 
 
@@ -96,3 +104,53 @@ class TestAnalysisConfigDataValidator:
         # 3. Verify final expectations.
         assert not _report.is_valid()
         assert len(_report._errors) == 3
+
+    @pytest.fixture(name="section_losses_analysis_config")
+    def _get_section_losses_analysis_config_generator(
+        self,
+    ) -> Iterator[Callable[str, AnalysisConfigData]]:
+        yield lambda file_id: AnalysisConfigData(
+            root_path=test_results,
+            output_path=test_results.joinpath("output"),
+            network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=file_id),
+            project=ProjectSection(),
+            analyses=[
+                AnalysisSectionLosses(
+                    name="Test Analysis",
+                    analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                )
+            ],
+        )
+
+    def test_validate_given_shp_network_without_id_when_multi_link_losses_then_fails(
+        self, section_losses_analysis_config: Callable[str, AnalysisConfigData]
+    ):
+        # 1. Define test data.
+        _test_config_data = section_losses_analysis_config(None)
+        assert _test_config_data.network.source == SourceEnum.SHAPEFILE
+        assert _test_config_data.network.file_id is None
+
+        # 2. Run test
+        _report = self._validate_config(_test_config_data)
+
+        # 3. Verify final expectations
+        assert not _report.is_valid()
+        assert len(_report._errors) == 1
+        assert (
+            _report._errors[0]
+            == "Not possible to create analysis 'Test Analysis' - Shapefile used as source, but no 'file_id' configured for the 'NetworkSection'."
+        )
+
+    def test_validate_given_shp_network_with_id_when_multi_link_losses_then_succeeds(
+        self, section_losses_analysis_config: Callable[str, AnalysisConfigData]
+    ):
+        # 1. Define test data.
+        _test_config_data = section_losses_analysis_config("dummy")
+        assert _test_config_data.network.source == SourceEnum.SHAPEFILE
+        assert _test_config_data.network.file_id is not None
+
+        # 2. Run test
+        _report = self._validate_config(_test_config_data)
+
+        # 3. Verify final expectations
+        assert _report.is_valid()

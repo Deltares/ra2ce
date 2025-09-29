@@ -34,6 +34,7 @@ from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkSection
 from ra2ce.network.network_config_data.network_config_data_validator import (
     NetworkDictValues,
 )
@@ -118,7 +119,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
         # Validate `shp_input`.
         for _analysis in filter(
-            lambda a: a.analysis is not AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY,
+            lambda a: a.analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES,
             self._config.analyses,
         ):
             if (
@@ -126,7 +127,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
                 and not self._config.network.file_id
             ):
                 _report.error(
-                    f"Not possible to create analysis {_analysis.name} - Shapefile used as source, but no file_id configured in the network.ini file"
+                    f"Not possible to create analysis '{_analysis.name}' - Shapefile used as source, but no 'file_id' configured for the '{NetworkSection.__name__}'."
                 )
         return _report
 
