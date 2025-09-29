@@ -50,7 +50,7 @@ def read_origin_destination_files(
     destination_paths: Union[str, list],
     destination_names: Union[str, list],
     od_id: str,
-    origin_count: str,
+    origin_count: Optional[str],
     crs_: pyproj.CRS,
     category: str,
     region_paths: Optional[str],
@@ -98,6 +98,7 @@ def read_origin_destination_files(
 
     for op, on in zip(origin_paths, origin_names):
         origin_tmp = gpd.read_file(op, crs=crs_, engine="pyogrio")
+
         if od_id not in origin_tmp.columns:
             logging.warning(
                 "No origin found at %s for %s, using default index instead.", op, od_id
@@ -115,9 +116,9 @@ def read_origin_destination_files(
         if origin_count:
             origin_new[origin_count] = origin_tmp[origin_count]
 
-        origin_tmp["o_id"] = on + "_" + origin_tmp[od_id].astype(str)
-        origin_tmp.crs = origin.crs
-        origin = gpd.GeoDataFrame(pd.concat([origin, origin_tmp], ignore_index=True))
+        origin_new["o_id"] = on + "_" + origin_new[od_id].astype(str)
+        origin_new.crs = origin.crs
+        origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
 
     destination_columns_add = [od_id, "geometry"]
     if category:
