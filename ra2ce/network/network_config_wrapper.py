@@ -60,15 +60,14 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        if config_data.output_graph_dir:
-            if config_data.output_graph_dir.is_dir():
-                _new_network_config.graph_files = (
-                    _new_network_config.read_graphs_from_config(
-                        config_data.output_graph_dir
-                    )
+        if config_data.network.reuse_network and config_data.output_graph_dir.is_dir():
+            _new_network_config.graph_files = (
+                _new_network_config.read_graphs_from_config(
+                    config_data.output_graph_dir
                 )
-            else:
-                config_data.output_graph_dir.mkdir(parents=True)
+            )
+        else:
+            config_data.output_graph_dir.mkdir(parents=True)
         return _new_network_config
 
     @staticmethod
@@ -92,7 +91,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         # Call Hazard Handler (to rework)
         if not self.graph_files.has_graphs():
             self.graph_files = self.read_graphs_from_config(
-                self.config_data.static_path.joinpath("output_graph")
+                self.config_data.output_graph_dir
             )
 
         if not self.config_data.hazard.hazard_map:
