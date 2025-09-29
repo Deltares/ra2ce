@@ -29,16 +29,19 @@ div.highlight.highlight-python pre code {
 
 /* Numbers, operators, punctuation, comments */
 .highlight .mi, .highlight-python .mi     { color: #f5a97f !important; }
+.highlight .mf, .highlight-python .mf     { color: #f5a97f !important; }
+.highlight .nb, .highlight-python .nb     { color: #f5a97f !important; }
 .highlight .o, .highlight-python .o       { color: #91d7e3 !important; }
 .highlight .p, .highlight-python .p       { color: #cad3f5 !important; }
-.highlight .c, .highlight-python .c       { color: #6e738d !important; font-style: italic; }
+.highlight .c, .highlight-python .c       { color: #9ca0b0 !important; font-style: italic; }
+.highlight .c1, .highlight-python .c1       { color: #9ca0b0 !important; font-style: italic; }
 
 /* Variable names / attribute names */
 .highlight .n, .highlight-python .n       { color: #cad3f5 !important; }
 
 /* Strings (all variants) */
-.highlight .s, .highlight .s1, .highlight .s2,
-.highlight-python .s, .highlight-python .s1, .highlight-python .s2 {
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sa,
+.highlight-python .s, .highlight-python .s1, .highlight-python .s2, .highlight-python .sa {
   color: #a6e3a1 !important;
 }
 
