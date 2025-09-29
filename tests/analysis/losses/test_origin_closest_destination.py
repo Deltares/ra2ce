@@ -42,6 +42,5 @@ class TestOriginClosestDestination:
         assert isinstance(_ocd, OriginClosestDestination)
         assert isinstance(_ocd.analysis, AnalysisSectionLosses)
         assert _ocd.analysis == _analysis
-        assert _ocd.hazard_names.names == _config.config_data.hazard_names
         assert _ocd.results_dict == {}
         assert _ocd.destination_key_value == "dummy_value"

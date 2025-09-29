@@ -56,6 +56,9 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         # (see https://github.com/Deltares/ra2ce/issues/703#issuecomment-3345897476)
         """
         _report = ValidationReport()
+        if not self._config.root_path or not self._config.static_path:
+            _report.error("Root or static path not properly set.")
+            return _report
         if not self._config.network:
             _report.error("Network properties not present in Network ini file.")
             return _report

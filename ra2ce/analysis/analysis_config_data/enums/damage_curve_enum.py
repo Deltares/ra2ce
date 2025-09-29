@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
@@ -6,6 +8,10 @@ class DamageCurveEnum(Ra2ceEnumBase):
     OSD = 2
     MAN = 3
     INVALID = 99
+
+    @classmethod
+    def get_enum(cls, input_str: str | None) -> DamageCurveEnum:
+        return DamageCurveEnum(super().get_enum(input_str))
 
     @property
     def config_value(self) -> str | None:
