@@ -314,15 +314,10 @@ class AnalysisConfigData(ConfigDataProtocol):
     network
         Section containing network configuration data.
 
-    aggregate_wl
-        Aggregation method for water levels when relevant.
-
-    hazard_names
-        Names of hazards included in the analysis.
-    """
     ANALYSIS_SECTION = (
         AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
     )
+    """
 
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
@@ -335,7 +330,6 @@ class AnalysisConfigData(ConfigDataProtocol):
     )
     network: NetworkSection = field(default_factory=NetworkSection)
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
-    hazard_names: list[str] = field(default_factory=list)
 
     def reroot_analysis_config(
         self,

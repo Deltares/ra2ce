@@ -1,16 +1,20 @@
 """
                     GNU GENERAL PUBLIC LICENSE
                       Version 3, 29 June 2007
+
     Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
     Copyright (C) 2023 Stichting Deltares
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
+
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
@@ -178,10 +182,6 @@ class NetworkConfigData(ConfigDataProtocol):
     ----------
     root_path
         The root directory path for the project.
-    input_path
-        The input directory path for the project.
-    output_path
-        The output directory path for the project.
     static_path
         The static files directory path for the project. Recommended to be: root_path/static.
     crs : CRS, default=EPSG:4326
@@ -200,8 +200,6 @@ class NetworkConfigData(ConfigDataProtocol):
         Section containing cleanup options.
     """
     root_path: Path = None
-    input_path: Path = None
-    output_path: Path = None
     static_path: Path = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
     crs: Optional[CRS] = field(default_factory=lambda: CRS.from_user_input(4326))
@@ -215,15 +213,11 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup: Optional[CleanupSection] = field(default_factory=CleanupSection)
 
     @property
-    def output_graph_dir(self) -> Optional[Path]:
-        if not self.static_path:
-            return None
+    def output_graph_dir(self) -> Path:
         return self.static_path.joinpath("output_graph")
 
     @property
-    def network_dir(self) -> Optional[Path]:
-        if not self.static_path:
-            return None
+    def network_dir(self) -> Path:
         return self.static_path.joinpath("network")
 
     @staticmethod

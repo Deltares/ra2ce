@@ -58,7 +58,7 @@ Overview
 
         :octicon:`list-unordered;10em`
         +++
-        API Reference
+        Docstrings Reference
 
     .. grid-item-card::
         :text-align: center

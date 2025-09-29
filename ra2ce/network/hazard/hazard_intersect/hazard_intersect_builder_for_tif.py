@@ -24,10 +24,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+import numpy as np
+import rasterio
+from affine import Affine
 from geopandas import GeoDataFrame
 from networkx import Graph, set_edge_attributes
 from numpy import nan
+from rasterio.features import shapes
+from rasterio.mask import mask
 from rasterstats import zonal_stats
+from shapely.geometry import LineString, box, shape
+from shapely.ops import unary_union
 from tqdm import tqdm
 
 from ra2ce.network.hazard.hazard_common_functions import (
@@ -37,11 +44,7 @@ from ra2ce.network.hazard.hazard_common_functions import (
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.network.networks_utils import (
-    fraction_flooded,
-    get_graph_edges_extent,
-    get_valid_mean,
-)
+from ra2ce.network.networks_utils import get_graph_edges_extent, get_valid_mean
 
 
 @dataclass
@@ -60,6 +63,38 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             list[tuple[str, str]]: List of `str` tuples (hazard_name, ra2ce_name).
         """
         return list(zip(self.hazard_names, self.ra2ce_names))
+
+    def _fraction_flooded_array(
+        self, line: LineString, src: rasterio.io.DatasetReader
+    ) -> float:
+        """
+        Calculates the fraction of a linestring that overlaps with a hazard raster (values > 0).
+
+        Args:
+            line (LineString): The linestring to check.
+            src (rasterio.io.DatasetReader): An open rasterio dataset.
+
+        Returns:
+            float: Fraction of the linestring overlapping raster cells with value > 0.
+        """
+        bbox_line = box(*line.bounds)
+        try:
+            out_image, out_transform = mask(
+                src, [bbox_line], crop=True, all_touched=True
+            )
+            flooded_cells = unary_union(
+                [
+                    shape(x[0])
+                    for x in shapes(out_image[0], transform=out_transform)
+                    if x[-1] > 0
+                ]
+            )
+            flooded_cells = GeoDataFrame({"geometry": [flooded_cells]})
+            line_intersect = flooded_cells.intersection(line)
+            return line_intersect.length.sum() / line.length
+        except Exception as e:
+            logging.info(f"_fraction_flooded_array() {e} \n for line {line}")
+            return 0
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Overlays the hazard raster over the road segments graph.
@@ -100,64 +135,75 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             gdf = GeoDataFrame(
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
-            tqdm.pandas(desc="Graph hazard overlay with " + hazard_name)
-            _tif_hazard_files = str(hazard_tif_file)
-            if self.hazard_aggregate_wl == "mean":
-                flood_stats = gdf.geometry.progress_apply(
-                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                        x,
-                        _files_value,
-                        all_touched=True,
-                        add_stats={"mean": get_valid_mean},
+
+            # Open raster once for both operations
+            with rasterio.open(hazard_tif_file) as src:
+                raster_array = src.read(1)
+                raster_transform = src.transform
+                nodata_value = src.nodata
+
+                tqdm.pandas(desc="Graph hazard overlay with " + hazard_name)
+                if self.hazard_aggregate_wl == "mean":
+                    flood_stats = gdf.geometry.progress_apply(
+                        lambda x: zonal_stats(
+                            x,
+                            raster_array,
+                            affine=raster_transform,
+                            all_touched=True,
+                            add_stats={"mean": get_valid_mean},
+                            nodata=nodata_value,
+                        )
                     )
-                )
-            else:
-                flood_stats = gdf.geometry.progress_apply(
-                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                        x,
-                        _files_value,
-                        all_touched=True,
-                        stats=f"{self.hazard_aggregate_wl}",
+                else:
+                    flood_stats = gdf.geometry.progress_apply(
+                        lambda x: zonal_stats(
+                            x,
+                            raster_array,
+                            affine=raster_transform,
+                            all_touched=True,
+                            stats=f"{self.hazard_aggregate_wl}",
+                            nodata=nodata_value,
+                        )
                     )
+
+                try:
+                    flood_stats = flood_stats.apply(
+                        lambda x: (
+                            x[0][self.hazard_aggregate_wl]
+                            if x[0][self.hazard_aggregate_wl]
+                            else 0
+                        )
+                    )
+                    set_edge_attributes(
+                        hazard_overlay,
+                        {
+                            (edges[0], edges[1], edges[2]): {
+                                ra2ce_name + "_" + self.hazard_aggregate_wl[:2]: x
+                            }
+                            for x, edges in zip(flood_stats, edges_geoms)
+                        },
+                    )
+                except KeyError:
+                    logging.warning(
+                        "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
+                    )
+
+                # Get the fraction of the road that is intersecting with the hazard
+                tqdm.pandas(
+                    desc="Graph fraction with hazard overlay with " + hazard_name
                 )
 
-            try:
-                flood_stats = flood_stats.apply(
-                    lambda x: (
-                        x[0][self.hazard_aggregate_wl]
-                        if x[0][self.hazard_aggregate_wl]
-                        else 0
-                    )
+                graph_fraction_flooded = gdf.geometry.progress_apply(
+                    lambda x: self._fraction_flooded_array(x, src)
                 )
+                graph_fraction_flooded = graph_fraction_flooded.fillna(0)
                 set_edge_attributes(
                     hazard_overlay,
                     {
-                        (edges[0], edges[1], edges[2]): {
-                            ra2ce_name + "_" + self.hazard_aggregate_wl[:2]: x
-                        }
-                        for x, edges in zip(flood_stats, edges_geoms)
+                        (edges[0], edges[1], edges[2]): {ra2ce_name + "_fr": x}
+                        for x, edges in zip(graph_fraction_flooded, edges_geoms)
                     },
                 )
-            except KeyError:
-                logging.warning(
-                    "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
-                )
-
-            # Get the fraction of the road that is intersecting with the hazard
-            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hazard_name)
-            graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x, _files_values=_tif_hazard_files: fraction_flooded(
-                    x, _files_values
-                )
-            )
-            graph_fraction_flooded = graph_fraction_flooded.fillna(0)
-            set_edge_attributes(
-                hazard_overlay,
-                {
-                    (edges[0], edges[1], edges[2]): {ra2ce_name + "_fr": x}
-                    for x, edges in zip(graph_fraction_flooded, edges_geoms)
-                },
-            )
 
         self._overlay_hazard_files(overlay_network_x)
         return hazard_overlay
@@ -198,34 +244,44 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             )
             validate_extent_graph(extent_graph, hazard_tif_file)
 
-            tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
-            _hazard_files_str = str(hazard_tif_file)
-            # Performance sinkhole
-            flood_stats = hazard_overlay.geometry.progress_apply(
-                lambda _geom_vector: zonal_stats(
-                    vectors=_geom_vector,
-                    raster=_hazard_files_str,
-                    all_touched=True,
-                    stats="min max",
-                    add_stats={"mean": get_valid_mean},
+            # Open raster once for both operations
+            with rasterio.open(hazard_tif_file) as src:
+                raster_array = src.read(1)
+                raster_transform = src.transform
+                nodata_value = src.nodata
+
+                tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
+                flood_stats = hazard_overlay.geometry.progress_apply(
+                    lambda _geom_vector: zonal_stats(
+                        vectors=_geom_vector,
+                        raster=raster_array,
+                        affine=raster_transform,
+                        all_touched=True,
+                        stats="min max",
+                        add_stats={"mean": get_valid_mean},
+                        nodata=nodata_value,
+                    )
                 )
-            )
 
-            def _get_attributes(gen_flood_stat: list[dict]) -> tuple:
-                # Just get the first element of the generator
-                _flood_stat = gen_flood_stat[0]
-                return _flood_stat["min"], _flood_stat["max"], _flood_stat["mean"]
+                def _get_attributes(gen_flood_stat: list[dict]) -> tuple:
+                    # Just get the first element of the generator
+                    _flood_stat = gen_flood_stat[0]
+                    return _flood_stat["min"], _flood_stat["max"], _flood_stat["mean"]
 
-            (
-                hazard_overlay[ra2ce_name + "_mi"],
-                hazard_overlay[ra2ce_name + "_ma"],
-                hazard_overlay[ra2ce_name + "_me"],
-            ) = list(zip(*map(_get_attributes, flood_stats)))
+                (
+                    hazard_overlay[ra2ce_name + "_mi"],
+                    hazard_overlay[ra2ce_name + "_ma"],
+                    hazard_overlay[ra2ce_name + "_me"],
+                ) = list(zip(*map(_get_attributes, flood_stats)))
 
-            tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
-            hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: fraction_flooded(x, _hz_str)
-            )
+                tqdm.pandas(
+                    desc="Network fraction with hazard overlay with " + hazard_name
+                )
+                hazard_overlay[
+                    ra2ce_name + "_fr"
+                ] = hazard_overlay.geometry.progress_apply(
+                    lambda x: self._fraction_flooded_array(x, src)
+                )
 
         self._overlay_hazard_files(overlay_geodataframe)
         return hazard_overlay

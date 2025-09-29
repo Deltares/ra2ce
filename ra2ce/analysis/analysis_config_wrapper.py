@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
@@ -44,7 +45,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
 
     def initialize_output_dirs(self) -> None:
         """
-        #Initializes the required output directories for a Ra2ce analysis.
+        Initializes the required output directories for a Ra2ce analysis.
         """
         # Create the output folders
         for a in self.config_data.analyses:
@@ -90,6 +91,23 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         )
         # Graphs are retrieved from the already configured object
         _new_analysis.graph_files = network_config.graph_files
+
+        # Set config paths (if not set)
+        if not _new_analysis.config_data.root_path:
+            _new_analysis.config_data.root_path = network_config.config_data.root_path
+        _root_path: Optional[Path] = _new_analysis.config_data.root_path
+        if not _new_analysis.config_data.static_path:
+            _new_analysis.config_data.static_path = (
+                network_config.config_data.static_path
+            )
+        if not _new_analysis.config_data.input_path and _root_path:
+            _new_analysis.config_data.input_path = (
+                _new_analysis.config_data.root_path.joinpath("input")
+            )
+        if not _new_analysis.config_data.output_path and _root_path:
+            _new_analysis.config_data.output_path = (
+                _new_analysis.config_data.root_path.joinpath("output")
+            )
 
         return _new_analysis
 
