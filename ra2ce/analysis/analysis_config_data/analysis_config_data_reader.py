@@ -85,8 +85,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         _config_data.project.name = _parent_dir.name
 
-        self._copy_output_files(ini_file, _config_data)
-
         return _config_data
 
     def _remove_none_values(self) -> None:
@@ -279,40 +277,3 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _analysis_sections.append(_analysis_section)
 
         return _analysis_sections
-
-    def _copy_output_files(
-        self, from_path: Path, config_data: AnalysisConfigData
-    ) -> None:
-        _output_dir = config_data.root_path.joinpath(config_data.project.name, "output")
-        config_data.output_path = _output_dir
-        if not _output_dir.exists():
-            _output_dir.mkdir(parents=True)
-        try:
-            copyfile(
-                from_path,
-                config_data.output_path.joinpath("{}.ini".format(from_path.stem)),
-            )
-        except FileNotFoundError as e:
-            logging.warning(e)
-
-    def _parse_path_list(
-        self, property_name: str, path_list: str, config_data: AnalysisConfigData
-    ) -> list[Path]:
-        _list_paths = []
-        for path_value in path_list.split(","):
-            path_value = Path(path_value)
-            if path_value.is_file():
-                _list_paths.append(path_value)
-                continue
-
-            _project_name_dir = config_data.root_path.joinpath(config_data.project.name)
-            abs_path = _project_name_dir.joinpath("static", property_name, path_value)
-            try:
-                assert abs_path.is_file()
-            except AssertionError:
-                abs_path = _project_name_dir.joinpath(
-                    "input", property_name, path_value
-                )
-
-            _list_paths.append(abs_path)
-        return _list_paths
