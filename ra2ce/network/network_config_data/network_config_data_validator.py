@@ -1,22 +1,22 @@
 """
-                    GNU GENERAL PUBLIC LICENSE
-                      Version 3, 29 June 2007
+                GNU GENERAL PUBLIC LICENSE
+                  Version 3, 29 June 2007
 
-    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
+Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Any
@@ -49,24 +49,18 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     def __init__(self, config_data: NetworkConfigData) -> None:
         self._config = config_data
 
-    def _validate_shp_input(self, network_config: NetworkSection) -> ValidationReport:
-        """Checks if a file id is configured when using the option to create network from shapefile"""
-        _shp_report = ValidationReport()
-        if network_config.source == SourceEnum.SHAPEFILE and not network_config.file_id:
-            _shp_report.error(
-                "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
-            )
-        return _shp_report
-
     def validate(self) -> ValidationReport:
-        """Check if input properties are correct and exist."""
+        """
+        Check if input properties are correct and exist.
+        Note: We no longer validate here networks as it is agreed.
+        # (see https://github.com/Deltares/ra2ce/issues/703#issuecomment-3345897476)
+        """
         _report = ValidationReport()
         if not self._config.network:
             _report.error("Network properties not present in Network ini file.")
             return _report
 
         # check if properties exist in settings.ini file
-        _report.merge(self._validate_shp_input(self._config.network))
         _report.merge(self._validate_sections())
         return _report
 

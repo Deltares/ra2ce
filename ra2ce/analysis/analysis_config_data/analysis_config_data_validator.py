@@ -113,8 +113,10 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
         return _report
 
-    def _validate_analysis_compatibility(self) -> ValidationReport:
+    def _validate_analysis_network_compatibility(self) -> ValidationReport:
         _report = ValidationReport()
+
+        # Validate `shp_input`.
         for _analysis in filter(
             lambda a: a.analysis is not AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY,
             self._config.analyses,
@@ -133,6 +135,6 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
         _required_headers = ["project", "analyses"]
 
         _report.merge(self._validate_headers(_required_headers))
-        _report.merge(self._validate_analysis_compatibility())
+        _report.merge(self._validate_analysis_network_compatibility())
 
         return _report
