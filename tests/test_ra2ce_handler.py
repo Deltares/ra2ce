@@ -6,7 +6,6 @@ import geopandas
 import pytest
 from geopandas import GeoDataFrame
 from rasterio import open as rasterio_open
-from shapely.geometry import box
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -154,6 +153,66 @@ class TestRa2ceHandler:
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
+    @pytest.mark.parametrize(
+        "reuse_existing_network",
+        [
+            pytest.param(True, id="Reuse existing network"),
+            pytest.param(False, id="Do not reuse existing network"),
+        ],
+    )
+    def test_initialize_handler_from_files_does_not_raise(
+        self,
+        simple_test_case_files: tuple[Path, Path],
+        reuse_existing_network: bool,
+    ):
+        # 1. Define test data.
+        _graph_file = simple_test_case_files[0].parent.joinpath(
+            "static", "output_graph", "base_graph.p"
+        )
+        assert _graph_file.is_file()
+        _dtcreated = _graph_file.stat().st_ctime
+
+        # 2. Run test.
+        _ = Ra2ceHandler(simple_test_case_files[0], simple_test_case_files[1])
+
+        # 3. Verify expectations.
+        _dtupdated = _graph_file.stat().st_ctime
+        assert (
+            _dtcreated == pytest.approx(_dtupdated, abs=1e-9)
+        ) == reuse_existing_network
+
+    @pytest.mark.parametrize(
+        "reuse_existing_network",
+        [
+            pytest.param(True, id="Reuse existing network"),
+            pytest.param(False, id="Do not reuse existing network"),
+        ],
+    )
+    def test_initialize_handler_from_minimal_config_does_not_raise(
+        self,
+        minimal_acceptance_test_case: Path,
+        simple_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData],
+        reuse_existing_network: bool,
+    ):
+        # 1. Define test data.
+        _network_config, _analysis_config = simple_test_case_configs
+        _network_config.network.reuse_network = reuse_existing_network
+
+        _graph_file = minimal_acceptance_test_case.joinpath(
+            "static", "output_graph", "base_graph.p"
+        )
+        assert _graph_file.is_file()
+        _dtcreated = _graph_file.stat().st_ctime
+
+        # 2. Run test.
+        _ = Ra2ceHandler.from_config(_network_config, _analysis_config)
+
+        # 3. Verify expectations.
+        _dtupdated = _graph_file.stat().st_ctime
+        assert (
+            _dtcreated == pytest.approx(_dtupdated, abs=1e-9)
+        ) == reuse_existing_network
+
     def test_initialize_without_analysis_raises(self, request: pytest.FixtureRequest):
         # 1. Define test data.
         _test_dir = test_results.joinpath(request.node.name)
@@ -260,6 +319,7 @@ class TestRa2ceHandler:
                 RoadTypeEnum.RESIDENTIAL,
                 RoadTypeEnum.UNCLASSIFIED,
             ],
+            reuse_network=True,
         )
 
         _hazard_section = HazardSection(
@@ -292,7 +352,7 @@ class TestRa2ceHandler:
 
         assert legacy_output_gdf["EV1_ma"].values == pytest.approx(
             update_output_gdf["EV1_ma"].values
-        ), f"EV1_ma values are not equal before and after update."
+        ), "EV1_ma values are not equal before and after update."
         assert legacy_output_gdf["EV1_fr"].values == pytest.approx(
             update_output_gdf["EV1_fr"].values
-        ), f"EV1_fr values are not equal before and after update."
+        ), "EV1_fr values are not equal before and after update."
