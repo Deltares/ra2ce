@@ -198,5 +198,5 @@ Next Steps
 
 Once your origins and destinations are ready, you can continue with one of the tutorials:
 
-- :doc:`Defined Origin–Destination Pairs <accessibility.all_origin_destinations>`
-- :doc:`Origins to Closest Destinations <accessibility.closest_origin_destinations>`
+- :doc:`Defined Origin–Destination Pairs <../_examples/accessibility_all_pairs_origin_destinations>`
+- :doc:`Origins to Closest Destinations <../_examples/accessibility_closest_origin_destinations>`

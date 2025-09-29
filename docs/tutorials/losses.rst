@@ -26,7 +26,7 @@ Types of Loss Analysis
 
 RA2CE currently supports only one type of losses workflow:
 
-- :doc:`Criticiality based losses <losses.multi_link_redundancy_losses>`
+- :doc:`Criticiality based losses <../_examples/losses_multi_link_redundancy_losses>`
   This is the economic losses due to disruption of road segments, based on the criticality of each link in the network (see details in the :doc:`Criticality analysis <criticality>`).
 
 
@@ -63,5 +63,4 @@ The following tutorials guide you through different parts of the losses workflow
 .. toctree::
    :maxdepth: 1
 
-   losses.multi_link_redundancy_losses
-
+   ../_examples/losses_multi_link_redundancy_losses
