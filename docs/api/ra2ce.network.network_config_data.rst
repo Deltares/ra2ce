@@ -1,8 +1,8 @@
 ra2ce.network.network\_config\_data package
 ===========================================
 
-Subpackages
------------
+Enums
+-----
 
 .. toctree::
    :maxdepth: 2
@@ -10,38 +10,30 @@ Subpackages
    ra2ce.network.network_config_data.enums
 
 
-Submodules
-----------
+Classes
+-------
 
-ra2ce.network.network\_config\_data.network_config_data module
-----------------------------------------------------------------
-
-.. automodule:: ra2ce.network.network_config_data.network_config_data
+.. autoclass:: ra2ce.network.network_config_data.network_config_data.NetworkSection
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-ra2ce.network.network\_config\_data.network\_config\_data\_reader module
-------------------------------------------------------------------------
-
-.. automodule:: ra2ce.network.network_config_data.network_config_data_reader
+.. autoclass:: ra2ce.network.network_config_data.network_config_data.HazardSection
    :members:
    :undoc-members:
    :show-inheritance:
 
-ra2ce.network.network\_config\_data.network\_config\_data\_validator module
----------------------------------------------------------------------------
-
-.. automodule:: ra2ce.network.network_config_data.network_config_data_validator
+.. autoclass:: ra2ce.network.network_config_data.network_config_data.CleanupSection
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+.. autoclass:: ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-.. automodule:: ra2ce.network.network_config_data
+.. autoclass:: ra2ce.network.network_config_data.network_config_data.NetworkConfigData
    :members:
    :undoc-members:
    :show-inheritance:
