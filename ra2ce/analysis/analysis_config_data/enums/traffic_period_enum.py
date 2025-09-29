@@ -17,5 +17,5 @@ class TrafficPeriodEnum(Ra2ceEnumBase):
     INVALID = 99
 
     @classmethod
-    def get_enum(cls, input: str | None) -> TrafficPeriodEnum:
-        return super().get_enum(input)
+    def get_enum(cls, input_str: str | None) -> TrafficPeriodEnum:
+        return TrafficPeriodEnum(super().get_enum(input_str))
