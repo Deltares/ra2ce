@@ -160,6 +160,11 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.save_gpkg = self._parser.getboolean(
             _section, "save_gpkg", fallback=_network_section.save_gpkg
         )
+        _network_section.use_existing_network = self._parser.getboolean(
+            _section,
+            "use_existing_network",
+            fallback=_network_section.use_existing_network,
+        )
         _network_section.network_type = NetworkTypeEnum.get_enum(
             self._parser.get(_section, "network_type", fallback=None)
         )
