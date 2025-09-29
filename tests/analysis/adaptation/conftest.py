@@ -127,7 +127,6 @@ def _get_valid_adaptation_config_fixture(
     )
     _network_config_data = NetworkConfigData(
         root_path=_root_path,
-        input_path=_input_path,
         static_path=_static_path,
         hazard=_hazard_section,
         network=_network_section,
