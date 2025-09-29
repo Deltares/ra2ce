@@ -314,11 +314,11 @@ class AnalysisConfigData(ConfigDataProtocol):
     network
         Section containing network configuration data.
 
-    ANALYSIS_SECTION = (
-        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
-    )
-    """
 
+    """
+    ANALYSIS_SECTION = (
+            AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+    )
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
