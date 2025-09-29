@@ -25,8 +25,39 @@ from pathlib import Path
 from typing import Any, Hashable, Optional
 
 import pandas as pd
+import re
 
-import warnings
+
+# Alias/synonym table (keys are normalized: casefolded, spaces/hyphens -> underscores)
+_ASSET_ALIASES: dict[str, str] = {
+    "low_water_crossing": "low_water_crossing",
+    "low-water-crossing": "low_water_crossing",
+    "low water crossing": "low_water_crossing",
+
+    "building_passage": "building_passage",
+    "building-passage": "building_passage",
+    "building passage": "building_passage",
+
+    "avalanche_protector": "avalanche_protector",
+    "avalanche-protector": "avalanche_protector",
+    "avalanche protector": "avalanche_protector",
+
+    "movable_bridge": "movable_bridge",
+    "movable-bridge": "movable_bridge",
+    "movable bridge": "movable_bridge",
+    "movable": "movable_bridge",  # common shorthand
+    "moveable": "movable_bridge",  # <-- add this misspelling
+
+    'culverts': 'culvert',  # plurals
+    'bridges': 'bridge',
+    'tunnels': 'tunnel',
+    'viaducts': 'viaduct',
+    "movables": "movable_bridge",
+    "aqueducts": "aqueduct",
+    "boardwalks": "boardwalk",
+    "trestles": "trestle",
+    "cantilever": "cantilever",
+}
 
 
 from ra2ce.analysis.damages.damage_functions.damage_fraction_uniform import (
@@ -101,27 +132,55 @@ class DamageFunctionByRoadTypeByLane:
             max_damage=max_damage, damage_fraction=damage_fraction, name=name, allowed_asset_types=allowed_asset_types
         )
 
+    @staticmethod
+    def _normalize_asset_key(s: str) -> str:
+        """
+        Normalize to lowercase, collapse spaces/hyphens to underscores,
+        then apply alias mapping. If no alias, return normalized token.
+        """
+        key = re.sub(r"[\s\-]+", "_", str(s).casefold().strip())
+        return _ASSET_ALIASES.get(key, key)
+
     # Todo: these two below functions are maybe better implemented at a lower level?
-    def add_max_damage(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
-        """ "Ads the max damage value to the dataframe"""
-        cols = df.columns
-        assert "road_type" in cols, "no column 'road type' in df"
-        assert "lanes" in cols, "no column 'lanes in df"
+    def add_max_damage(self, df: pd.DataFrame, prefix: str | None = None) -> pd.DataFrame:
+        """Adds the max damage value to the dataframe for each (road_type, lanes) pair."""
+        assert "road_type" in df.columns, "No column 'road_type' in df"
+        assert "lanes" in df.columns, "No column 'lanes' in df"
 
-        max_damage_data = self.max_damage.data
+        prefix = prefix or self.prefix
 
-        # Flatten max_damage_data into a Series with MultiIndex (infra_type, lanes)
+        # Work on a copy to avoid mutating original df
+        out = df.copy()
+
+        # 1) Normalize road_type in df and ensure lanes are ints
+        out["_road_type_norm"] = out["road_type"].map(self._normalize_asset_key)
+        out["_lanes_int"] = out["lanes"].astype("Int64")  # allows NA; will convert to int where possible
+
+        # 2) Prepare / normalize max_damage table
+        max_damage_data = self.max_damage.data.copy()
+
+        # Normalize index (road types)
+        max_damage_data.index = [self._normalize_asset_key(idx) for idx in max_damage_data.index]
+
+        # Normalize/ensure lane columns are ints (if columns are numbers as strings)
+        max_damage_data.columns = max_damage_data.columns.astype(int)
+
+        # 3) Flatten to a Series indexed by (road_type, lanes)
         max_damage_series = (
             max_damage_data
-            .stack()  # turns wide columns into rows
+            .stack()
             .rename("max_damage")
         )
-        # Now the index is ('Road_type \ lanes', lanes)
+        max_damage_series.index.set_names(["road_type", "lanes"], inplace=True)
 
-        # Map into df
-        df[f"{prefix}_temp_max_dam"] = df.set_index(["infra_type", "lanes"]).index.map(max_damage_series)
+        # 4) Build a MultiIndex from df to map values
+        mi = pd.MultiIndex.from_arrays([out["_road_type_norm"], out["_lanes_int"]], names=["road_type", "lanes"])
+        out[f"{prefix}_temp_max_dam"] = mi.map(max_damage_series)
 
-        return df
+        # Cleanup
+        out.drop(columns=["_road_type_norm", "_lanes_int"], inplace=True)
+
+        return out
 
     def calculate_damage(
         self,
