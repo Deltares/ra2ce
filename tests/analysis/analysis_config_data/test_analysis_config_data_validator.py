@@ -1,11 +1,12 @@
 import shutil
 from os import name
-from typing import Callable, Iterator
+from typing import Any, Callable, Iterator
 
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
     ProjectSection,
@@ -16,6 +17,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -154,3 +156,61 @@ class TestAnalysisConfigDataValidator:
 
         # 3. Verify final expectations
         assert _report.is_valid()
+
+    @pytest.mark.parametrize(
+        "analysis_enum",
+        [
+            pytest.param(_option, id=str(_option.name))
+            for _option in 
+            filter(lambda x: x.name.lower() != "invalid", [ale for ale in AnalysisLossesEnum if ale != AnalysisLossesEnum.MULTI_LINK_LOSSES]
+            + [ade for ade in AnalysisDamagesEnum]
+            + [ae for ae in AnalysisEnum])
+        ],
+    )
+    def test_validate_given_shp_network_without_id_when_any_valid_analysis_given_then_succeeds(
+        self, analysis_enum: Any
+    ):
+        # 1. Define test data
+        _test_config_data = AnalysisConfigData(
+            root_path=test_results,
+            output_path=test_results.joinpath("output"),
+            network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=None),
+            project=ProjectSection(),
+            analyses=[
+                AnalysisSectionBase(name="Test Analysis", analysis=analysis_enum)
+            ],
+        )
+
+        # 2. Run test
+        _report = self._validate_config(_test_config_data)
+
+        # 3. Verify final expectations.
+        assert _report.is_valid()
+
+    @pytest.mark.parametrize("analysis_enum",
+                             [
+                                 pytest.param(AnalysisLossesEnum.INVALID, id="Losses - Invalid"),
+                                 pytest.param(AnalysisDamagesEnum.INVALID, id="Damages - Invalid"),
+                                 pytest.param(AnalysisEnum.INVALID, id="General - Invalid"),
+                             ])
+    def test_validate_given_shp_network_without_id_when_invalid_analysis_given_then_fails(
+        self, analysis_enum: Any
+    ):
+        # 1. Define test data
+        _test_config_data = AnalysisConfigData(
+            root_path=test_results,
+            output_path=test_results.joinpath("output"),
+            network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=None),
+            project=ProjectSection(),
+            analyses=[
+                AnalysisSectionBase(name="Test Analysis", analysis=analysis_enum)
+            ],
+        )
+
+        # 2. Run test
+        _report = self._validate_config(_test_config_data)
+
+        # 3. Verify final expectations.
+        assert not _report.is_valid()
+        # The errors are not actually related to our network compatibility issue.
+        assert not any(_re for _re in _report._errors if _re.startswith("Not possible to create analysis 'Test Analysis'"))
