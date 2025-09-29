@@ -21,13 +21,11 @@
 
 import copy
 import logging
-import warnings
 from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
 import osmnx
-import pandas as pd
 import pyproj
 
 from ra2ce.network import networks_utils as nut
