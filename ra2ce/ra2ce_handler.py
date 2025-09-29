@@ -97,7 +97,7 @@ class Ra2ceHandler:
                 return None
             _network_config = NetworkConfigWrapper()
             _network_config.config_data = network
-            if network.output_graph_dir:
+            if network.network.use_existing_network and network.output_graph_dir:
                 if network.output_graph_dir.is_dir():
                     _network_config.graph_files = (
                         _network_config.read_graphs_from_config(
@@ -105,6 +105,7 @@ class Ra2ceHandler:
                         )
                     )
                 else:
+                    network.output_graph_dir.unlink(missing_ok=True)
                     network.output_graph_dir.mkdir(parents=True)
             return _network_config
 
