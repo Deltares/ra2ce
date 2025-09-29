@@ -44,7 +44,7 @@ _BRIDGE_MAP = {
     "viaduct": "viaduct",
     "aqueduct": "aqueduct",
     "boardwalk": "boardwalk",
-    "movable": "movable_bridge",
+    "movable_bridge": "movable_bridge",
     "trestle": "trestle",
     "cantilever": "cantilever",
     "low_water_crossing": "low_water_crossing",
@@ -79,6 +79,7 @@ _ASSET_ALIASES: dict[str, str] = {
     "movable-bridge": "movable_bridge",
     "movable bridge": "movable_bridge",
     "movable": "movable_bridge",  # common shorthand for the OSM bridge subtype
+    "movables": "movable_bridge",
 }
 
 
@@ -296,8 +297,8 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         tunnel_norm = tunnel.map(_TUNNEL_MAP)  # -> e.g., "culvert", "tunnel", ...
 
         # Only apply where the normalized label is recognized AND exists in the loaded damage functions
-        m_bridge = bridge.isin(bridge_keys) & bridge_norm.isin(self.allowed_asset_types)
-        m_tunnel = tunnel.isin(tunnel_keys) & tunnel_norm.isin(self.allowed_asset_types)
+        m_bridge = bridge.isin(bridge_keys)
+        m_tunnel = tunnel.isin(tunnel_keys)
 
         out = df["highway"].astype("string").copy()
 
