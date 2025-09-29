@@ -132,9 +132,17 @@ class DamageNetworkBase(ABC):
 
             # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
             lane_nans_mask = self.gdf.lanes.isnull()
-            self.gdf.loc[lane_nans_mask, "lanes"] = self.gdf.loc[
-                lane_nans_mask, "road_type"
-            ].replace(lane_stats)
+
+            self.gdf["lanes"] = pd.to_numeric(self.gdf["lanes"], errors="coerce").astype("Int64")
+
+            fill_vals = (
+                self.gdf.loc[lane_nans_mask, "road_type"]
+                .astype("string").str.strip().str.casefold()
+                .map(lane_stats)
+                .astype("Int64")  # nullable ints, keeps <NA> for unknown road_type
+            )
+            self.gdf.loc[lane_nans_mask, "lanes"] = fill_vals
+
             logging.warning(
                 "Interpolated the missing lane data as follows: {}".format(lane_stats)
             )

@@ -110,22 +110,6 @@ class DamageFunctionByRoadTypeByLane:
 
         max_damage_data = self.max_damage.data
 
-        # Validate index asset types
-        norm_allowed = {a.strip().casefold() for a in self.allowed_asset_types}
-        index_values = max_damage_data.index
-        invalid = sorted({
-            str(idx).strip().casefold()
-            for idx in index_values
-            if str(idx).strip().casefold() not in norm_allowed
-        })
-        if invalid:
-            warnings.warn(
-                "Unsupported asset type(s) in max_damage_data index: "
-                f"{', '.join(invalid)}. Allowed: {', '.join(sorted(norm_allowed))}",
-                category=UserWarning,
-                stacklevel=2,  # points the warning at the caller's line in the stack
-            )
-
         # Flatten max_damage_data into a Series with MultiIndex (infra_type, lanes)
         max_damage_series = (
             max_damage_data
