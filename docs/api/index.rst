@@ -1,5 +1,5 @@
-API Reference
-=============
+Docstrings Reference
+====================
 
 .. toctree::
    :maxdepth: 2
