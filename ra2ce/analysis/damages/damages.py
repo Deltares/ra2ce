@@ -62,31 +62,23 @@ _CANONICAL_ASSET_TYPES: set[str] = set(_BRIDGE_MAP.values()) | set(_TUNNEL_MAP.v
 
 # Alias/synonym table (keys are normalized: casefolded, spaces/hyphens -> underscores)
 _ASSET_ALIASES: dict[str, str] = {
-    # plurals / basic forms
-    "bridges": "bridge",
-    "viaducts": "viaduct",
-    "aqueducts": "aqueduct",
-    "boardwalks": "boardwalk",
-    "movable": "movable_bridge",           # if user writes "movable" as asset
-    "movable_bridge": "movable_bridge",
-    "movable_bridges": "movable_bridge",
-    "trestles": "trestle",
-    "cantilevers": "cantilever",
-    "low_water_crossing": "low_water_crossing",
-    "low_water_crossings": "low_water_crossing",
-    "tunnels": "tunnel",
-    "culverts": "culvert",
-    "building_passage": "building_passage",
-    "building_passages": "building_passage",
-    "avalanche_protectors": "avalanche_protector",
-    "flooded_tunnels": "flooded",
-
-    # allow space/hyphen variants (normalized below to underscores)
+    # spelling/spacing/hyphen variants
+    "low_water_crossing": "low_water_crossing",   # self-map to be explicit
+    "low-water-crossing": "low_water_crossing",   # will be normalized anyway
     "low water crossing": "low_water_crossing",
-    "low-water-crossing": "low_water_crossing",
+
+    "building_passage": "building_passage",
+    "building-passage": "building_passage",
     "building passage": "building_passage",
+
+    "avalanche_protector": "avalanche_protector",
+    "avalanche-protector": "avalanche_protector",
     "avalanche protector": "avalanche_protector",
+
+    "movable_bridge": "movable_bridge",
+    "movable-bridge": "movable_bridge",
     "movable bridge": "movable_bridge",
+    "movable": "movable_bridge",  # common shorthand for the OSM bridge subtype
 }
 
 
@@ -109,9 +101,8 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         base_graph_hazard: MultiGraph,
         hazard_prefix: str = "F",
     ) -> None:
+        self.allowed_asset_types: set[str] = set(_CANONICAL_ASSET_TYPES)
 
-        # Canonical set OSM supports
-        self.allowed_asset_types: set[str] = {"bridge", "viaduct", "tunnel"}
         self.analysis = analysis_input.analysis
         self.graph_file = None
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -125,6 +116,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         if self.analysis.damage_curve == DamageCurveEnum.MAN:
             self.manual_damage_functions = self._load_manual_damage_functions()
 
+        # Asset-based processing that may rely on allowed_asset_types
         if self.analysis.analysis == AnalysisDamagesEnum.DAMAGES_WITH_ASSETS:
             self._validate_for_damages_with_asset()
             self._rename_highway_by_assets()
@@ -167,30 +159,29 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
     def _to_canonical_asset(
             key: Any,
             *,
-            aliases=None,
+            aliases: Optional[dict[str, str]] = None,
     ) -> tuple[Optional[str], str]:
         """
         Normalize an asset key:
           - trim whitespace
-          - case-insensitive (Unicode-aware)
+          - case-insensitive
           - spaces/hyphens -> underscores
-          - map aliases to canonical_asset
-          - handle simple plurals
-          - validate against canonical_set (if given)
+          - map aliases to canonical_asset (spelling/format variants only)
+          - handle simple plurals (sole place for plural handling)
         Returns (canonical_asset | None, original_str).
         """
         if aliases is None:
             aliases = _ASSET_ALIASES
-        original = str(key)
 
+        original = str(key)
         # normalize: strip, casefold, spaces/hyphens -> underscores, collapse repeats
         s = re.sub(r"[\s\-]+", "_", original.strip()).casefold().strip("_")
 
-        # alias mapping
-        if aliases and s in aliases:
+        # 1) form-variant alias mapping (no plurals inside aliases)
+        if s in aliases:
             canonical = aliases[s]
         else:
-            # conservative plural -> singular rules
+            # 2) conservative plural -> singular rules (the only place doing plural correction)
             if s.endswith("ies") and len(s) > 3:
                 singular = s[:-3] + "y"  # policies -> policy
             elif s.endswith(("sses", "shes", "ches", "xes", "zes")) and len(s) > 4:
@@ -246,56 +237,78 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
                 f"(got {damage_curve.name})."
             )
 
+    def _assets_from_damage_functions(self) -> set[str]:
+        """
+        Collect canonical asset keys we have manual damage functions for.
+        Applies alias + plural normalization, then keeps only assets
+        we can emit via _BRIDGE_MAP/_TUNNEL_MAP (i.e., _CANONICAL_ASSET_TYPES).
+        """
+        if self.manual_damage_functions is None:
+            return set()
+
+        assets = set(self.manual_damage_functions.keys())
+
+        canon: set[str] = set()
+        for asset in assets:
+            c, _orig = self._to_canonical_asset(asset, aliases=_ASSET_ALIASES)
+            if c is not None and c in _CANONICAL_ASSET_TYPES:
+                canon.add(c)
+
+        return canon
+
     def _rename_highway_by_assets(self) -> None:
         """
-        Set/normalize 'infra_type' based on OSM asset flags:
-          - bridge=* : yes, viaduct, aqueduct, boardwalk, movable, trestle, cantilever, low_water_crossing
-          - tunnel=* : yes, culvert, building_passage, avalanche_protector, flooded
+        Convert 'highway' to asset labels (bridge/tunnel variants) ONLY if:
+          - bridge/tunnel columns contain a recognized value in _BRIDGE_MAP/_TUNNEL_MAP, and
+          - that canonical asset is present among the loaded manual damage functions.
+
         Precedence: bridge types > tunnel types.
-        Only override when a recognized value is present; otherwise keep existing road type.
+        Otherwise, keep the existing 'highway' road class.
         """
         df = self.road_gdf
 
         def _norm(col: str) -> pd.Series:
             """
             Normalize a column without turning NaN into 'nan':
-              - keep as pandas StringDtype (preserves <NA>)
-              - strip/ casefold
-              - replace spaces with underscores
+              - keep pandas StringDtype (<NA>)
+              - strip + casefold
+              - spaces -> underscores
             """
             if col not in df.columns:
                 return pd.Series(pd.array([pd.NA] * len(df), dtype="string"), index=df.index)
-            s = df[col].astype("string")  # preserves <NA>
+            s = df[col].astype("string")
             s = s.str.strip().str.casefold()
             s = s.str.replace(r"\s+", "_", regex=True)
             return s
 
+        if not self.allowed_asset_types:
+            return
+
         bridge = _norm("bridge")
         tunnel = _norm("tunnel")
 
-        # Recognized values only (no generic fallback for unknown non-empty strings)
+        # Recognized inputs only (do not fall back to generic labels if unrecognized)
         bridge_keys = set(_BRIDGE_MAP.keys())
         tunnel_keys = set(_TUNNEL_MAP.keys())
 
-        bridge_match = bridge.isin(bridge_keys)
-        tunnel_match = tunnel.isin(tunnel_keys)
+        # Map to canonical asset labels
+        bridge_norm = bridge.map(_BRIDGE_MAP)  # -> e.g., "viaduct", "bridge", ...
+        tunnel_norm = tunnel.map(_TUNNEL_MAP)  # -> e.g., "culvert", "tunnel", ...
 
-        bridge_norm = bridge.map(_BRIDGE_MAP)  # recognized -> mapped; others -> <NA>
-        tunnel_norm = tunnel.map(_TUNNEL_MAP)
+        # Only apply where the normalized label is recognized AND exists in the loaded damage functions
+        m_bridge = bridge.isin(bridge_keys) & bridge_norm.isin(self.allowed_asset_types)
+        m_tunnel = tunnel.isin(tunnel_keys) & tunnel_norm.isin(self.allowed_asset_types)
 
-        # Start infra_type from existing value if present; otherwise from current highway
-        infra = df.get("highway", pd.Series("", index=df.index)).copy()
+        out = df["highway"].astype("string").copy()
 
-        # 1) Apply bridge-types
-        m_bridge = bridge_match & bridge_norm.notna()
-        infra.loc[m_bridge] = bridge_norm[m_bridge]
+        # 1) bridge-types first
+        out.loc[m_bridge] = bridge_norm[m_bridge]
 
-        # 2) Apply tunnel-types only where not assigned by bridge
-        m_tunnel = (~m_bridge) & tunnel_match & tunnel_norm.notna()
-        infra.loc[m_tunnel] = tunnel_norm[m_tunnel]
+        # 2) tunnel-types where bridge hasn't already set it
+        m_tunnel_only = (~m_bridge) & m_tunnel
+        out.loc[m_tunnel_only] = tunnel_norm[m_tunnel_only]
 
-        # Write back: keep 'highway' as the road class; store assets in 'infra_type'
-        df["highway"] = infra
+        df["highway"] = out
         self.road_gdf = df
 
     def execute(self) -> AnalysisResultWrapper:
