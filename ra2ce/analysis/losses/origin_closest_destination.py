@@ -64,7 +64,6 @@ class OriginClosestDestination:
         self.origins_destinations = analysis_input.origins_destinations
         self.o_name = self.origins_destinations.origins_names
         self.d_name = self.origins_destinations.destinations_names
-        self.od_id = self.origins_destinations.id_name_origin_destination
         self.origin_out_fraction = self.origins_destinations.origin_out_fraction
         self.origin_count: Optional[str] = self.origins_destinations.origin_count
         self.od_key = "od_id"
@@ -136,9 +135,7 @@ class OriginClosestDestination:
             cnt_per_destination["destination"],
             cnt_per_destination["origin_cnt"],
         ):
-            destinations.loc[
-                destinations[self.od_id] == int(dest.split("_")[-1]), "origin_cnt"
-            ] = origin_cnt
+            destinations.loc[destinations["d_id"] == dest, "origin_cnt"] = origin_cnt
 
         return base_graph, optimal_routes_gdf, destinations
 
@@ -239,48 +236,6 @@ class OriginClosestDestination:
                     hazard_name,
                     hazard_name,
                 )
-
-            ## THE BELOW IS NOT USED AT THE MOMENT - COULD BE IMPLEMENTED AS OPTION AT A LATER STAGE ##
-            # # Now calculate for the routes that were going to a flooded destination, another non-flooded destination
-            # # There can be nodes that are both origins and destinations. The flooded destinations are removed from
-            # # the graph.
-            # list_dests_flooded_destination_only = [dest[-1][0] for dest in list_disrupted_dest if
-            #                                        not self.o_name in dest[-1][-1]]
-            # list_dests_flooded_destination_and_origin = [dest[-1][0] for dest in list_disrupted_dest if
-            #     self.o_name in dest[-1][-1] and self.d_name in dest[-1][-1]]
-            # list_origins_without_routes = [dest[0][0] for dest in list_disrupted_dest]
-            # list_origins_with_routes = [n for n in h.nodes() if n not in list_origins_without_routes]
-            #
-            # disr_by_flood = len(list_dests_flooded_destination_only + list_dests_flooded_destination_and_origin)
-            #
-            # if disr_by_flood > 0:
-            #     # Remove the flooded destination nodes
-            #     h.remove_nodes_from(list_dests_flooded_destination_only)
-            #
-            #     for node in list_dests_flooded_destination_and_origin:
-            #         # Delete the destination name from the "od_id" attribute of the nodes of which the destination is
-            #         # flooded.
-            #         od_id = h.nodes[node]["od_id"]
-            #         h.nodes[node]["od_id"] = ",".join([od for od in od_id.split(",") if self.d_name not in od])
-            #
-            #     # Remove the origin nodes that already have a destination
-            #     h.remove_nodes_from(list_origins_with_routes)
-            #
-            #     # Search for the next closest location
-            #     base_graph, origins, destinations, list_disrupted_dest, results_dict_update = self.find_closest_location(h,
-            #                                                                                                        base_graph,
-            #                                                                                                        origins,
-            #                                                                                                        destinations,
-            #                                                                                                        hazard_name,
-            #                                                                                                        self.d_name)
-            #
-            #     self.results_dict['Nr. no access'] = [
-            #         self.results_dict['Nr. no access'][0] + self.results_dict_update['Nr. no access'][0]]
-            #
-            # self.results_dict.update({
-            #     "Flooded destination": [disr_by_flood]
-            # })
-            ## THE ABOVE IS NOT USED AT THE MOMENT - COULD BE IMPLEMENTED AS OPTION AT A LATER STAGE ##
 
             aggregated.append(pd.DataFrame(self.results_dict))
 
@@ -407,13 +362,13 @@ class OriginClosestDestination:
         # Find the number of people per neighborhood
         try:
             nr_people_per_route_total = origins.loc[
-                origins[self.od_id] == int(origin_node.split("_")[-1]),
+                origins["o_id"] == origin_node,
                 self.origin_count,
             ].iloc[0]
         except IndexError:
             origin_node = [a for a in origin_node.split(",") if self.o_name in a][0]
             nr_people_per_route_total = origins.loc[
-                origins[self.od_id] == int(origin_node.split("_")[-1]),
+                origins["o_id"] == origin_node,
                 self.origin_count,
             ].iloc[0]
         nr_per_route = nr_people_per_route_total * self.origin_out_fraction
@@ -434,8 +389,8 @@ class OriginClosestDestination:
         ]
 
         # Add the number of people to the total number of people that go to that destination
-        destinations.loc[destinations[self.od_id].isin(dest_ids), col_name] = (
-            destinations.loc[destinations[self.od_id].isin(dest_ids), col_name].sum()
+        destinations.loc[destinations["d_id"].isin(dest_ids), col_name] = (
+            destinations.loc[destinations["d_id"].isin(dest_ids), col_name].sum()
             + nr_per_route
         )
         return destinations
@@ -449,7 +404,7 @@ class OriginClosestDestination:
                 od_id_list = oth[-1].split(",")
                 for od_id in od_id_list:
                     origins.loc[
-                        origins[self.od_id] == int(od_id.split("_")[-1]),
+                        origins["o_id"] == od_id,
                         col_name,
                     ] = "no access"
         return origins
@@ -484,7 +439,7 @@ class OriginClosestDestination:
                 round(
                     (
                         origins.loc[
-                            origins[self.od_id].isin(origins_no_access),
+                            origins["o_id"].isin(origins_no_access),
                             self.origin_count,
                         ]
                         * self.origin_out_fraction
