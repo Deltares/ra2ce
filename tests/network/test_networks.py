@@ -25,8 +25,6 @@ class TestNetworks:
         # 1. Define test data.
         _test_dir = test_results / "test_networks" / request.node.name
         _config_data = NetworkConfigData(
-            input_path=None,
-            output_path=_test_dir.joinpath("output"),
             static_path=_test_dir.joinpath("static"),
         )
         _files = {}

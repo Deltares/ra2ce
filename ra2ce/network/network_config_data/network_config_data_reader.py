@@ -38,9 +38,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
 
         _config_data = NetworkConfigData(
             root_path=_parent_dir.parent,
-            input_path=_parent_dir.joinpath("input"),
             static_path=_parent_dir.joinpath("static"),
-            output_path=_parent_dir.joinpath("output"),
             **self._get_sections(),
         )
         self._correct_paths(_config_data)
