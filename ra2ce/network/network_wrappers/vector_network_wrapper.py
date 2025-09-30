@@ -59,7 +59,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.crs = config_data.crs
 
         # Network options
-        self.primary_files = config_data.network.primary_file
+        self.primary_files = config_data.network.primary_files
         self.directed = config_data.network.directed
 
         # Origins Destinations

@@ -40,7 +40,7 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
                 Instead, the beta version of package TRAILS is used. 
                 First stable release of TRAILS is expected in 2023."""
         )
-        self.primary_files = config_data.network.primary_file
+        self.primary_files = config_data.network.primary_files
         self.segmentation_length = config_data.cleanup.segmentation_length
         self.crs = config_data.crs
 

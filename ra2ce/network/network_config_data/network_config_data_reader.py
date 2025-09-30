@@ -93,8 +93,8 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 config_data.network.polygon
             )
 
-        config_data.network.primary_file = _correct_list(
-            _network_directory, config_data.network.primary_file
+        config_data.network.primary_files = _correct_list(
+            _network_directory, config_data.network.primary_files
         )
         config_data.network.diversion_file = _correct_list(
             _network_directory, config_data.network.diversion_file
@@ -147,8 +147,8 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.source = SourceEnum.get_enum(
             self._parser.get(_section, "source", fallback=None)
         )
-        _network_section.primary_file = self._get_path_list(
-            _section, "primary_file", _network_section.primary_file
+        _network_section.primary_files = self._get_path_list(
+            _section, "primary_file", _network_section.primary_files
         )
         _network_section.diversion_file = self._get_path_list(
             _section, "diversion_file", _network_section.diversion_file

@@ -43,7 +43,7 @@ class ProjectSection:
 class NetworkSection:
     directed: bool = False
     source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
-    primary_file: list[Path] = field(default_factory=list)
+    primary_files: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     link_type_column: str = "highway"

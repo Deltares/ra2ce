@@ -47,7 +47,7 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         self.crs = config_data.crs
 
         # Network options
-        self.primary_files = _network_options.primary_file
+        self.primary_files = _network_options.primary_files
         self.diversion_files = _network_options.diversion_file
         self.directed = _network_options.directed
         self.file_id = _network_options.file_id
