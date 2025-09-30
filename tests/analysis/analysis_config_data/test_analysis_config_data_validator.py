@@ -55,11 +55,13 @@ class TestAnalysisConfigDataValidator:
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
-            analyses=[AnalysisSectionDamages(
-                analysis=AnalysisDamagesEnum.DAMAGES,
-                event_type=EventTypeEnum.EVENT,
-                damage_curve=DamageCurveEnum.HZ,
-            )],
+            analyses=[
+                AnalysisSectionDamages(
+                    analysis=AnalysisDamagesEnum.DAMAGES,
+                    event_type=EventTypeEnum.EVENT,
+                    damage_curve=DamageCurveEnum.HZ,
+                )
+            ],
             output_path=_output_dir,
         )
         _report = self._validate_config(_test_config_data)
@@ -160,8 +162,11 @@ class TestAnalysisConfigDataValidator:
         "analysis_enum",
         [
             pytest.param(_option, id=str(_option.name))
-            for _option in 
-            [ale for ale in AnalysisLossesEnum.list_valid_options() if ale != AnalysisLossesEnum.MULTI_LINK_LOSSES]
+            for _option in [
+                ale
+                for ale in AnalysisLossesEnum.list_valid_options()
+                if ale != AnalysisLossesEnum.MULTI_LINK_LOSSES
+            ]
             + [ade for ade in AnalysisDamagesEnum.list_valid_options()]
             + [ae for ae in AnalysisEnum.list_valid_options()]
         ],
@@ -186,12 +191,14 @@ class TestAnalysisConfigDataValidator:
         # 3. Verify final expectations.
         assert _report.is_valid()
 
-    @pytest.mark.parametrize("analysis_enum",
-                             [
-                                 pytest.param(AnalysisLossesEnum.INVALID, id="Losses - Invalid"),
-                                 pytest.param(AnalysisDamagesEnum.INVALID, id="Damages - Invalid"),
-                                 pytest.param(AnalysisEnum.INVALID, id="General - Invalid"),
-                             ])
+    @pytest.mark.parametrize(
+        "analysis_enum",
+        [
+            pytest.param(AnalysisLossesEnum.INVALID, id="Losses - Invalid"),
+            pytest.param(AnalysisDamagesEnum.INVALID, id="Damages - Invalid"),
+            pytest.param(AnalysisEnum.INVALID, id="General - Invalid"),
+        ],
+    )
     def test_validate_given_shp_network_without_id_when_invalid_analysis_given_then_fails(
         self, analysis_enum: Any
     ):
@@ -212,4 +219,8 @@ class TestAnalysisConfigDataValidator:
         # 3. Verify final expectations.
         assert not _report.is_valid()
         # The errors are not actually related to our network compatibility issue.
-        assert not any(_re for _re in _report._errors if _re.startswith("Not possible to create analysis 'Test Analysis'"))
+        assert not any(
+            _re
+            for _re in _report._errors
+            if _re.startswith("Not possible to create analysis 'Test Analysis'")
+        )

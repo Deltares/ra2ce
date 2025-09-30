@@ -76,7 +76,9 @@ class AnalysisSectionBase:
     name: str = ""
     save_gpkg: bool = False
     save_csv: bool = False
-    analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum = field(default_factory=lambda: AnalysisEnum.INVALID)
+    analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum = field(
+        default_factory=lambda: AnalysisEnum.INVALID
+    )
 
 
 @dataclass
