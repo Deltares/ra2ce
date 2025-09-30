@@ -61,7 +61,7 @@ class OriginsDestinationsSection:
     origins_names: str = ""
     destinations_names: str = ""
     id_name_origin_destination: str = ""
-    origin_count: str = ""
+    origin_count: Optional[str] = None
     origin_out_fraction: int = (
         1  # fraction of things/people going out of the origin to the destination
     )
