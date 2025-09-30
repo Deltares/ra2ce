@@ -161,7 +161,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         )
         _network_section.reuse_network = self._parser.getboolean(
             _section,
-            "use_existing_network",
+            "reuse_network",
             fallback=_network_section.reuse_network,
         )
         _network_section.network_type = NetworkTypeEnum.get_enum(

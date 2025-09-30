@@ -202,15 +202,16 @@ class TestRa2ceHandler:
             "static", "output_graph", "base_graph.p"
         )
         assert _graph_file.is_file()
-        _dtcreated = _graph_file.stat().st_ctime
+        _ts_initial = _graph_file.stat().st_ctime
 
         # 2. Run test.
-        _ = Ra2ceHandler.from_config(_network_config, _analysis_config)
+        _handler = Ra2ceHandler.from_config(_network_config, _analysis_config)
+        _handler.configure()
 
         # 3. Verify expectations.
-        _dtupdated = _graph_file.stat().st_ctime
+        _st_updated = _graph_file.stat().st_ctime
         assert (
-            _dtcreated == pytest.approx(_dtupdated, abs=1e-9)
+            _ts_initial == pytest.approx(_st_updated, abs=1e-9)
         ) == reuse_existing_network
 
     def test_initialize_without_analysis_raises(self, request: pytest.FixtureRequest):
