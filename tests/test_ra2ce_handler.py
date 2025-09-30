@@ -1,6 +1,4 @@
-import configparser
 import shutil
-from configparser import ConfigParser
 from pathlib import Path
 from typing import Iterator
 
