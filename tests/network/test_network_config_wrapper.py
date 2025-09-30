@@ -1,16 +1,94 @@
 import shutil
 from pathlib import Path
+from turtle import st
 
 import pytest
 
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
-from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
-from tests import test_results
+from tests import test_data, test_results
 
 
 class TestNetworkConfigWrapper:
+    @pytest.fixture(name="test_case_dir")
+    def _get_test_case_dir(self, request: pytest.FixtureRequest) -> Path:
+        _test_case_dir = test_results.joinpath(request.node.originalname)
+        if request.node.originalname != request.node.name:
+            _test_case_dir = _test_case_dir.joinpath(
+                request.node.name.split("[")[-1].split("]")[0].lower().replace(" ", "_")
+            )
+        return _test_case_dir
+
+    def test_from_data_without_output_graph_does_not_raise(self):
+        # 1. Define test data
+        _network_config = NetworkConfigData(
+            root_path=Path("dummy_path"),
+            static_path=None,
+        )
+
+        # 2. Run test
+        _ = NetworkConfigWrapper.from_data(None, _network_config)
+
+    def test_from_data_with_output_graph_creates_dir(self, test_case_dir: Path):
+        # 1. Define test data
+        _network_config = NetworkConfigData(
+            root_path=Path("dummy_path"),
+            static_path=test_case_dir.joinpath("static"),
+        )
+        _output_graph_dir = _network_config.output_graph_dir
+        assert _output_graph_dir
+        if _output_graph_dir.exists():
+            shutil.rmtree(_output_graph_dir)
+
+        # 2. Run test
+        _ = NetworkConfigWrapper.from_data(None, _network_config)
+
+        # 3. Verify expectations.
+        assert _output_graph_dir.exists()
+
+    @pytest.mark.parametrize(
+        "reuse_existing_network",
+        [
+            pytest.param(True, id="Reuse existing network"),
+            pytest.param(False, id="Do not reuse existing network"),
+        ],
+    )
+    def test_from_data_wipes_output_graph_based_on_reuse(
+        self,
+        test_case_dir: Path,
+        reuse_existing_network: bool,
+    ):
+        # 1. Define test data
+        _reference_dir = test_data.joinpath("simple_inputs")
+        assert _reference_dir.exists()
+
+        if test_case_dir.exists():
+            shutil.rmtree(test_case_dir)
+        test_case_dir.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(_reference_dir, test_case_dir)
+
+        _network_config = NetworkConfigData(
+            root_path=Path("dummy_path"),
+            static_path=test_case_dir.joinpath("static"),
+            network=NetworkSection(
+                reuse_network=reuse_existing_network,
+            ),
+        )
+
+        _graph_file = (_network_config.output_graph_dir).joinpath("base_graph.p")
+        assert _graph_file.is_file()
+
+        # 2. Run test
+        _ = NetworkConfigWrapper.from_data(None, _network_config)
+
+        # 3. Verify expectations.
+        assert _graph_file.is_file() == reuse_existing_network
+
     def test_read_graphs_from_config_without_output_dir_raises(
         self, request: pytest.FixtureRequest
     ):
