@@ -155,7 +155,7 @@ class TestRa2ceHandler:
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
-       def test_initialize_without_analysis_raises(self, request: pytest.FixtureRequest):
+    def test_initialize_without_analysis_raises(self, request: pytest.FixtureRequest):
         # 1. Define test data.
         _test_dir = test_results.joinpath(request.node.name)
         _analysis_dir = _test_dir.joinpath("analysis_folder")
