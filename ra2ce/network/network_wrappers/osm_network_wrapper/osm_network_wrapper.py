@@ -24,6 +24,7 @@ from typing import Any
 import networkx as nx
 import osmnx
 import pyproj
+import geopandas as gpd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
@@ -74,7 +75,8 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @classmethod
     def with_polygon(
-        cls, config_data: NetworkConfigData, polygon: BaseGeometry
+        cls, config_data: NetworkConfigData, polygon: BaseGeometry,
+        crs: Any | None = None,
     ) -> OsmNetworkWrapper:
         """
         Gets an `OsmNetworkWrapper` with the given `polygon` transformed into a
@@ -89,6 +91,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         _wrapper = cls(config_data)
         _clean_graph = _wrapper._download_clean_graph_from_osm(
             polygon=polygon,
+            crs=crs,
             network_type=_wrapper.network_type,
             road_types=_wrapper.road_types,
         )
@@ -97,11 +100,16 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def get_network_from_polygon(
-        config_data: NetworkConfigData, polygon: BaseGeometry
+        config_data: NetworkConfigData, #polygon: BaseGeometry,
+        #crs: Any | None = None,
+        polygon_or_gdf: Any,
     ) -> tuple[MultiGraph, GeoDataFrame]:
         """
         Gets a valid network (`MultiGraph` and `GeoDataFrame`) for the given network configuration and
         boundary box (represented by a `shapely.BaseGeometry`).
+
+        Accepts either a Shapely geometry or a GeoDataFrame with a single polygon.
+        If a GeoDataFrame is provided, the CRS is taken from it.
 
         Args:
             config_data (NetworkConfigData): Network data configuration required for OSM download.
@@ -110,7 +118,16 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             tuple[MultiGraph, GeoDataFrame]: Resulting network representations.
         """
-        _network_wrapper = OsmNetworkWrapper.with_polygon(config_data, polygon)
+
+        crs = None
+        polygon = polygon_or_gdf
+        if isinstance(polygon_or_gdf, GeoDataFrame):
+            if polygon_or_gdf.empty:
+                raise ValueError("Empty GeoDataFrame provided for polygon.")
+            crs = polygon_or_gdf.crs
+            polygon = polygon_or_gdf.geometry.iloc[0]
+
+        _network_wrapper = OsmNetworkWrapper.with_polygon(config_data, polygon, crs)
         return _network_wrapper.get_network()
 
     @staticmethod
@@ -225,7 +242,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         polygon: BaseGeometry,
         road_types: list[RoadTypeEnum],
         network_type: NetworkTypeEnum,
+        crs: Any | None = None,
     ) -> MultiDiGraph:
+        polygon = self.ensure_polygon_in_epsg4326(polygon, crs)
         _available_road_types = road_types and any(road_types)
         _road_types_as_str = (
             list(map(lambda x: x.config_value, road_types))
@@ -416,3 +435,21 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         ):
             modify_graph(graph=graph, node_nearest_edge_data=node_nearest_edge_data)
         return graph
+    
+    @staticmethod
+    def ensure_polygon_in_epsg4326(polygon: BaseGeometry, crs=None) -> BaseGeometry:
+        """
+        Ensures the polygon is in EPSG:4326. If not, reprojects. If CRS is missing, raises an error.
+        """
+        if crs is None:
+            logging.error("Polygon geometry has no CRS. Please provide a polygon with a valid CRS.")
+            raise ValueError("Polygon geometry has no CRS. Please provide a polygon with a valid CRS.")
+
+        crs_str = getattr(crs, "to_string", lambda: str(crs))().lower()
+        if crs_str in ["epsg:4326", "wgs84", "wgs 84"]:
+            return polygon
+
+        logging.info(f"Reprojecting polygon from {crs} to EPSG:4326.")
+        gdf = gpd.GeoDataFrame(geometry=[polygon], crs=crs)
+        gdf = gdf.to_crs("EPSG:4326")
+        return gdf.geometry.iloc[0]

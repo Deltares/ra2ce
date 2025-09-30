@@ -389,11 +389,13 @@ class HazardOverlay:
 
             # Do the actual hazard intersect
             _base_graph_hazard_reprojected = self.hazard_intersect(_graph_reprojected)
+            #I want to keep the reprojected geometries for the base network
+            return _base_graph_hazard_reprojected  # do not restore original geoms
 
             # Assign the original geometries to the reprojected raster
-            return self.get_original_geoms_graph(
-                base_graph, _base_graph_hazard_reprojected
-            )
+            #return self.get_original_geoms_graph(
+            #    base_graph, _base_graph_hazard_reprojected
+            #)
 
         return self.hazard_intersect(base_graph)
 
@@ -435,9 +437,12 @@ class HazardOverlay:
             ) = self.od_hazard_intersect(_graph_reprojected, _ods_reprojected)
 
             # Assign the original geometries to the reprojected dataset
-            _graph_hazard = self.get_original_geoms_graph(
-                origins_destinations_graph, _od_graph_hazard_reprojected
-            )
+            #_graph_hazard = self.get_original_geoms_graph(
+            #    origins_destinations_graph, _od_graph_hazard_reprojected
+            #)
+
+            # Keep geometries in hazard CRS
+            _graph_hazard = _od_graph_hazard_reprojected
             _ods = _ods_hazard_reprojected.to_crs(_ods.crs)
         else:
             (
@@ -473,12 +478,16 @@ class HazardOverlay:
             logging.info("Gdf extent after reprojecting: %s", _extent_gdf_reprojected)
 
             # Do the actual hazard intersect
-            _gdf_reprojected = self.hazard_intersect(_gdf_reprojected)
+            #_gdf_reprojected = self.hazard_intersect(_gdf_reprojected)
 
             # Assign the original geometries to the reprojected raster
-            _original_geometries = base_network["geometry"]
-            _gdf_reprojected["geometry"] = _original_geometries
-            return _gdf_reprojected.copy()
+            #_original_geometries = base_network["geometry"]
+            #_gdf_reprojected["geometry"] = _original_geometries
+            #return _gdf_reprojected.copy()
+        
+            # Do the actual hazard intersect and KEEP hazard CRS
+            _gdf_hazard = self.hazard_intersect(_gdf_reprojected)
+            return _gdf_hazard  # do not restore original geoms
 
         # read previously created file
         logging.info("Setting 'base_network_hazard' graph.")
