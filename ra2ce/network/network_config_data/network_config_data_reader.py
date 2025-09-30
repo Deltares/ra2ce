@@ -93,8 +93,10 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 config_data.network.polygon
             )
 
-        config_data.network.primary_file = _network_directory.joinpath(config_data.network.primary_file)
-        config_data.network.diversion_file = _network_directory.joinpath(config_data.network.diversion_file)
+        if _select_to_correct(config_data.network.primary_file):
+            config_data.network.primary_file = _network_directory.joinpath(config_data.network.primary_file)
+        if _select_to_correct(config_data.network.diversion_file):
+            config_data.network.diversion_file = _network_directory.joinpath(config_data.network.diversion_file)
 
         # Relative to hazard directory.
         _hazard_directory = config_data.static_path.joinpath("hazard")
