@@ -49,7 +49,7 @@ class TestVectorNetworkWrapper:
             root_path=Path("dummy_path"),
             static_path=Path("dummy_path"),
         )
-        _config_data.network.primary_file = [Path("dummy_primary")]
+        _config_data.network.primary_file = Path("dummy_primary")
         _config_data.network.directed = False
         _config_data.origins_destinations.region = Path("dummy_region")
 
@@ -67,9 +67,7 @@ class TestVectorNetworkWrapper:
     def _valid_wrapper(self, request: pytest.FixtureRequest) -> VectorNetworkWrapper:
         _network_dir = _test_dir.joinpath("static", "network")
         _config_data = NetworkConfigData()
-        _config_data.network.primary_file = [
-            _network_dir.joinpath("_test_lines.geojson")
-        ]
+        _config_data.network.primary_file = _network_dir.joinpath("_test_lines.geojson")
         _config_data.network.directed = False
         _config_data.origins_destinations.region = None
         _config_data.crs = CRS.from_user_input(4326)
