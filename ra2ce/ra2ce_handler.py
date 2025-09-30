@@ -93,18 +93,7 @@ class Ra2ceHandler:
         def get_network_config() -> NetworkConfigWrapper | None:
             if not isinstance(network, NetworkConfigData):
                 return None
-            _network_config = NetworkConfigWrapper()
-            _network_config.config_data = network
-            if network.output_graph_dir:
-                if network.output_graph_dir.is_dir():
-                    _network_config.graph_files = (
-                        _network_config.read_graphs_from_config(
-                            network.output_graph_dir
-                        )
-                    )
-                else:
-                    network.output_graph_dir.mkdir(parents=True)
-            return _network_config
+            return NetworkConfigWrapper.from_data(None, network)
 
         def get_analysis_config() -> AnalysisConfigWrapper | None:
             if not isinstance(analysis, AnalysisConfigData):

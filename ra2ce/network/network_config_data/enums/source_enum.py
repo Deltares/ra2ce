@@ -11,9 +11,9 @@ class SourceEnum(Ra2ceEnumBase):
     INVALID = 99
 
     @classmethod
-    def get_enum(cls, input: str) -> SourceEnum:
+    def get_enum(cls, input_str: str) -> SourceEnum:
         try:
-            return cls[input.replace(" ", "_").upper()]
+            return cls[input_str.replace(" ", "_").upper()]
         except KeyError:
             return cls.INVALID
 

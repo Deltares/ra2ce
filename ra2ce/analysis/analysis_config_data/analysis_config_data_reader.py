@@ -19,10 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import logging
 from configparser import ConfigParser
 from pathlib import Path
-from shutil import copyfile
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,

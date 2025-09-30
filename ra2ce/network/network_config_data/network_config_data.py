@@ -52,6 +52,7 @@ class NetworkSection:
     road_types: list[RoadTypeEnum] = field(default_factory=list)
     attributes_to_exclude_in_simplification: list[str] = field(default_factory=list)
     save_gpkg: bool = False
+    reuse_network_output: bool = False
 
 
 @dataclass
@@ -112,11 +113,15 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup: CleanupSection = field(default_factory=CleanupSection)
 
     @property
-    def output_graph_dir(self) -> Path:
+    def output_graph_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
         return self.static_path.joinpath("output_graph")
 
     @property
-    def network_dir(self) -> Path:
+    def network_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
         return self.static_path.joinpath("network")
 
     @staticmethod
