@@ -55,11 +55,11 @@ class TestAnalysisConfigDataValidator:
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
-            analyses=AnalysisSectionDamages(
+            analyses=[AnalysisSectionDamages(
                 analysis=AnalysisDamagesEnum.DAMAGES,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
-            ),
+            )],
             output_path=_output_dir,
         )
         _report = self._validate_config(_test_config_data)

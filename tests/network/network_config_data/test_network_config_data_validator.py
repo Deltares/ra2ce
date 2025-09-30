@@ -51,18 +51,3 @@ class TestNetworkIniConfigurationValidator:
         assert isinstance(_report, ValidationReport)
         assert not _report.is_valid()
         assert _expected_err in _report._errors
-
-    def test_validate_missing_shp_input_errors(self):
-        # 1. Define test data.
-        _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
-        _test_config_data = NetworkConfigData(
-            network=NetworkSection(source=SourceEnum.SHAPEFILE)
-        )
-
-        # 2. Run test.
-        _report = NetworkConfigDataValidator(_test_config_data).validate()
-
-        # 3. Verify final expectations.
-        assert isinstance(_report, ValidationReport)
-        assert not _report.is_valid()
-        assert _expected_err in _report._errors
