@@ -76,7 +76,7 @@ class TestNetworkConfigWrapper:
             root_path=Path("dummy_path"),
             static_path=test_case_dir.joinpath("static"),
             network=NetworkSection(
-                reuse_network=reuse_existing_network,
+                reuse_network_output=reuse_existing_network,
             ),
         )
 

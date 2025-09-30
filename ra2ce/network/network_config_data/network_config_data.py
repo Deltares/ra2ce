@@ -52,7 +52,7 @@ class NetworkSection:
     road_types: list[RoadTypeEnum] = field(default_factory=list)
     attributes_to_exclude_in_simplification: list[str] = field(default_factory=list)
     save_gpkg: bool = False
-    reuse_network: bool = False
+    reuse_network_output: bool = False
 
 
 @dataclass

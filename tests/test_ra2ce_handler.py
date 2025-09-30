@@ -261,7 +261,7 @@ class TestRa2ceHandler:
                 RoadTypeEnum.RESIDENTIAL,
                 RoadTypeEnum.UNCLASSIFIED,
             ],
-            reuse_network=True,
+            reuse_network_output=True,
         )
 
         _hazard_section = HazardSection(

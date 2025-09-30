@@ -65,7 +65,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         if (
             _output_graph_dir := config_data.output_graph_dir
         ) and _output_graph_dir.is_dir():
-            if config_data.network.reuse_network:
+            if config_data.network.reuse_network_output:
                 _new_network_config.graph_files = (
                     _new_network_config.read_graphs_from_config(_output_graph_dir)
                 )
