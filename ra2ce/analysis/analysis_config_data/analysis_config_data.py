@@ -122,6 +122,20 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     )
     risk_calculation_year: int = 0
 
+    @classmethod
+    def single_link_redundancy(cls, name: str = "", weighing: WeighingEnum = WeighingEnum.NONE, **kwargs) -> AnalysisSectionLosses:
+        """
+        Create a single link redundancy analysis with default settings.
+
+        Returns:
+            AnalysisSectionLosses: The single link redundancy analysis.
+        """
+        return cls(
+            name=name,
+            analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY,
+            save_gpkg=True,
+            save_csv=True,
+            **kwargs        )
 
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
