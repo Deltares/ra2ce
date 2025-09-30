@@ -23,7 +23,7 @@
 import copy
 import logging
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -66,7 +66,7 @@ class OriginClosestDestination:
         self.d_name = self.origins_destinations.destinations_names
         self.od_id = self.origins_destinations.id_name_origin_destination
         self.origin_out_fraction = self.origins_destinations.origin_out_fraction
-        self.origin_count = self.origins_destinations.origin_count
+        self.origin_count: Optional[str] = self.origins_destinations.origin_count
         self.od_key = "od_id"
         self.id_name = (
             analysis_input.file_id if analysis_input.file_id is not None else "rfid"
@@ -400,6 +400,10 @@ class OriginClosestDestination:
     def get_nr_people_on_route(
         self, origins: gpd.GeoDataFrame, origin_node: str
     ) -> float:
+        # If there is no origin count specified, we cannot calculate the number of people on the route
+        if not self.origin_count:
+            return 0
+
         # Find the number of people per neighborhood
         try:
             nr_people_per_route_total = origins.loc[
@@ -413,6 +417,7 @@ class OriginClosestDestination:
                 self.origin_count,
             ].iloc[0]
         nr_per_route = nr_people_per_route_total * self.origin_out_fraction
+
         return nr_per_route
 
     def update_destinations(
@@ -455,6 +460,11 @@ class OriginClosestDestination:
         origins_without_access: list,
         add_key_name: str = None,
     ) -> None:
+        # If there is no origin count specified, we cannot calculate the number of people without access
+        if not self.origin_count:
+            self.results_dict[f"Nr. no access{add_key_name}"] = [0]
+            return
+
         # Calculate the number of people that cannot access any destination
         origins_no_access = [
             o

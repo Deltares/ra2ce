@@ -50,7 +50,7 @@ def read_origin_destination_files(
     destination_paths: Union[str, list],
     destination_names: Union[str, list],
     od_id: str,
-    origin_count: str,
+    origin_count: Optional[str],
     crs_: pyproj.CRS,
     category: str,
     region_paths: Optional[str],
@@ -97,22 +97,25 @@ def read_origin_destination_files(
         destination_names = [destination_names]
 
     for op, on in zip(origin_paths, origin_names):
-        origin_new = gpd.read_file(op, crs=crs_, engine="pyogrio")
-        if od_id not in origin_new.columns:
+        origin_tmp = gpd.read_file(op, crs=crs_, engine="pyogrio")
+
+        if od_id not in origin_tmp.columns:
             logging.warning(
-                "No origin found at %s for %s, using default index instead.".format(
-                    op, od_id
-                )
+                "No origin found at %s for %s, using default index instead.", op, od_id
             )
-            origin_new[od_id] = origin_new.index
+            origin_tmp[od_id] = origin_tmp.index
 
         if region_paths:
-            origin_new = gpd.sjoin(left_df=origin_new, right_df=region, how="left")
-            origin_new["region"] = origin_new[region_var]
-            origin_new = origin_new[[od_id, origin_count, "geometry", "region"]]
+            origin_tmp = gpd.sjoin(left_df=origin_tmp, right_df=region, how="left")
+            origin_tmp["region"] = origin_tmp[region_var]
+            origin_new = origin_tmp[[od_id, "region", "geometry"]]
             origin_new["region"].fillna("Not assigned", inplace=True)
         else:
-            origin_new = origin_new[[od_id, origin_count, "geometry"]]
+            origin_new = origin_tmp[[od_id, "geometry"]]
+
+        if origin_count:
+            origin_new[origin_count] = origin_tmp[origin_count]
+
         origin_new["o_id"] = on + "_" + origin_new[od_id].astype(str)
         origin_new.crs = origin.crs
         origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
@@ -125,9 +128,9 @@ def read_origin_destination_files(
         destination_new = gpd.read_file(dp, crs=crs_, engine="pyogrio")
         if od_id not in destination_new.columns:
             logging.warning(
-                "No destination found at %s for %s, using default index instead.".format(
-                    dp, od_id
-                )
+                "No destination found at %s for %s, using default index instead.",
+                dp,
+                od_id,
             )
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
