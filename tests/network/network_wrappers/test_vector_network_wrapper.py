@@ -59,7 +59,7 @@ class TestVectorNetworkWrapper:
         # 3. Verify expectations.
         assert isinstance(_wrapper, VectorNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
-        assert _wrapper.primary_files == _config_data.network.primary_file
+        assert _wrapper.primary_file == _config_data.network.primary_file
         assert _wrapper.region_path == _config_data.origins_destinations.region
         assert _wrapper.crs.to_epsg() == 4326
 
