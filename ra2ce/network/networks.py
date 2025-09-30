@@ -22,6 +22,7 @@
 import copy
 import logging
 from pathlib import Path
+from typing import Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -71,7 +72,7 @@ class Network:
         self.id_name_origin_destination = (
             _origins_destinations.id_name_origin_destination
         )
-        self.origin_count = _origins_destinations.origin_count
+        self.origin_count: Optional[str] = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
         self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
