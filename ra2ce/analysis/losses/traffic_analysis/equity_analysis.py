@@ -39,25 +39,25 @@ class EquityAnalysis(TrafficAnalysisBase):
     road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     equity_data: pd.DataFrame
-    destinations_names: str
+    destinations_name: str
 
     def __init__(
         self,
         road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
-        destination_names: str,
+        destinations_name: str,
         equity_data: pd.DataFrame,
     ) -> None:
         """
         Args:
             road_network (gpd.GeoDataFrame): Geodataframe containing the overall network information.
             od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
-            destination_names (str): Destination nodes.
+            destinations_name (str): Destinations name.
             equity_data ( pd.DataFrame): Pandas DataFrame representing the equity traffic data.
         """
         self.road_network = road_network
         self.od_table = od_table
-        self.destinations_names = destination_names
+        self.destinations_name = destinations_name
         self.equity_data = equity_data
         self._set_values_prioritarian(self.equity_data, self.od_table)
 

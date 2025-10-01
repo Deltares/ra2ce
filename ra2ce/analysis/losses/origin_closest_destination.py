@@ -71,7 +71,7 @@ class OriginClosestDestination:
             analysis_input.file_id if analysis_input.file_id is not None else "rfid"
         )
 
-        self.destination_names = None
+        self.destination_names: list[str] = None
         self.destination_key = None
         if self.origins_destinations.category:
             self.destination_key = "category"
@@ -102,7 +102,6 @@ class OriginClosestDestination:
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
             }
-            logging.info(self.destination_names_short)  # TODO: WRITE SOMEWHERE
 
             for i, dn in self.destination_names_short.items():
                 destinations[col_name + "_P" + dn] = 0
@@ -165,7 +164,6 @@ class OriginClosestDestination:
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
             }
-            logging.info(self.destination_names_short)  # TODO: WRITE SOMEWHERE
 
         aggregated = []
         opt_routes_aggregated = []
