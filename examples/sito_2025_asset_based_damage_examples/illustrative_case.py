@@ -80,7 +80,6 @@ hazard_section = HazardSection(
 network_config_data = NetworkConfigData(
     root_path=root_dir,
     static_path=static_path,
-    output_path=output_path,
     network=network_section,
     hazard=hazard_section
 )
