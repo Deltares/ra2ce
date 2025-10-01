@@ -1,4 +1,6 @@
+import configparser
 import shutil
+from configparser import ConfigParser
 from pathlib import Path
 from typing import Iterator
 
@@ -6,7 +8,6 @@ import geopandas
 import pytest
 from geopandas import GeoDataFrame
 from rasterio import open as rasterio_open
-from shapely.geometry import box
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -260,6 +261,7 @@ class TestRa2ceHandler:
                 RoadTypeEnum.RESIDENTIAL,
                 RoadTypeEnum.UNCLASSIFIED,
             ],
+            reuse_network_output=True,
         )
 
         _hazard_section = HazardSection(
@@ -292,7 +294,7 @@ class TestRa2ceHandler:
 
         assert legacy_output_gdf["EV1_ma"].values == pytest.approx(
             update_output_gdf["EV1_ma"].values
-        ), f"EV1_ma values are not equal before and after update."
+        ), "EV1_ma values are not equal before and after update."
         assert legacy_output_gdf["EV1_fr"].values == pytest.approx(
             update_output_gdf["EV1_fr"].values
-        ), f"EV1_fr values are not equal before and after update."
+        ), "EV1_fr values are not equal before and after update."

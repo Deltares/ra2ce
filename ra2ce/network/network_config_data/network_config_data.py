@@ -1,22 +1,22 @@
 """
-                    GNU GENERAL PUBLIC LICENSE
-                      Version 3, 29 June 2007
+                GNU GENERAL PUBLIC LICENSE
+                  Version 3, 29 June 2007
 
-    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
+Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
@@ -72,8 +72,8 @@ class NetworkSection:
 
     directed: bool = False
     source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
-    primary_file: Optional[list[Path]] = field(default_factory=list)
-    diversion_file: list[Path] = field(default_factory=list)
+    primary_file: Optional[Path] = None
+    diversion_file: Optional[Path] = None
     file_id: str = ""
     link_type_column: Optional[str] = "highway"
     polygon: Optional[Path] = None
@@ -81,6 +81,7 @@ class NetworkSection:
     road_types: list[RoadTypeEnum] = field(default_factory=list)
     attributes_to_exclude_in_simplification: Optional[list[str]] = field(default_factory=list)
     save_gpkg: bool = False
+    reuse_network_output: bool = False
 
 
 @dataclass
@@ -115,9 +116,8 @@ class OriginsDestinationsSection:
     destinations: Optional[Path] = None
     origins_names: str = ""
     destinations_names: str = ""
-    id_name_origin_destination: str = ""
-    origin_count: str = ""
-    origin_out_fraction: Optional[int] = (
+    origin_count: Optional[str] = None
+    origin_out_fraction: int = (
         1  # fraction of things/people going out of the origin to the destination
     )
     category: Optional[str] = ""
@@ -213,11 +213,15 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup: Optional[CleanupSection] = field(default_factory=CleanupSection)
 
     @property
-    def output_graph_dir(self) -> Path:
+    def output_graph_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
         return self.static_path.joinpath("output_graph")
 
     @property
-    def network_dir(self) -> Path:
+    def network_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
         return self.static_path.joinpath("network")
 
     @staticmethod

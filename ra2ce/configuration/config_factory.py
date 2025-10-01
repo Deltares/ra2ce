@@ -20,7 +20,6 @@
 """
 
 import logging
-import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -104,19 +103,23 @@ class ConfigFactory:
         _network_config = NetworkConfigWrapper()
 
         # Read existing files and graphs from static folder
-        _static_dir = config_data.static_path
-        if _static_dir and _static_dir.is_dir():
+        if (
+            _output_graph_dir := _network_config.config_data.output_graph_dir
+        ) and _output_graph_dir.is_dir():
             _network_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
-                _static_dir.joinpath("output_graph")
+                _output_graph_dir
             )
         else:
-            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+            logging.error(
+                "Output graph dir not found. Value provided: %s", _output_graph_dir
+            )
 
         # Read network config file to get network and origin_destination settings
         if config_data.output_path:
             _output_network_ini_file = config_data.output_path.joinpath("network.ini")
         else:
             _output_network_ini_file = Path()
+
         if _output_network_ini_file.is_file():
             _network_data = NetworkConfigDataReader().read(_output_network_ini_file)
             _network_config.config_data.network = _network_data.network
@@ -128,7 +131,8 @@ class ConfigFactory:
             )
         else:
             logging.error(
-                f"Network configuration not found. Value provided: {_output_network_ini_file}"
+                "Network configuration not found. Value provided: %s",
+                _output_network_ini_file,
             )
 
         return AnalysisConfigWrapper.from_data_with_network(

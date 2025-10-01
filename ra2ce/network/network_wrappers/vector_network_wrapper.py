@@ -59,7 +59,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.crs = config_data.crs
 
         # Network options
-        self.primary_files = config_data.network.primary_file
+        self.primary_file = config_data.network.primary_file
         self.directed = config_data.network.directed
 
         # Origins Destinations
@@ -159,7 +159,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         return graph_simple, edges_complex
 
     def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
-        gdf = self._read_files(self.primary_files)
+        gdf = self._read_file(self.primary_file)
         if gdf is None:
             logging.info("no file is read.")
             return None
@@ -175,7 +175,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # clip for region
         if self.region_path:
-            _region_gpd = self._read_files([self.region_path])
+            _region_gpd = self._read_file(self.region_path)
             gdf = gpd.overlay(gdf, _region_gpd, how="intersection", keep_geom_type=True)
             logging.info("clip vector file to project region")
 
@@ -186,24 +186,18 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         return gdf
 
-    def _read_files(self, file_list: list[Path]) -> gpd.GeoDataFrame:
-        """Reads a list of files into a GeoDataFrame.
+    def _read_file(self, file_path: Path) -> gpd.GeoDataFrame:
+        """Reads a file into a GeoDataFrame.
 
         Args:
-            file_list (list[Path]): List of file paths.
+            file_path (Path): Path to the geodataframe file.
 
         Returns:
             gpd.GeoDataFrame: GeoDataFrame representing the data.
         """
         # read file
-        gdf = gpd.GeoDataFrame(
-            pd.concat([gpd.read_file(_fl, engine="pyogrio") for _fl in file_list])
-        )
-        logging.info(
-            "Read files {} into a 'GeoDataFrame'.".format(
-                ", ".join(map(str, file_list))
-            )
-        )
+        gdf = gpd.read_file(file_path, engine="pyogrio")
+        logging.info("Read file {} into a 'GeoDataFrame'.".format(file_path))
         return gdf
 
     @staticmethod

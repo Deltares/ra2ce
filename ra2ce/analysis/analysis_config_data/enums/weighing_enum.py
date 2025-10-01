@@ -10,5 +10,5 @@ class WeighingEnum(Ra2ceEnumBase):
     INVALID = 99
 
     @classmethod
-    def get_enum(cls, input: str | None) -> WeighingEnum:
-        return super().get_enum(input)
+    def get_enum(cls, input_str: str | None) -> WeighingEnum:
+        return WeighingEnum(super().get_enum(input_str))
