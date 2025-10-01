@@ -72,10 +72,14 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         lines = gpd.read_file(self.primary_file, engine="pyogrio")
 
         if self.diversion_file:
-            lines = pd.concat([
-                lines, 
-                nut.check_crs_gdf(gpd.read_file(self.diversion_file, engine="pyogrio"), self.crs)
-                ])
+            lines = pd.concat(
+                [
+                    lines,
+                    nut.check_crs_gdf(
+                        gpd.read_file(self.diversion_file, engine="pyogrio"), self.crs
+                    ),
+                ]
+            )
 
         lines.crs = self.crs
 
