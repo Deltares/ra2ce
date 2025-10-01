@@ -97,9 +97,9 @@ class Network:
         # Add the origin/destination nodes to the network
         ods = read_origin_destination_files(
             self.origins,
-            self.origins_names,
+            self.origins_name,
             self.destinations,
-            self.destinations_names,
+            self.destinations_name,
             self.origin_count,
             crs,
             self.od_category,

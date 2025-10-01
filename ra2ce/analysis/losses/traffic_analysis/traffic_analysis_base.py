@@ -37,7 +37,7 @@ from ra2ce.analysis.losses.traffic_analysis.accumulated_traffic_dataclass import
 class TrafficAnalysisBase(ABC):
     road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
-    destinations_names: str
+    destinations_name: str
 
     def optimal_route_od_link(
         self,
