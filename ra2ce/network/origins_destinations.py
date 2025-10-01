@@ -50,7 +50,7 @@ def read_origin_destination_files(
     destinations_path: Path,
     destinations_name: str,
     origin_count: Optional[str],
-    crs_: pyproj.CRS,
+    crs: pyproj.CRS,
     category: str,
     regions_path: Optional[str],
     region_var: Optional[str],
@@ -71,9 +71,9 @@ def read_origin_destination_files(
     """
 
     # Origins
-    origins = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs_)
+    origins = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs)
 
-    origins_in = gpd.read_file(origins_path, crs=crs_, engine="pyogrio")
+    origins_in = gpd.read_file(origins_path, crs=crs, engine="pyogrio")
     if regions_path:
         regions = gpd.read_file(regions_path, engine="pyogrio")
         regions = regions[[region_var, "geometry"]]
@@ -88,9 +88,9 @@ def read_origin_destination_files(
         origins[origin_count] = origins_in[origin_count]
 
     # Destinations
-    destinations = gpd.GeoDataFrame(columns=["d_id", "geometry"], crs=crs_)
+    destinations = gpd.GeoDataFrame(columns=["d_id", "geometry"], crs=crs)
 
-    destinations_in = gpd.read_file(destinations_path, crs=crs_, engine="pyogrio")
+    destinations_in = gpd.read_file(destinations_path, crs=crs, engine="pyogrio")
     destinations["d_id"] = destinations_name + "_" + destinations_in.index.astype(str)
     destinations["geometry"] = destinations_in["geometry"]
 
