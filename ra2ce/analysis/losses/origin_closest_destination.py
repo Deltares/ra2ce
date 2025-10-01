@@ -62,8 +62,8 @@ class OriginClosestDestination:
         self.threshold_destinations = self.analysis.threshold_destinations
         self.weighing = self.analysis.weighing.config_value
         self.origins_destinations = analysis_input.origins_destinations
-        self.o_name = self.origins_destinations.origins_names
-        self.d_name = self.origins_destinations.destinations_names
+        self.o_name = self.origins_destinations.origins_name
+        self.d_name = self.origins_destinations.destinations_name
         self.od_id = self.origins_destinations.id_name_origin_destination
         self.origin_out_fraction = self.origins_destinations.origin_out_fraction
         self.origin_count: Optional[str] = self.origins_destinations.origin_count

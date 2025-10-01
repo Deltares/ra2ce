@@ -19,8 +19,8 @@ class TestOriginClosestDestination:
         _config = AnalysisConfigWrapper()
         _config.config_data = AnalysisConfigData(
             origins_destinations=OriginsDestinationsSection(
-                origins_names="",
-                destinations_names="",
+                origins_name="",
+                destinations_name="",
                 id_name_origin_destination="",
                 origin_out_fraction="",
                 origin_count="",

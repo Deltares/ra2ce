@@ -59,8 +59,8 @@ class NetworkSection:
 class OriginsDestinationsSection:
     origins: Optional[Path] = None
     destinations: Optional[Path] = None
-    origins_names: str = ""
-    destinations_names: str = ""
+    origins_name: str = ""
+    destinations_name: str = ""
     id_name_origin_destination: str = ""
     origin_count: Optional[str] = None
     origin_out_fraction: int = (
