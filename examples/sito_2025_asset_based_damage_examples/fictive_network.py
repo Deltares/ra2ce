@@ -41,7 +41,6 @@ analysis_config_data = AnalysisConfigData(
     output_path=output_path,
 )
 
-analysis_config_data = AnalysisConfigData(analyses=damages_analysis, root_path=root_dir, output_path=output_path)
 analysis_config_data.input_path = root_dir.joinpath("input_data")
 
 handler = Ra2ceHandler.from_config(None, analysis_config_data)
