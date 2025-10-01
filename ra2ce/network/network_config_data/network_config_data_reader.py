@@ -93,12 +93,10 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 config_data.network.polygon
             )
 
-        config_data.network.primary_file = _correct_list(
-            _network_directory, config_data.network.primary_file
-        )
-        config_data.network.diversion_file = _correct_list(
-            _network_directory, config_data.network.diversion_file
-        )
+        if _select_to_correct(config_data.network.primary_file):
+            config_data.network.primary_file = _network_directory.joinpath(config_data.network.primary_file)
+        if _select_to_correct(config_data.network.diversion_file):
+            config_data.network.diversion_file = _network_directory.joinpath(config_data.network.diversion_file)
 
         # Relative to hazard directory.
         _hazard_directory = config_data.static_path.joinpath("hazard")
@@ -147,12 +145,8 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.source = SourceEnum.get_enum(
             self._parser.get(_section, "source", fallback=None)
         )
-        _network_section.primary_file = self._get_path_list(
-            _section, "primary_file", _network_section.primary_file
-        )
-        _network_section.diversion_file = self._get_path_list(
-            _section, "diversion_file", _network_section.diversion_file
-        )
+        _network_section.primary_file = self._get_str_as_path( _network_section.primary_file)
+        _network_section.diversion_file = self._get_str_as_path(_network_section.diversion_file)
         _network_section.directed = self._parser.getboolean(
             _section, "directed", fallback=_network_section.directed
         )
