@@ -43,8 +43,8 @@ class ProjectSection:
 class NetworkSection:
     directed: bool = False
     source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
-    primary_file: list[Path] = field(default_factory=list)
-    diversion_file: list[Path] = field(default_factory=list)
+    primary_file: Optional[Path] = None
+    diversion_file: Optional[Path] = None
     file_id: str = ""
     link_type_column: str = "highway"
     polygon: Optional[Path] = None
@@ -61,7 +61,6 @@ class OriginsDestinationsSection:
     destinations: Optional[Path] = None
     origins_name: str = ""
     destinations_name: str = ""
-    id_name_origin_destination: str = ""
     origin_count: Optional[str] = None
     origin_out_fraction: int = (
         1  # fraction of things/people going out of the origin to the destination

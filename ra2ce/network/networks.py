@@ -67,11 +67,8 @@ class Network:
         _origins_destinations = network_config.origins_destinations
         self.origins = _origins_destinations.origins
         self.destinations = _origins_destinations.destinations
-        self.origins_names = _origins_destinations.origins_name
-        self.destinations_names = _origins_destinations.destinations_name
-        self.id_name_origin_destination = (
-            _origins_destinations.id_name_origin_destination
-        )
+        self.origins_name = _origins_destinations.origins_names
+        self.destinations_name = _origins_destinations.destinations_names
         self.origin_count: Optional[str] = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
         self.region = _origins_destinations.region
@@ -103,7 +100,6 @@ class Network:
             self.origins_names,
             self.destinations,
             self.destinations_names,
-            self.id_name_origin_destination,
             self.origin_count,
             crs,
             self.od_category,

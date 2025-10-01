@@ -49,7 +49,6 @@ def read_origin_destination_files(
     origins_name: str,
     destinations_path: Path,
     destinations_name: str,
-    od_id: str,
     origin_count: Optional[str],
     crs_: pyproj.CRS,
     category: str,
@@ -62,7 +61,6 @@ def read_origin_destination_files(
         origins_name: The name of the origins
         destinations_path: The path of the point shapefile(s) used for the locations of the Destinations.
         destinations_name: The name of the destinations
-        od_id: The name of the unique identifier attribute in both the origin and destination shapefiles.
         origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
         crs_: The Coordinate Reference System used in the project.
         category: The name of the attribute in the destination shapefile that can be used to categorize the (closest) destination.
@@ -74,61 +72,43 @@ def read_origin_destination_files(
 
     # Origins
     if region_paths:
-        origin = gpd.GeoDataFrame(
-            columns=[od_id, "o_id", "geometry", "region"], crs=crs_
-        )
+        origin = gpd.GeoDataFrame(columns=["o_id", "geometry", "region"], crs=crs_)
         region = gpd.read_file(region_paths, engine="pyogrio")
         region = region[[region_var, "geometry"]]
     else:
-        origin = gpd.GeoDataFrame(columns=[od_id, "o_id", "geometry"], crs=crs_)
+        origin = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs_)
 
-    origin_in = gpd.read_file(origins_path, crs=crs_, engine="pyogrio")
-
-    if od_id not in origin_in.columns:
-        logging.warning(
-            "No origin found at %s for %s, using default index instead.",
-            origins_path,
-            od_id,
-        )
-        origin_in[od_id] = origin_in.index
+    origin_tmp = gpd.read_file(origins_path, crs=crs_, engine="pyogrio")
 
     if region_paths:
-        origin_in = gpd.sjoin(left_df=origin_in, right_df=region, how="left")
-        origin_in["region"] = origin_in[region_var]
-        origin_new = origin_in[[od_id, "region", "geometry"]]
+        origin_tmp = gpd.sjoin(left_df=origin_tmp, right_df=region, how="left")
+        origin_tmp["region"] = origin_tmp[region_var]
+        origin_new = origin_tmp[["region", "geometry"]]
         origin_new["region"].fillna("Not assigned", inplace=True)
     else:
-        origin_new = origin_in[[od_id, "geometry"]]
+        origin_new = origin_tmp[["geometry"]]
 
     if origin_count:
-        origin_new[origin_count] = origin_in[origin_count]
+        origin_new[origin_count] = origin_tmp[origin_count]
 
-    origin_new["o_id"] = origins_name + "_" + origin_new[od_id].astype(str)
+    origin_new["o_id"] = origins_name + "_" + origin_new.index.astype(str)
     origin_new.crs = origin.crs
     origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
 
-    # Destinations
-    destination_columns = [od_id, "d_id", "geometry"]
+    destination_columns = ["d_id", "geometry"]
     if category:
         destination_columns.append(category)
 
     destination = gpd.GeoDataFrame(columns=destination_columns, crs=crs_)
 
-    destination_columns_add = [od_id, "geometry"]
+    destination_columns_add = ["geometry"]
     if category:
         destination_columns_add.append(category)
 
     destination_new = gpd.read_file(destinations_path, crs=crs_, engine="pyogrio")
-    if od_id not in destination_new.columns:
-        logging.warning(
-            "No destination found at %s for %s, using default index instead.",
-            destinations_path,
-            od_id,
-        )
-        destination_new[od_id] = destination_new.index
     destination_new = destination_new[destination_columns_add]
     destination_new["d_id"] = (
-        destinations_name + "_" + destination_new[od_id].astype(str)
+        destinations_name + "_" + destination_new.index.astype(str)
     )
     destination_new.crs = destination.crs
     destination = gpd.GeoDataFrame(
