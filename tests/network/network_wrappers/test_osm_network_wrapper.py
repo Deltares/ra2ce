@@ -22,7 +22,7 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
 from ra2ce.network.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
     OsmNetworkWrapper,
 )
-from tests import slow_test, test_data, test_results
+from tests import slow_test, temp_dir, test_data
 
 
 class TestOsmNetworkWrapper:
@@ -32,7 +32,11 @@ class TestOsmNetworkWrapper:
             network_type=NetworkTypeEnum.ALL,
             road_types=[RoadTypeEnum.PRIMARY],
         )
-        _network_config_data = NetworkConfigData(network=_network_section)
+        _network_config_data = NetworkConfigData(
+            root_path=temp_dir,
+            static_path=temp_dir,
+            network=_network_section,
+        )
 
         # 2. Run test.
         _wrapper = OsmNetworkWrapper(_network_config_data)
@@ -49,10 +53,11 @@ class TestOsmNetworkWrapper:
             road_types=[RoadTypeEnum.ROAD],
             directed=True,
         )
-        _output_dir = test_results.joinpath("test_osm_network_wrapper")
-        if not _output_dir.exists():
-            _output_dir.mkdir(parents=True)
-        return NetworkConfigData(network=_network_section, output_path=_output_dir)
+        return NetworkConfigData(
+            root_path=temp_dir,
+            static_path=temp_dir,
+            network=_network_section,
+        )
 
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
@@ -403,7 +408,7 @@ class TestOsmNetworkWrapper:
         _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
         _network_config_data.network.road_types = []
         # `output_graph_dir` is a property indirectly derived from `static_path`.
-        _network_config_data.static_path = None
+        _network_config_data.static_path = temp_dir
 
         # 2. Run test.
         _wrapper = OsmNetworkWrapper(_network_config_data)
@@ -463,7 +468,10 @@ class TestOsmNetworkWrapper:
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
 
-        _config_data = NetworkConfigData()
+        _config_data = NetworkConfigData(
+            root_path=temp_dir,
+            static_path=temp_dir,
+        )
         _config_data.network.polygon = _polygon_file
         _config_data.network.network_type = NetworkTypeEnum.DRIVE
         _config_data.network.road_types = []

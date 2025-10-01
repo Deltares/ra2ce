@@ -22,14 +22,15 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional
 
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 
 
 class ConfigWrapper:
-    network_config: NetworkConfigWrapper
-    analysis_config: AnalysisConfigWrapper
+    network_config: Optional[NetworkConfigWrapper]
+    analysis_config: Optional[AnalysisConfigWrapper]
 
     def __init__(self) -> None:
         self.network_config = None

@@ -21,13 +21,12 @@
 
 import copy
 import logging
-import warnings
 from pathlib import Path
+from typing import Optional
 
 import geopandas as gpd
 import networkx as nx
 import osmnx
-import pandas as pd
 import pyproj
 
 from ra2ce.network import networks_utils as nut
@@ -70,10 +69,7 @@ class Network:
         self.destinations = _origins_destinations.destinations
         self.origins_names = _origins_destinations.origins_names
         self.destinations_names = _origins_destinations.destinations_names
-        self.id_name_origin_destination = (
-            _origins_destinations.id_name_origin_destination
-        )
-        self.origin_count = _origins_destinations.origin_count
+        self.origin_count: Optional[str] = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
         self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
@@ -104,7 +100,6 @@ class Network:
             self.origins_names,
             str(self.destinations),
             self.destinations_names,
-            self.id_name_origin_destination,
             self.origin_count,
             crs,
             self.od_category,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
@@ -9,3 +11,7 @@ class NetworkTypeEnum(Ra2ceEnumBase):
     DRIVE_SERVICE = 4
     ALL = 5
     INVALID = 99
+
+    @classmethod
+    def get_enum(cls, input_str: str | None) -> NetworkTypeEnum:
+        return NetworkTypeEnum(super().get_enum(input_str))

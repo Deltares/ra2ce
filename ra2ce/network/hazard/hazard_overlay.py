@@ -67,7 +67,6 @@ class HazardOverlay:
         # Sections properties
         self._network_file_id = config.network.file_id
         self._output_graph_dir = config.static_path.joinpath("output_graph")
-        self._output_dir = config.output_path
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
         self._save_gpkg = config.network.save_gpkg
@@ -602,11 +601,8 @@ class HazardOverlay:
             self._export_network_files("locations_hazard", "pickle")
 
         # Save the hazard name bookkeeping table.
-        if not self._output_dir.exists():
-            self._output_dir.mkdir(parents=True, exist_ok=True)
-
         self.hazard_name_table.to_excel(
-            self._output_dir.joinpath("hazard_names.xlsx"), index=False
+            self._output_graph_dir.joinpath("hazard_names.xlsx"), index=False
         )
 
         return self.graph_files

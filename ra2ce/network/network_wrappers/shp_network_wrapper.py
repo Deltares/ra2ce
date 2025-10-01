@@ -47,8 +47,8 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         self.crs = config_data.crs
 
         # Network options
-        self.primary_files = _network_options.primary_file
-        self.diversion_files = _network_options.diversion_file
+        self.primary_file = _network_options.primary_file
+        self.diversion_file = _network_options.diversion_file
         self.directed = _network_options.directed
         self.file_id = _network_options.file_id
 
@@ -68,17 +68,18 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
             lines (list of shapely LineStrings): full list of linestrings
             properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
         """
-        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [gpd.read_file(shp, engine="pyogrio") for shp in self.primary_files]
+        # Generate geodataframe from analysis and set analysis to 1 or 0 for diversions
+        lines = gpd.read_file(self.primary_file, engine="pyogrio")
 
-        if any(self.diversion_files):
-            lines.extend(
+        if self.diversion_file:
+            lines = pd.concat(
                 [
-                    nut.check_crs_gdf(gpd.read_file(shp, engine="pyogrio"), self.crs)
-                    for shp in self.diversion_files
+                    lines,
+                    nut.check_crs_gdf(
+                        gpd.read_file(self.diversion_file, engine="pyogrio"), self.crs
+                    ),
                 ]
             )
-        lines = pd.concat(lines)
 
         lines.crs = self.crs
 

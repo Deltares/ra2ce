@@ -189,22 +189,22 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         abs_destination_disconnected = []
         share_destination_disconnected = []
         for hz in hazard_list:
-            gdf_ = gdf.loc[gdf["hazard"] == hz]
+            _gdf = gdf.loc[gdf["hazard"] == hz]
 
-            gdf_["origin_count"] = gdf_["origin"].apply(lambda x: len(x.split(",")))
-            remaining_origins = gdf_.groupby("origin")["origin_count"].sum()
-            del gdf_["origin_count"]
+            _gdf["origin_count"] = _gdf["origin"].apply(lambda x: len(x.split(",")))
+            remaining_origins = _gdf.groupby("origin")["origin_count"].sum()
+            del _gdf["origin_count"]
             diff_origins = init_origins - remaining_origins
             abs_origin_disconnected.append(diff_origins)
             share_origin_disconnected.append(100 * diff_origins / init_origins)
 
-            gdf_["destination_count"] = gdf_["destination"].apply(
+            _gdf["destination_count"] = _gdf["destination"].apply(
                 lambda x: len(x.split(","))
             )
-            remaining_destinations = gdf_.groupby("destination")[
+            remaining_destinations = _gdf.groupby("destination")[
                 "destination_count"
             ].sum()
-            del gdf_["destination_count"]
+            del _gdf["destination_count"]
             diff_destinations = init_destinations - remaining_destinations
             abs_destination_disconnected.append(diff_destinations)
             share_destination_disconnected.append(
@@ -226,9 +226,9 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         mean_increase_pc = []
         median_increase_pc = []
         for hz in hazard_list:
-            gdf_ = gdf.loc[gdf["hazard"] == hz][["OD", "length"]]
-            gdf_.columns = ["OD", "length_" + hz]
-            gdf_ori = gdf_ori.merge(gdf_, how="left", on="OD")
+            _gdf = gdf.loc[gdf["hazard"] == hz][["OD", "length"]]
+            _gdf.columns = ["OD", "length_" + hz]
+            gdf_ori = gdf_ori.merge(_gdf, how="left", on="OD")
             gdf_ori.drop_duplicates(subset="OD", inplace=True)
             gdf_ori["diff_length_" + hz] = gdf_ori["length_" + hz] - gdf_ori["length"]
             gdf_ori["diff_length_" + hz + "_pc"] = (

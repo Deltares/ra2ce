@@ -10,5 +10,5 @@ class LossTypeEnum(Ra2ceEnumBase):
     INVALID = 99
 
     @classmethod
-    def get_enum(cls, input: str | None) -> LossTypeEnum:
-        return super().get_enum(input)
+    def get_enum(cls, input_str: str | None) -> LossTypeEnum:
+        return LossTypeEnum(super().get_enum(input_str))

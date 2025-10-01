@@ -174,20 +174,8 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         od_nodes = []
         for aa, bb in od_pairs:
             # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
-            od_nodes.append(
-                (
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == aa) | (aa in n_name)
-                    ][0],
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == bb) | (bb in n_name)
-                    ][0],
-                )
-            )
+            node_lookup = {n_name: (n, n_name) for n, n_name in all_nodes}
+            od_nodes.append((node_lookup[aa], node_lookup[bb]))
         return od_nodes
 
     def optimal_route_origin_destination(

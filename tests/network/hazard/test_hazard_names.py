@@ -37,9 +37,11 @@ class TestHazardNames:
 
     @pytest.fixture(autouse=True)
     def hazard_names_file(self, request: pytest.FixtureRequest) -> Iterator[Path]:
-        _output_path = test_results.joinpath(request.node.name)
-        _output_path.mkdir(parents=True, exist_ok=True)
-        _file = _output_path.joinpath("hazard_names.xlsx")
+        _file_path = test_results.joinpath(
+            request.node.name, "static_path", "output_graph"
+        )
+        _file_path.mkdir(parents=True, exist_ok=True)
+        _file = _file_path.joinpath("hazard_names.xlsx")
         _data = [["a", "A"], ["b", "B"], ["c", "C"]]
         _columns = ["File name", "RA2CE name"]
         _df = pd.DataFrame(_data, columns=_columns)
@@ -61,7 +63,7 @@ class TestHazardNames:
         # 1. Define test data
         _file = hazard_names_file
         _analysis_config = AnalysisConfigWrapper()
-        _analysis_config.config_data.output_path = _file.parent
+        _analysis_config.config_data.static_path = _file.parent.parent
 
         # 2. Run test
         _hazard_names = HazardNames.from_config(_analysis_config)

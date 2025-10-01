@@ -1,0 +1,11 @@
+,road_types,avg_speed
+0,"['unclassified', 'residential']",60.0
+1,secondary,60.0
+2,trunk,50.0
+3,trunk_link,50.0
+4,unclassified,60.0
+5,tertiary,59.4
+6,"['residential', 'unclassified']",60.0
+7,residential,60.0
+8,secondary_link,60.0
+9,tertiary_link,59.4

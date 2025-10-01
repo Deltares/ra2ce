@@ -21,7 +21,9 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
@@ -34,7 +36,7 @@ from ra2ce.network.networks import Network
 
 
 class NetworkConfigWrapper(ConfigWrapperProtocol):
-    ini_file: Path
+    ini_file: Optional[Path]
     config_data: NetworkConfigData
     graph_files: GraphFilesCollection
 
@@ -45,7 +47,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @classmethod
     def from_data(
-        cls, ini_file: Path, config_data: NetworkConfigData
+        cls, ini_file: Optional[Path], config_data: NetworkConfigData
     ) -> NetworkConfigWrapper:
         """
         Initializes a `NetworkConfig` with the given parameters.
@@ -60,15 +62,17 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        if config_data.output_graph_dir:
-            if config_data.output_graph_dir.is_dir():
+        if (
+            _output_graph_dir := config_data.output_graph_dir
+        ) and _output_graph_dir.is_dir():
+            if config_data.network.reuse_network_output:
                 _new_network_config.graph_files = (
-                    _new_network_config.read_graphs_from_config(
-                        config_data.output_graph_dir
-                    )
+                    _new_network_config.read_graphs_from_config(_output_graph_dir)
                 )
             else:
-                config_data.output_graph_dir.mkdir(parents=True)
+                shutil.rmtree(_output_graph_dir)
+        if _output_graph_dir and not _output_graph_dir.is_dir():
+            _output_graph_dir.mkdir(parents=True)
         return _new_network_config
 
     @staticmethod
@@ -92,7 +96,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         # Call Hazard Handler (to rework)
         if not self.graph_files.has_graphs():
             self.graph_files = self.read_graphs_from_config(
-                self.config_data.static_path.joinpath("output_graph")
+                self.config_data.output_graph_dir
             )
 
         if not self.config_data.hazard.hazard_map:

@@ -1,0 +1,28 @@
+---
+name: Other task request
+description: Create a task that needs to be done and does not fit in any other category.
+labels: ["help wanted", "triage required"]
+type: task
+projects: ["Deltares/69"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      description: >
+        Please provide a clear and concise description of the task you're requesting to be done
+      label: Task Description
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      description: >
+        Please describe a situation in which this task would be useful to you, with code or cli examples if possible
+      label: Use case
+  - type: textarea
+    id: context
+    attributes:
+      description: >
+        Please add any other context about the task here
+      label: Additional Context

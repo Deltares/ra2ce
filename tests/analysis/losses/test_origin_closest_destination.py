@@ -21,7 +21,6 @@ class TestOriginClosestDestination:
             origins_destinations=OriginsDestinationsSection(
                 origins_names="",
                 destinations_names="",
-                id_name_origin_destination="",
                 origin_out_fraction="",
                 origin_count="",
                 category="dummy_value",
@@ -42,6 +41,5 @@ class TestOriginClosestDestination:
         assert isinstance(_ocd, OriginClosestDestination)
         assert isinstance(_ocd.analysis, AnalysisSectionLosses)
         assert _ocd.analysis == _analysis
-        assert _ocd.hazard_names.names == _config.config_data.hazard_names
         assert _ocd.results_dict == {}
         assert _ocd.destination_key_value == "dummy_value"
