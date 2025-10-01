@@ -383,7 +383,7 @@ class OriginClosestDestination:
         col_name: str,
     ) -> gpd.GeoDataFrame:
         dest_ids = [
-            int(d.split("_")[-1])
+            d
             for d in [dest for dest in destination_name.split(",")]
             if self.d_name in d
         ]
@@ -428,11 +428,7 @@ class OriginClosestDestination:
                 for oth in origins_without_access
             ]
         ]
-        origins_no_access = [
-            int(item.split("_")[-1])
-            for sublist in origins_no_access
-            for item in sublist
-        ]
+        origins_no_access = [item for sublist in origins_no_access for item in sublist]
 
         pp_no_access = [
             (
