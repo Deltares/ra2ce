@@ -52,7 +52,7 @@ def read_origin_destination_files(
     origin_count: Optional[str],
     crs_: pyproj.CRS,
     category: str,
-    region_paths: Optional[str],
+    regions_path: Optional[str],
     region_var: Optional[str],
 ):
     """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
@@ -64,58 +64,40 @@ def read_origin_destination_files(
         origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
         crs_: The Coordinate Reference System used in the project.
         category: The name of the attribute in the destination shapefile that can be used to categorize the (closest) destination.
-        region_paths:
+        regions_path:
         region_var:
     Returns:
         od:
     """
 
     # Origins
-    if region_paths:
-        origin = gpd.GeoDataFrame(columns=["o_id", "geometry", "region"], crs=crs_)
-        region = gpd.read_file(region_paths, engine="pyogrio")
-        region = region[[region_var, "geometry"]]
-    else:
-        origin = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs_)
+    origins = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs_)
 
-    origin_tmp = gpd.read_file(origins_path, crs=crs_, engine="pyogrio")
+    origins_in = gpd.read_file(origins_path, crs=crs_, engine="pyogrio")
+    if regions_path:
+        regions = gpd.read_file(regions_path, engine="pyogrio")
+        regions = regions[[region_var, "geometry"]]
+        origins_in = gpd.sjoin(left_df=origins_in, right_df=regions, how="left")
+        origins["region"] = origins_in[region_var]
+        origins["region"].fillna("Not assigned", inplace=True)
 
-    if region_paths:
-        origin_tmp = gpd.sjoin(left_df=origin_tmp, right_df=region, how="left")
-        origin_tmp["region"] = origin_tmp[region_var]
-        origin_new = origin_tmp[["region", "geometry"]]
-        origin_new["region"].fillna("Not assigned", inplace=True)
-    else:
-        origin_new = origin_tmp[["geometry"]]
+    origins["o_id"] = origins_name + "_" + origins_in.index.astype(str)
+    origins["geometry"] = origins_in["geometry"]
 
     if origin_count:
-        origin_new[origin_count] = origin_tmp[origin_count]
+        origins[origin_count] = origins_in[origin_count]
 
-    origin_new["o_id"] = origins_name + "_" + origin_new.index.astype(str)
-    origin_new.crs = origin.crs
-    origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
+    # Destinations
+    destinations = gpd.GeoDataFrame(columns=["d_id", "geometry"], crs=crs_)
 
-    destination_columns = ["d_id", "geometry"]
+    destinations_in = gpd.read_file(destinations_path, crs=crs_, engine="pyogrio")
+    destinations["d_id"] = destinations_name + "_" + destinations_in.index.astype(str)
+    destinations["geometry"] = destinations_in["geometry"]
+
     if category:
-        destination_columns.append(category)
+        destinations[category] = destinations_in[category]
 
-    destination = gpd.GeoDataFrame(columns=destination_columns, crs=crs_)
-
-    destination_columns_add = ["geometry"]
-    if category:
-        destination_columns_add.append(category)
-
-    destination_new = gpd.read_file(destinations_path, crs=crs_, engine="pyogrio")
-    destination_new = destination_new[destination_columns_add]
-    destination_new["d_id"] = (
-        destinations_name + "_" + destination_new.index.astype(str)
-    )
-    destination_new.crs = destination.crs
-    destination = gpd.GeoDataFrame(
-        pd.concat([destination, destination_new], ignore_index=True)
-    )
-
-    od = pd.concat([origin, destination], sort=False)
+    od = pd.concat([origins, destinations], sort=False)
 
     return od
 
