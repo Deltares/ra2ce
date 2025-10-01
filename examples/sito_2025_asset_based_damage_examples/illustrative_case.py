@@ -68,6 +68,7 @@ network_section = NetworkSection(
         RoadTypeEnum.MOTORWAY,
         RoadTypeEnum.MOTORWAY_LINK,
     ],
+    reuse_network_output=True,
 )
 
 hazard_section = HazardSection(
