@@ -22,9 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Protocol
 
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -56,15 +56,6 @@ LossesAnalysisNameList: list[str] = list(
 DamagesAnalysisNameList: list[str] = list(
     map(str, AnalysisDamagesEnum.list_valid_options())
 )
-
-
-@dataclass
-class ProjectSection:
-    """
-    Reflects all possible settings that a project section might contain.
-    """
-
-    name: str = ""
 
 
 @dataclass
@@ -121,6 +112,38 @@ class AnalysisSectionLosses(AnalysisSectionBase):
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
     risk_calculation_year: int = 0
+
+class AnalysisConfigDataProtocol(Protocol):
+    """
+    Reflects all common settings that damages and losses analysis sections might contain.
+    """
+
+    name: str = ""
+    save_gpkg: bool = False
+    save_csv: bool = False
+
+@dataclass
+class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+    """
+    Reflects all possible settings that a single link redundancy config might contain.
+    """
+
+    name: str
+    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
+    save_gpkg: bool = False
+    save_csv: bool = False
+
+    @classmethod
+    def from_ini_file(cls, **kwargs):      
+        """
+        Legacy helper class method to filter out properties present in the ini files
+        no longer required by ra2ce config data such as `analysis`.
+        """
+        _field_names = set([f.name for f in fields(cls)])
+        return cls(**{
+            k: v for k, v in kwargs.items() 
+            if k in _field_names
+        })
 
 
 @dataclass
@@ -183,6 +206,15 @@ class AnalysisSectionAdaptationOption:
 
 
 @dataclass
+class ProjectSection:
+    """
+    Reflects all possible settings that a project section might contain.
+    """
+
+    name: str = ""
+
+
+@dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
@@ -190,7 +222,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     """
 
     ANALYSIS_SECTION = (
-        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation | AnalysisConfigDataProtocol
     )
 
     root_path: Optional[Path] = None
@@ -295,4 +327,5 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
         return ini_file.parent.joinpath("output")
