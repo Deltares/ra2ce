@@ -21,7 +21,6 @@ class TestOriginClosestDestination:
             origins_destinations=OriginsDestinationsSection(
                 origins_names="",
                 destinations_names="",
-                id_name_origin_destination="",
                 origin_out_fraction="",
                 origin_count="",
                 category="dummy_value",
