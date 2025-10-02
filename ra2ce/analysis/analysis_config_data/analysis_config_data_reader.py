@@ -32,6 +32,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     LossesAnalysisNameList,
     ProjectSection,
 )
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -49,6 +52,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
+)
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
@@ -102,6 +108,46 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
+
+    def _get_single_link_redundancy_config_data(self, section_name: str) -> SingleLinkRedundancyConfigData:
+        _section = SingleLinkRedundancyConfigData.from_ini_file(**self._parser[section_name])
+        _section.name = self._parser.get(section_name, "name", fallback=_section.name)
+        _section.weighing = WeighingEnum.get_enum(
+            self._parser.get(section_name, "weighing", fallback=None)
+        )
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        return _section
+
+    def _get_analysis_sections_with_new_dataclasses(self) -> list[AnalysisConfigDataProtocol]:
+        """
+        Extracts info from [analysis<n>] sections
+
+        Returns:
+            list[AnalysisConfigDataProtocol]: List of analyses
+        """
+        _section_names = list(
+            section_name
+            for section_name in self._parser.sections()
+            if "analysis" in section_name
+        )
+        _analysis_sections: list[AnalysisConfigDataProtocol] = []
+
+        for _section_name in _section_names:
+            _analysis_type = self._parser.get(_section_name, "analysis", fallback=None)
+            if _analysis_type == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value:
+                _analysis_section = self._get_single_link_redundancy_config_data(_section_name)
+                _analysis_sections.append(_analysis_section)
+            else:
+                continue
+                # NOTE: Work in progress, we do not need to raise an error just yet.
+                raise ValueError(f"Analysis {_analysis_type} not supported.")
+
+        return _analysis_sections
 
     def _get_analysis_section_losses(self, section_name: str) -> AnalysisSectionLosses:
         _section = AnalysisSectionLosses(**self._parser[section_name])
