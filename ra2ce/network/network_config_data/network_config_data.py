@@ -59,8 +59,6 @@ class NetworkSection:
 class OriginsDestinationsSection:
     origins: Optional[Path] = None
     destinations: Optional[Path] = None
-    origins_name: str = ""
-    destinations_name: str = ""
     origin_count: Optional[str] = None
     origin_out_fraction: int = (
         1  # fraction of things/people going out of the origin to the destination
