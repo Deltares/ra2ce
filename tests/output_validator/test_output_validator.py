@@ -1,7 +1,9 @@
 import shutil
 from pathlib import Path
 
+import geopandas as gpd
 import pytest
+from shapely.geometry import Point
 
 from tests import test_data, test_results
 from tests.output_validator.output_validator import OutputValidator
@@ -93,3 +95,26 @@ class TestOutputValidator:
             str(exc.value)
             == f"No validator implemented for file type {_unknown_extension}"
         )
+
+    def test_run_output_validator_different_gpkg_features_raises(
+        self, results_dir: Path
+    ) -> None:
+        # 1. Define test data.
+        _modified_reference_file = results_dir.joinpath(
+            "reference", "static", "output_graph", "base_graph_edges.gpkg"
+        )
+        _modified_reference_file.unlink(missing_ok=True)
+
+        _gpd = gpd.GeoDataFrame(
+            columns=["geometry"], crs="epsg:4326", data=[Point(1, 1)]
+        )
+        _gpd.to_file(_modified_reference_file, driver="GPKG")
+        assert _modified_reference_file.is_file()
+
+        _validator = OutputValidator(result_path=results_dir)
+
+        # 2. Run test data and verify expectations.
+        with pytest.raises(AssertionError) as exc:
+            _validator.validate_results()
+
+        assert str(exc.value).endswith("differ in number of features: 1 != 230")
