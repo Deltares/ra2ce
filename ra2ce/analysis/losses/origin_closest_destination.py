@@ -69,13 +69,15 @@ class OriginClosestDestination:
             analysis_input.file_id if analysis_input.file_id is not None else "rfid"
         )
 
-        self.destination_names: list[str] = None
+        self.destination_categories: list[str] = None
         self.destination_key = None
         if self.origins_destinations.category:
             self.destination_key = "category"
             self.destination_key_value = self.origins_destinations.category
 
         self.results_dict = {}
+        self.origin_prefix: str = "O"
+        self.destination_prefix: str = "D"
 
     def optimal_route_origin_closest_destination(
         self,
@@ -94,11 +96,12 @@ class OriginClosestDestination:
         col_name = "noHaz"
 
         if self.destination_key:
-            self.destination_names = list(
+            self.destination_categories = list(
                 destinations[self.origins_destinations.category].unique()
             )
             self.destination_names_short = {
-                dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
+                dn: f"{self.destination_prefix}{i+1}"
+                for i, dn in enumerate(self.destination_categories)
             }
 
             for i, dn in self.destination_names_short.items():
@@ -156,11 +159,12 @@ class OriginClosestDestination:
         base_graph = copy.deepcopy(graph)
 
         if self.destination_key:
-            self.destination_names = list(
+            self.destination_categories = list(
                 destinations[self.origins_destinations.category].unique()
             )
             self.destination_names_short = {
-                dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
+                dn: f"{self.destination_prefix}{i+1}"
+                for i, dn in enumerate(self.destination_categories)
             }
 
         aggregated = []
@@ -266,16 +270,21 @@ class OriginClosestDestination:
 
         # If the destination is different from the origin, the destination is further than without hazard disruption
         if pref_routes.loc[
-            (pref_routes["origin"] == "O") & (pref_routes["destination"] == "D")
+            (pref_routes["origin"] == self.origin_prefix)
+            & (pref_routes["destination"] == self.desitination_prefix)
         ].empty:
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = (
                 alt_route
-                - pref_routes.loc[pref_routes["origin"] == "O", self.weighing].iloc[0]
+                - pref_routes.loc[
+                    pref_routes["origin"] == self.origin_prefix, self.weighing
+                ].iloc[0]
             )
             extra_km = (
                 alt_dist
-                - pref_routes.loc[pref_routes["origin"] == "O", "tot_km"].iloc[0]
+                - pref_routes.loc[
+                    pref_routes["origin"] == self.origin_prefix, "tot_km"
+                ].iloc[0]
             )
             pp_delayed.append(nr_per_route)
             extra_weights.append(extra_dist)
@@ -358,7 +367,9 @@ class OriginClosestDestination:
                 self.origin_count,
             ].iloc[0]
         except IndexError:
-            origin_node = [a for a in origin_node.split(",") if "O" in a][0]
+            origin_node = [
+                a for a in origin_node.split(",") if self.origin_prefix in a
+            ][0]
             nr_people_per_route_total = origins.loc[
                 origins["o_id"] == origin_node,
                 self.origin_count,
@@ -375,7 +386,9 @@ class OriginClosestDestination:
         col_name: str,
     ) -> gpd.GeoDataFrame:
         dest_ids = [
-            d for d in [dest for dest in destination_name.split(",")] if "D" in d
+            d
+            for d in [dest for dest in destination_name.split(",")]
+            if self.desitination_prefix in d
         ]
 
         # Add the number of people to the total number of people that go to that destination
@@ -481,7 +494,7 @@ class OriginClosestDestination:
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
-            if self.od_key in ndat and "D" in ndat[self.od_key]:
+            if self.od_key in ndat and self.desitination_prefix in ndat[self.od_key]:
                 special_edges.append((n, "special", {self.weighing: 0}))
 
         disrupted_graph.add_edges_from(special_edges)
@@ -560,7 +573,7 @@ class OriginClosestDestination:
             Optional[gpd.GeoDataFrame]: When the wrapper for-loop needs to go into the next iteration it will return 'None'. Otherwise a resulting `gpd.GeoDataFrame`.
         """
         n, ndat = n_ndat
-        if self.od_key in ndat and "O" in ndat[self.od_key]:
+        if self.od_key in ndat and self.origin_prefix in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
                 # Add elements to the dictionary this way to prevent an exception when
                 # their key is not present.
@@ -688,7 +701,7 @@ class OriginClosestDestination:
         """
 
         optimal_routes = []
-        for dest_name in self.destination_names:
+        for dest_name in self.destination_categories:
             name_save = column_name + "_{}" + self.destination_names_short[dest_name]
             nx.set_edge_attributes(base_graph, 0, name_save.format("P"))
 
