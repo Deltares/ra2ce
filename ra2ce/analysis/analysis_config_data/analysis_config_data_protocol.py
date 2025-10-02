@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Protocol
 
+from ra2ce.common.validation.validation_report import ValidationReport
+
 
 class AnalysisConfigDataProtocol(Protocol):
     """
@@ -30,3 +32,17 @@ class AnalysisConfigDataProtocol(Protocol):
     name: str = ""
     save_gpkg: bool = False
     save_csv: bool = False
+
+class AnalysisConfigDataWithIntegrityValidationProtocol(AnalysisConfigDataProtocol, Protocol):
+    """
+    Extension of the protocol AnalysisConfigDataProtocol with integrity validation method.
+    """
+
+    def validate_integrity(self) -> ValidationReport:
+      """
+      Validates the integrity of the config data instance.
+
+      Returns:
+          ValidationReport: The validation report containing the results of the integrity check.
+      """
+      ...
