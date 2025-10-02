@@ -328,4 +328,3 @@ class AnalysisConfigData(ConfigDataProtocol):
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
         return ini_file.parent.joinpath("output")
-        return ini_file.parent.joinpath("output")
