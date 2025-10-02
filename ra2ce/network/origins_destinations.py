@@ -59,7 +59,7 @@ def read_origin_destination_files(
     Args:
         origins_path: The path of the point shapefile used for the locations of the Origins.
         origins_name: The name of the origins
-        destinations_path: The path of the point shapefile(s) used for the locations of the Destinations.
+        destinations_path: The path of the point shapefile used for the locations of the Destinations.
         destinations_name: The name of the destinations
         origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
         crs_: The Coordinate Reference System used in the project.
