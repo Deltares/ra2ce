@@ -24,6 +24,7 @@ class SourceEnum(Ra2ceEnumBase):
         Invalid or unsupported data source (99).
 
     """
+
     OSB_BPF = 1
     OSM_DOWNLOAD = 2
     SHAPEFILE = 3

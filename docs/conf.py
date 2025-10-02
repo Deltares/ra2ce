@@ -118,11 +118,11 @@ source_suffix = ".rst"
 # The master toctree document.
 master_doc = "index"
 
-nb_execution_mode = "off" # notebook will not be executed during the build process
+nb_execution_mode = "off"  # notebook will not be executed during the build process
 # Disable input prompts in code cells
 
-nbsphinx_prompt_width = '0px'        # string with units
-nbsphinx_show_input_prompt = False   # hides input prompts
+nbsphinx_prompt_width = "0px"  # string with units
+nbsphinx_show_input_prompt = False  # hides input prompts
 nbsphinx_show_output_prompt = False  # hides output prompts
 
 
@@ -298,5 +298,7 @@ nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
 nbsphinx_execute = "never"
 
-autodoc_typehints = "description"   # put type hints in the description instead of signature
+autodoc_typehints = (
+    "description"  # put type hints in the description instead of signature
+)
 add_module_names = False  # shorten class names in the docs

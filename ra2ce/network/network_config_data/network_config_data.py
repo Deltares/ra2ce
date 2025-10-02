@@ -79,7 +79,9 @@ class NetworkSection:
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
     road_types: list[RoadTypeEnum] = field(default_factory=list)
-    attributes_to_exclude_in_simplification: Optional[list[str]] = field(default_factory=list)
+    attributes_to_exclude_in_simplification: Optional[list[str]] = field(
+        default_factory=list
+    )
     save_gpkg: bool = False
     reuse_network_output: bool = False
 
@@ -95,6 +97,12 @@ class OriginsDestinationsSection:
         Path to a shapefile or other supported file containing origin points.
     destinations
         Path to a shapefile or other supported file containing destination points.
+    origins_names
+        Shortcut name for the origins, used in output files.
+    destinations_names
+        Shortcut name for the destinations, used in output files.
+    id_name_origin_destination
+        Field name of the ID attribute in both the origins and destinations files. Mandatory field.
     origin_count
         Field name of the attribute in the origins file that contains the count of things/people at the origin. Mandatory field.
     origin_out_fraction
@@ -106,6 +114,7 @@ class OriginsDestinationsSection:
     region_var
         (Optional) Field name of the attribute in the region file that contains the region variable.
     """
+
     origins: Optional[Path] = None
     destinations: Optional[Path] = None
     origin_count: Optional[str] = None
@@ -142,6 +151,7 @@ class HazardSection:
     overlay_segmented_network
         If False no overlay of the segmented network will be created. Default is ``True``.
     """
+
     hazard_map: list[Path] = field(default_factory=list)
     hazard_id: Optional[str] = ""
     hazard_field_name: Optional[str] = ""
@@ -191,6 +201,7 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup
         Section containing cleanup options.
     """
+
     root_path: Path = None
     static_path: Path = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.

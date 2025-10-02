@@ -13,6 +13,7 @@ class ToIntegrateShaperProtocol(Protocol):
     Attributes:
         gdf (GeoDataFrame): Input GeoDataFrame containing hazard data.
     """
+
     gdf: gpd.GeoDataFrame
 
     def get_return_periods(self) -> list:
