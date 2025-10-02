@@ -271,7 +271,7 @@ class OriginClosestDestination:
         # If the destination is different from the origin, the destination is further than without hazard disruption
         if pref_routes.loc[
             (pref_routes["origin"] == self.origin_prefix)
-            & (pref_routes["destination"] == self.desitination_prefix)
+            & (pref_routes["destination"] == self.destination_prefix)
         ].empty:
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = (
@@ -388,7 +388,7 @@ class OriginClosestDestination:
         dest_ids = [
             d
             for d in [dest for dest in destination_name.split(",")]
-            if self.desitination_prefix in d
+            if self.destination_prefix in d
         ]
 
         # Add the number of people to the total number of people that go to that destination
@@ -467,21 +467,24 @@ class OriginClosestDestination:
         list,
         gpd.GeoDataFrame,
     ]:
-        """Find the closest destination nodes with a certain attribute from all origin nodes for a single destination
+        """Find the closest destination nodes with a certain attribute from all origin nodes for a single destination.
+
         Args:
-            disrupted_graph: NetworkX graph with origin and destination nodes and disrupted edges removed
-            base_graph: Original NetworkX graph
-            origins: GeoDataFrame containing the origins
-            destinations: GeoDataFrame containing the destinations
-            column_name: the name of the column which will be added to the base_graph, origins, destinations, and self.results_dict
-            hazard_name: the name of the hazard (which is an attribute of the edges in the disrupted_graph)
-            pref_routes: GeoDataFrame containing the preferred routes without disruption
+            disrupted_graph (nx.MultiGraph): NetworkX graph with origin and destination nodes and disrupted edges removed.
+            base_graph (nx.MultiGraph): Original NetworkX graph.
+            origins (gpd.GeoDataFrame): GeoDataFrame containing the origins.
+            destinations (gpd.GeoDataFrame): GeoDataFrame containing the destinations.
+            column_name (str): Name of the column to be added to the base_graph, origins, destinations, and results_dict.
+            hazard_name (str, optional): Name of the hazard (an attribute of the edges in disrupted_graph). Defaults to None.
+            pref_routes (gpd.GeoDataFrame, optional): GeoDataFrame containing preferred routes without disruption. Defaults to None.
 
         Returns:
-            base_graph:
-            origins: the updated origins GeoDataFrame
-            destinations: the updated destinations GeoDataFrame
-            list_disrupted_destinations [list of tuples]: list of the origin and destination node id and node name from the origins/nodes that do not have a route between them
+            tuple:
+                - base_graph (nx.MultiGraph): The updated base graph.
+                - origins (gpd.GeoDataFrame): Updated origins GeoDataFrame.
+                - destinations (gpd.GeoDataFrame): Updated destinations GeoDataFrame.
+                - list_disrupted_destinations (list): List of tuples with origin and destination node id and name for unreachable destinations.
+                - pref_routes (gpd.GeoDataFrame): Updated preferred routes.
         """
         name_save = column_name + "_{}"
         nx.set_edge_attributes(base_graph, 0, name_save.format("P"))
@@ -494,7 +497,7 @@ class OriginClosestDestination:
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
-            if self.od_key in ndat and self.desitination_prefix in ndat[self.od_key]:
+            if self.od_key in ndat and self.destination_prefix in ndat[self.od_key]:
                 special_edges.append((n, "special", {self.weighing: 0}))
 
         disrupted_graph.add_edges_from(special_edges)
@@ -683,21 +686,24 @@ class OriginClosestDestination:
         list,
         gpd.GeoDataFrame,
     ]:
-        """Find the closest destination nodes with a certain attribute from all origin nodes for multiple destinations
+        """Find the closest destination nodes with a certain attribute from all origin nodes for multiple destinations.
+
         Args:
-            disrupted_graph: NetworkX graph with origin and destination nodes and disrupted edges removed
-            base_graph: Original NetworkX graph
-            origins: GeoDataFrame containing the origins
-            destinations: GeoDataFrame containing the destinations
-            column_name: the name of the column which will be added to the base_graph, origins, destinations, and self.results_dict
-            hazard_name: the name of the hazard
-            pref_routes: GeoDataFrame containing the preferred routes without disruption
+            disrupted_graph (nx.MultiGraph): NetworkX graph with origin and destination nodes and disrupted edges removed.
+            base_graph (nx.MultiGraph): Original NetworkX graph.
+            origins (gpd.GeoDataFrame): GeoDataFrame containing the origins.
+            destinations (gpd.GeoDataFrame): GeoDataFrame containing the destinations.
+            column_name (str): Name of the column to be added to base_graph, origins, destinations, and results_dict.
+            hazard_name (str, optional): Name of the hazard. Defaults to None.
+            pref_routes (gpd.GeoDataFrame, optional): GeoDataFrame containing the preferred routes without disruption. Defaults to None.
 
         Returns:
-            base_graph:
-            origins: the updated origins GeoDataFrame
-            destinations: the updated destinations GeoDataFrame
-            list_disrupted_destinations [list of tuples]: list of the origin and destination node id and node name from the origins/nodes that do not have a route between them
+            tuple:
+                - base_graph (nx.MultiGraph): The updated base graph.
+                - origins (gpd.GeoDataFrame): Updated origins GeoDataFrame.
+                - destinations (gpd.GeoDataFrame): Updated destinations GeoDataFrame.
+                - list_disrupted_destinations (list): List of tuples with origin and destination node id and node name for unreachable destinations.
+                - pref_routes (gpd.GeoDataFrame): Updated preferred routes.
         """
 
         optimal_routes = []

@@ -100,7 +100,17 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
     def multi_link_origin_destination(
         self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
     ) -> GeoDataFrame:
-        """Calculates the connectivity between origins and destinations"""
+        """
+        Calculates the connectivity between origins and destinations.
+
+        Args:
+            graph: The MultiGraph representing the network.
+            analysis: The AnalysisSectionLosses object containing OD information.
+
+        Returns:
+            GeoDataFrame: Connectivity results between origins and destinations.
+
+        """
         od_nodes = self._get_origin_destination_pairs(graph)
 
         all_results = []
@@ -269,22 +279,34 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         self, gdf_ori: GeoDataFrame
     ) -> tuple[GeoDataFrame, GeoDataFrame]:
         """
-        Aggregation of the impacts of disruptions at region level
-        Users need to specify 'region' and 'region_var' attributes in the network.ini file
-        See the Pontianak case study for an example
+        Aggregate the impacts of disruptions at the regional level.
 
-        The function outputs the following files:
+        Users need to specify the 'region' and 'region_var' attributes in the network.ini file.
+        See the Pontianak case study for an example.
+
+        The function outputs two files:
+
         1. multi_link_origin_destination_regional_impact.csv
-            Impacts of disruption aggregated for each origin node. Region information (to which region an origin node belongs) is retained
+           - Impacts of disruption aggregated for each origin node.
+           - Retains region information (which region each origin node belongs to).
 
         2. multi_link_origin_destination_regional_impact_summary.csv
-            Impacts of disruption aggregated for each region.
+           - Impacts of disruption aggregated for each region.
 
-        In both files, the following information is stored:
-            - init_length: initial average length to all destination nodes (for each origin node and for each region)
-            - init_destination: initial number of destination nodes
-            - hazardName_pc_increase: average increase in travel time to all destination nodes (percentage relative to initial travel time, for each origin node and for each region)
-            - hazardName_pc_disconnect: average number of OD pairs disconnected (relative to initial number of OD pairs, for each origin node and for each region)
+        Both files contain the following information:
+
+            - init_length: Initial average length to all destination nodes (for each origin node and each region).
+            - init_destination: Initial number of destination nodes.
+            - hazardName_pc_increase: Average increase in travel time to all destination nodes (percentage relative to initial travel time, for each origin node and each region).
+            - hazardName_pc_disconnect: Average number of OD pairs disconnected (relative to initial number of OD pairs, for each origin node and each region).
+
+        Args:
+            gdf_ori (GeoDataFrame): GeoDataFrame containing the origin nodes.
+
+        Returns:
+            tuple[GeoDataFrame, GeoDataFrame]:
+                - First GeoDataFrame: aggregated results per origin node.
+                - Second GeoDataFrame: aggregated results per region.
         """
 
         gdf_ori_ = gdf_ori.copy()

@@ -24,6 +24,15 @@ from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 
 class AvgSpeedWriter(Ra2ceExporterProtocol):
     def export(self, export_path: Path, export_data: AvgSpeed) -> None:
+        """Export an `AvgSpeed` object to a CSV file.
+
+        Args:
+            export_path (Path): Path to save the CSV file.
+            export_data (AvgSpeed): The `AvgSpeed` object containing average speed data.
+
+        Returns:
+            None
+        """
         export_path.parent.mkdir(parents=True, exist_ok=True)
         pd.DataFrame(
             {
