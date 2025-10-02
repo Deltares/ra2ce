@@ -31,13 +31,16 @@ from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeE
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
+from ra2ce.analysis.analysis_config_data.legacy_mappers import with_legacy_mappers
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
+@with_legacy_mappers
 @dataclass
 class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
-
-    name: str
+    """
+    Configuration data for damages analysis.
+    """
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID

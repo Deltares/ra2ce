@@ -19,30 +19,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.legacy_mappers import with_legacy_mappers
 
 
+@with_legacy_mappers
 @dataclass
 class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     """
     Reflects all possible settings that a single link redundancy config might contain.
     """
-
-    name: str
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
-    save_gpkg: bool = False
-    save_csv: bool = False
-
-    @classmethod
-    def from_ini_file(cls, **kwargs):
-        """
-        Legacy helper class method to filter out properties present in the ini files
-        no longer required by ra2ce config data such as `analysis`.
-        """
-        _field_names = set([f.name for f in fields(cls)])
-        return cls(**{k: v for k, v in kwargs.items() if k in _field_names})
