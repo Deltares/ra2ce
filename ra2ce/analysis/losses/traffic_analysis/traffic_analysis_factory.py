@@ -36,7 +36,6 @@ class TrafficAnalysisFactory:
     def get_analysis(
         road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
-        destinations_name: str,
         equity_data: pd.DataFrame,
     ) -> TrafficAnalysisBase:
         """
@@ -45,17 +44,14 @@ class TrafficAnalysisFactory:
         Args:
             road_network (gpd.GeoDataFrame): General dataframe for the road network to analyze.
             od_table (gpd.GeoDataFrame): Origins - destination table dataframe.
-            destinations_name (str): Destinations name.
             equity_data (pd.DataFrame): Dataframe contaning region - weight information.
 
         Returns:
             TrafficAnalysisBase: Object to make an equity analysis.
         """
         if isinstance(equity_data, pd.DataFrame) and not equity_data.empty:
-            return EquityAnalysis(
-                road_network, od_table, destinations_name, equity_data
-            )
-        return TrafficAnalysis(road_network, od_table, destinations_name)
+            return EquityAnalysis(road_network, od_table, equity_data)
+        return TrafficAnalysis(road_network, od_table)
 
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:

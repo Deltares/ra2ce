@@ -67,8 +67,6 @@ class Network:
         _origins_destinations = network_config.origins_destinations
         self.origins = _origins_destinations.origins
         self.destinations = _origins_destinations.destinations
-        self.origins_name = _origins_destinations.origins_name
-        self.destinations_name = _origins_destinations.destinations_name
         self.origin_count: Optional[str] = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
         self.region = _origins_destinations.region
@@ -97,9 +95,7 @@ class Network:
         # Add the origin/destination nodes to the network
         ods = read_origin_destination_files(
             self.origins,
-            self.origins_name,
             self.destinations,
-            self.destinations_name,
             self.origin_count,
             crs,
             self.od_category,

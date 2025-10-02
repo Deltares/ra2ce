@@ -46,9 +46,7 @@ TODO: This whole file should be throughouly tested / redesigned.
 
 def read_origin_destination_files(
     origins_path: Path,
-    origins_name: str,
     destinations_path: Path,
-    destinations_name: str,
     origin_count: Optional[str],
     crs: pyproj.CRS,
     category: str,
@@ -58,9 +56,7 @@ def read_origin_destination_files(
     """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
     Args:
         origins_path: The path of the point shapefile used for the locations of the Origins.
-        origins_name: The name of the origins
         destinations_path: The path of the point shapefile used for the locations of the Destinations.
-        destinations_name: The name of the destinations
         origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
         crs_: The Coordinate Reference System used in the project.
         category: The name of the attribute in the destination shapefile that can be used to categorize the (closest) destination.
@@ -81,7 +77,7 @@ def read_origin_destination_files(
         origins["region"] = origins_in[region_var]
         origins["region"].fillna("Not assigned", inplace=True)
 
-    origins["o_id"] = origins_name + "_" + origins_in.index.astype(str)
+    origins["o_id"] = "O_" + origins_in.index.astype(str)
     origins["geometry"] = origins_in["geometry"]
 
     if origin_count:
@@ -91,7 +87,7 @@ def read_origin_destination_files(
     destinations = gpd.GeoDataFrame(columns=["d_id", "geometry"], crs=crs)
 
     destinations_in = gpd.read_file(destinations_path, crs=crs, engine="pyogrio")
-    destinations["d_id"] = destinations_name + "_" + destinations_in.index.astype(str)
+    destinations["d_id"] = "D_" + destinations_in.index.astype(str)
     destinations["geometry"] = destinations_in["geometry"]
 
     if category:

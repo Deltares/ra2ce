@@ -62,8 +62,6 @@ class OriginClosestDestination:
         self.threshold_destinations = self.analysis.threshold_destinations
         self.weighing = self.analysis.weighing.config_value
         self.origins_destinations = analysis_input.origins_destinations
-        self.o_name = self.origins_destinations.origins_name
-        self.d_name = self.origins_destinations.destinations_name
         self.origin_out_fraction = self.origins_destinations.origin_out_fraction
         self.origin_count: Optional[str] = self.origins_destinations.origin_count
         self.od_key = "od_id"
@@ -258,8 +256,6 @@ class OriginClosestDestination:
         self,
         pref_routes: gpd.GeoDataFrame,
         nr_per_route: float,
-        o_name: str,
-        d_name: str,
         alt_route: float,
         alt_dist: float,
     ) -> None:
@@ -270,18 +266,16 @@ class OriginClosestDestination:
 
         # If the destination is different from the origin, the destination is further than without hazard disruption
         if pref_routes.loc[
-            (pref_routes["origin"] == o_name) & (pref_routes["destination"] == d_name)
+            (pref_routes["origin"] == "O") & (pref_routes["destination"] == "D")
         ].empty:
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = (
                 alt_route
-                - pref_routes.loc[pref_routes["origin"] == o_name, self.weighing].iloc[
-                    0
-                ]
+                - pref_routes.loc[pref_routes["origin"] == "O", self.weighing].iloc[0]
             )
             extra_km = (
                 alt_dist
-                - pref_routes.loc[pref_routes["origin"] == o_name, "tot_km"].iloc[0]
+                - pref_routes.loc[pref_routes["origin"] == "O", "tot_km"].iloc[0]
             )
             pp_delayed.append(nr_per_route)
             extra_weights.append(extra_dist)
@@ -364,7 +358,7 @@ class OriginClosestDestination:
                 self.origin_count,
             ].iloc[0]
         except IndexError:
-            origin_node = [a for a in origin_node.split(",") if self.o_name in a][0]
+            origin_node = [a for a in origin_node.split(",") if "O" in a][0]
             nr_people_per_route_total = origins.loc[
                 origins["o_id"] == origin_node,
                 self.origin_count,
@@ -381,9 +375,7 @@ class OriginClosestDestination:
         col_name: str,
     ) -> gpd.GeoDataFrame:
         dest_ids = [
-            d
-            for d in [dest for dest in destination_name.split(",")]
-            if self.d_name in d
+            d for d in [dest for dest in destination_name.split(",")] if "D" in d
         ]
 
         # Add the number of people to the total number of people that go to that destination
@@ -489,7 +481,7 @@ class OriginClosestDestination:
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
-            if self.od_key in ndat and self.d_name in ndat[self.od_key]:
+            if self.od_key in ndat and "D" in ndat[self.od_key]:
                 special_edges.append((n, "special", {self.weighing: 0}))
 
         disrupted_graph.add_edges_from(special_edges)
@@ -568,7 +560,7 @@ class OriginClosestDestination:
             Optional[gpd.GeoDataFrame]: When the wrapper for-loop needs to go into the next iteration it will return 'None'. Otherwise a resulting `gpd.GeoDataFrame`.
         """
         n, ndat = n_ndat
-        if self.od_key in ndat and self.o_name in ndat[self.od_key]:
+        if self.od_key in ndat and "O" in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
                 # Add elements to the dictionary this way to prevent an exception when
                 # their key is not present.

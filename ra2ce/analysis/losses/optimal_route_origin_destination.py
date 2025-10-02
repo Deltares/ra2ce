@@ -195,7 +195,6 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         return TrafficAnalysisFactory.get_analysis(
             road_network,
             od_table,
-            self.origins_destinations.destinations_name,
             equity,
         ).optimal_route_od_link()
 
