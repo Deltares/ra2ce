@@ -60,6 +60,7 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         Returns:
             list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
         """
+        # NOTE: this code is duplicated in optimal_route_origin_destination.py
         _od_nodes = []
         for n, v in graph.nodes(data=True):
             if "od_id" not in v:
@@ -70,7 +71,8 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
 
     def _get_origin_destination_pairs(
         self, graph: nx.MultiGraph
-    ) -> list[tuple[str, str], tuple[str, str]]:
+    ) -> list[tuple[tuple[str, str], tuple[str, str]]]:
+        # NOTE: this code is duplicated in optimal_route_origin_destination.py
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -81,24 +83,19 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
             for b in od.loc[od["d_id"].notnull(), "d_id"]
         ]
         all_nodes = self.extract_od_nodes_from_graph(graph)
-        od_nodes = []
-        for aa, bb in od_pairs:
+
+        def _find_node(name: str, nodes: list[tuple[str, str]]) -> tuple[str, str]:
             # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
-            od_nodes.append(
-                (
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == aa) | (aa in n_name)
-                    ][0],
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == bb) | (bb in n_name)
-                    ][0],
-                )
+            return next(
+                (n, n_name)
+                for n, n_name in nodes
+                if n_name == name or name in n_name.split(",")
             )
-        return od_nodes
+
+        return [
+            (_find_node(aa, all_nodes), _find_node(bb, all_nodes))
+            for aa, bb in od_pairs
+        ]
 
     def multi_link_origin_destination(
         self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
@@ -168,8 +165,8 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
 
         # calculate number of disconnected origin, destination, and origin-destination pair
         # TODO: there seems to be an issue in calculating origin_count and destination_count where origin and destination nodes are the same, e.g., A_25,B_1
-        gdf["OD"] = gdf["origin"] + gdf["destination"]
-        gdf_ori["OD"] = gdf_ori["origin"] + gdf_ori["destination"]
+        gdf["OD"] = gdf["origin"] + "-" + gdf["destination"]
+        gdf_ori["OD"] = gdf_ori["origin"] + "-" + gdf_ori["destination"]
         # origin
         gdf_ori["origin_count"] = gdf_ori["origin"].apply(lambda x: len(x.split(",")))
         init_origins = gdf_ori.groupby("origin")["origin_count"].sum()

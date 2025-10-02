@@ -26,6 +26,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -56,15 +59,6 @@ LossesAnalysisNameList: list[str] = list(
 DamagesAnalysisNameList: list[str] = list(
     map(str, AnalysisDamagesEnum.list_valid_options())
 )
-
-
-@dataclass
-class ProjectSection:
-    """
-    Reflects all possible settings that a project section might contain.
-    """
-
-    name: str = ""
 
 
 @dataclass
@@ -183,6 +177,15 @@ class AnalysisSectionAdaptationOption:
 
 
 @dataclass
+class ProjectSection:
+    """
+    Reflects all possible settings that a project section might contain.
+    """
+
+    name: str = ""
+
+
+@dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
@@ -190,7 +193,10 @@ class AnalysisConfigData(ConfigDataProtocol):
     """
 
     ANALYSIS_SECTION = (
-        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+        AnalysisSectionDamages
+        | AnalysisSectionLosses
+        | AnalysisSectionAdaptation
+        | AnalysisConfigDataProtocol
     )
 
     root_path: Optional[Path] = None
