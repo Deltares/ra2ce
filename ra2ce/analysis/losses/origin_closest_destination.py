@@ -271,7 +271,7 @@ class OriginClosestDestination:
         # If the destination is different from the origin, the destination is further than without hazard disruption
         if pref_routes.loc[
             (pref_routes["origin"] == self.origin_prefix)
-            & (pref_routes["destination"] == self.desitination_prefix)
+            & (pref_routes["destination"] == self.destination_prefix)
         ].empty:
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = (
@@ -388,7 +388,7 @@ class OriginClosestDestination:
         dest_ids = [
             d
             for d in [dest for dest in destination_name.split(",")]
-            if self.desitination_prefix in d
+            if self.destination_prefix in d
         ]
 
         # Add the number of people to the total number of people that go to that destination
@@ -494,7 +494,7 @@ class OriginClosestDestination:
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
-            if self.od_key in ndat and self.desitination_prefix in ndat[self.od_key]:
+            if self.od_key in ndat and self.destination_prefix in ndat[self.od_key]:
                 special_edges.append((n, "special", {self.weighing: 0}))
 
         disrupted_graph.add_edges_from(special_edges)
