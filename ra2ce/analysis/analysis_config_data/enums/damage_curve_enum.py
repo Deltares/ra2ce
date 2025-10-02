@@ -23,6 +23,7 @@ class DamageCurveEnum(Ra2ceEnumBase):
     INVALID : int
         Invalid or unsupported damage curve type (99).
     """
+
     HZ = 1
     OSD = 2
     MAN = 3

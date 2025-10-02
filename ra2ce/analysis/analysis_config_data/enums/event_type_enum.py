@@ -22,6 +22,7 @@ class EventTypeEnum(Ra2ceEnumBase):
     INVALID : int
         Invalid or unsupported event type (99).
     """
+
     NONE = 0
     EVENT = 1
     RETURN_PERIOD = 2

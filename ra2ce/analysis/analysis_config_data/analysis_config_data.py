@@ -145,7 +145,6 @@ class AnalysisSectionLosses(AnalysisSectionBase):
         Year used for risk or estimated annual loss calculations.
     """
 
-
     analysis: AnalysisLossesEnum = field(
         default_factory=lambda: AnalysisLossesEnum.INVALID
     )
@@ -175,7 +174,9 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     save_traffic: Optional[bool] = False
 
     # risk or estimated annual losses related
-    event_type: Optional[EventTypeEnum] = field(default_factory=lambda: EventTypeEnum.NONE)
+    event_type: Optional[EventTypeEnum] = field(
+        default_factory=lambda: EventTypeEnum.NONE
+    )
     risk_calculation_mode: Optional[RiskCalculationModeEnum] = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
@@ -322,6 +323,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
 
     """
+
     ANALYSIS_SECTION = (
         AnalysisSectionDamages
         | AnalysisSectionLosses
@@ -333,7 +335,9 @@ class AnalysisConfigData(ConfigDataProtocol):
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=ProjectSection)
-    analyses: list[AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation] = field(default_factory=list)
+    analyses: list[
+        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+    ] = field(default_factory=list)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )

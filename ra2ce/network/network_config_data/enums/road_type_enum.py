@@ -57,6 +57,7 @@ class RoadTypeEnum(Ra2ceEnumBase):
     These identifiers are based on OSM tagging conventions.
     See: https://wiki.openstreetmap.org/wiki/Key:highway
     """
+
     NONE = 0
     MOTORWAY = 1
     MOTORWAY_LINK = 2

@@ -56,6 +56,7 @@ class RiskCalculationModeEnum(Ra2ceEnumBase):
     INVALID : int
         Invalid or unsupported risk calculation mode (99).
     """
+
     NONE = 0
     DEFAULT = 1
     CUT_FROM_YEAR = 2

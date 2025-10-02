@@ -13,6 +13,7 @@ class HzToIntegrateShaper(ToIntegrateShaperProtocol):
     Attributes:
         gdf (GeoDataFrame): Input GeoDataFrame containing hazard data.
     """
+
     gdf: gpd.GeoDataFrame
 
     def __init__(self, gdf):
