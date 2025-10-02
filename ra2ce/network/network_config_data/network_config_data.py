@@ -95,12 +95,6 @@ class OriginsDestinationsSection:
         Path to a shapefile or other supported file containing origin points.
     destinations
         Path to a shapefile or other supported file containing destination points.
-    origins_names
-        Shortcut name for the origins, used in output files.
-    destinations_names
-        Shortcut name for the destinations, used in output files.
-    id_name_origin_destination
-        Field name of the ID attribute in both the origins and destinations files. Mandatory field.
     origin_count
         Field name of the attribute in the origins file that contains the count of things/people at the origin. Mandatory field.
     origin_out_fraction
