@@ -109,8 +109,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
-    def _get_single_link_redundancy_config_data(self, section_name: str) -> SingleLinkRedundancyConfigData:
-        _section = SingleLinkRedundancyConfigData.from_ini_file(**self._parser[section_name])
+    def _get_single_link_redundancy_config_data(
+        self, section_name: str
+    ) -> SingleLinkRedundancyConfigData:
+        _section = SingleLinkRedundancyConfigData.from_ini_file(
+            **self._parser[section_name]
+        )
         _section.name = self._parser.get(section_name, "name", fallback=_section.name)
         _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
@@ -123,7 +127,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _get_analysis_sections_with_new_dataclasses(self) -> list[AnalysisConfigDataProtocol]:
+    def _get_analysis_sections_with_new_dataclasses(
+        self,
+    ) -> list[AnalysisConfigDataProtocol]:
         """
         Extracts info from [analysis<n>] sections
 
@@ -140,7 +146,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         for _section_name in _section_names:
             _analysis_type = self._parser.get(_section_name, "analysis", fallback=None)
             if _analysis_type == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value:
-                _analysis_section = self._get_single_link_redundancy_config_data(_section_name)
+                _analysis_section = self._get_single_link_redundancy_config_data(
+                    _section_name
+                )
                 _analysis_sections.append(_analysis_section)
             else:
                 continue

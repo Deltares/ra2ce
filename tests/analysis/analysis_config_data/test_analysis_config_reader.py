@@ -63,8 +63,12 @@ class TestAnalysisConfigReader:
 
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
-        
-        _first_slr_cd = next(_sl_cd for _sl_cd in _analyses_config_data if isinstance(_sl_cd, SingleLinkRedundancyConfigData))
+
+        _first_slr_cd = next(
+            _sl_cd
+            for _sl_cd in _analyses_config_data
+            if isinstance(_sl_cd, SingleLinkRedundancyConfigData)
+        )
         assert _first_slr_cd.name == "single link redundancy test"
         assert _first_slr_cd.save_csv is True
         assert _first_slr_cd.save_gpkg is True

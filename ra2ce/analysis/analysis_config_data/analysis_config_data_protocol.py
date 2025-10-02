@@ -30,4 +30,3 @@ class AnalysisConfigDataProtocol(Protocol):
     name: str = ""
     save_gpkg: bool = False
     save_csv: bool = False
-

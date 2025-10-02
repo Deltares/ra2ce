@@ -116,6 +116,7 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     )
     risk_calculation_year: int = 0
 
+
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
     """
@@ -192,7 +193,10 @@ class AnalysisConfigData(ConfigDataProtocol):
     """
 
     ANALYSIS_SECTION = (
-        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation | AnalysisConfigDataProtocol
+        AnalysisSectionDamages
+        | AnalysisSectionLosses
+        | AnalysisSectionAdaptation
+        | AnalysisConfigDataProtocol
     )
 
     root_path: Optional[Path] = None
