@@ -22,10 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -112,39 +115,6 @@ class AnalysisSectionLosses(AnalysisSectionBase):
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
     risk_calculation_year: int = 0
-
-class AnalysisConfigDataProtocol(Protocol):
-    """
-    Reflects all common settings that damages and losses analysis sections might contain.
-    """
-
-    name: str = ""
-    save_gpkg: bool = False
-    save_csv: bool = False
-
-@dataclass
-class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
-    """
-    Reflects all possible settings that a single link redundancy config might contain.
-    """
-
-    name: str
-    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
-    save_gpkg: bool = False
-    save_csv: bool = False
-
-    @classmethod
-    def from_ini_file(cls, **kwargs):      
-        """
-        Legacy helper class method to filter out properties present in the ini files
-        no longer required by ra2ce config data such as `analysis`.
-        """
-        _field_names = set([f.name for f in fields(cls)])
-        return cls(**{
-            k: v for k, v in kwargs.items() 
-            if k in _field_names
-        })
-
 
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
