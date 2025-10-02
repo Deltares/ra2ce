@@ -73,11 +73,10 @@ class TestTrafficAnalysisFactory:
         # 1. Define test data.
         _gdf = gpd.GeoDataFrame()
         _od_table = gpd.GeoDataFrame()
-        _destination_names = ""
 
         # 2. Run test.
         _result = TrafficAnalysisFactory.get_analysis(
-            _gdf, _od_table, _destination_names, equity_data_value
+            _gdf, _od_table, equity_data_value
         )
 
         # 3. Verify expectations.
@@ -88,7 +87,6 @@ class TestTrafficAnalysisFactory:
         self, valid_traffic_analysis_input: TrafficAnalysisInput
     ):
         # 1. Define test data.
-        valid_traffic_analysis_input.destination_names = ""
         assert (
             "values_prioritarian"
             not in valid_traffic_analysis_input.od_table_data.columns
@@ -98,7 +96,6 @@ class TestTrafficAnalysisFactory:
         _result = TrafficAnalysisFactory.get_analysis(
             valid_traffic_analysis_input.road_network,
             valid_traffic_analysis_input.od_table_data,
-            valid_traffic_analysis_input.destination_names,
             valid_traffic_analysis_input.equity_data,
         )
 

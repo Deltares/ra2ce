@@ -23,7 +23,6 @@ class TestEquityAnalysis:
         yield EquityAnalysis(
             valid_traffic_analysis_input.road_network,
             valid_traffic_analysis_input.od_table_data,
-            valid_traffic_analysis_input.destination_names,
             valid_traffic_analysis_input.equity_data,
         )
 
