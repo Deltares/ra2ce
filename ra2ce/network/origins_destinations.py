@@ -53,7 +53,8 @@ def read_origin_destination_files(
     regions_path: Optional[str],
     region_var: Optional[str],
 ):
-    """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
+    """Read origin and destination point shapefiles and create one OD GeoDataFrame.
+
     Args:
         origins_path: The path of the point shapefile used for the locations of the Origins.
         destinations_path: The path of the point shapefile used for the locations of the Destinations.
@@ -63,7 +64,7 @@ def read_origin_destination_files(
         regions_path:
         region_var:
     Returns:
-        od:
+        gpd.GeoDataFrame: A GeoDataFrame containing the combined origin-destination data.
     """
 
     # Origins

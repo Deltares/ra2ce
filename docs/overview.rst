@@ -26,44 +26,44 @@ Overview
 
     .. grid-item-card::
         :text-align: center
-        :link: examples_index
-        :link-type: ref
+        :link: getting_started/index
+        :link-type: doc
 
         :octicon:`eye;10em`
         +++
-        Examples
+        Getting started
     
     .. grid-item-card::
         :text-align: center
-        :link: network_module
-        :link-type: ref
+        :link: showcases/index
+        :link-type: doc
 
         :octicon:`share-android;10em`
         +++
-        Network user guide
+        Showcases & examples
 
     .. grid-item-card::
         :text-align: center
-        :link: analysis_module
-        :link-type: ref
+        :link: tutorials/index
+        :link-type: doc
 
         :octicon:`git-compare;10em`
         +++
-        Analysis user guide
+        Tutorials
 
     .. grid-item-card::
         :text-align: center
-        :link: technical_documentation
-        :link-type: ref
+        :link: api/index
+        :link-type: doc
 
         :octicon:`list-unordered;10em`
         +++
-        Technical documentation
+        Docstrings Reference
 
     .. grid-item-card::
         :text-align: center
-        :link: contributing
-        :link-type: ref
+        :link: contributing/index
+        :link-type: doc
 
         :octicon:`people;10em`
         +++
@@ -92,12 +92,9 @@ Overview
    :maxdepth: 1
    :hidden:
 
-   about/about.rst
-   installation/installation.rst
-   examples/index.rst
-   network_module/network_module.rst
-   analysis_module/analysis_module.rst 
-   contributing/index.rst
+   getting_started/index.rst
+   showcases/index.rst
+   tutorials/index.rst
+   api/index.rst
    technical_documentation/technical_documentation.rst
-   faq/faq.rst
-   publications/publications.rst
+   contributing/index.rst
