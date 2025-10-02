@@ -3,13 +3,13 @@ from typing import Any
 
 import pytest
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    SingleLinkRedundancyConfigData,
-)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
+)
 from tests import acceptance_test_data
 
 
