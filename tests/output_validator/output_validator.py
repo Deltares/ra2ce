@@ -1,12 +1,15 @@
 from pathlib import Path
 from typing import Iterator, Optional
 
-from tests.output_validator.csv_validator import CsvValidator
-from tests.output_validator.feather_validator import FeatherValidator
-from tests.output_validator.file_validator_protocol import FileValidatorProtocol
-from tests.output_validator.gpkg_validator import GpkgValidator
-from tests.output_validator.pfile_validator import PfileValidator
-from tests.output_validator.xlsx_validator import XlsxValidator
+from tests.output_validator.file_validators import (
+    CsvValidator,
+    FeatherValidator,
+    FileValidatorProtocol,
+    GpkgValidator,
+    JsonValidator,
+    PfileValidator,
+    XlsxValidator,
+)
 
 
 class OutputValidator:
@@ -24,6 +27,8 @@ class OutputValidator:
             return CsvValidator
         if file.suffix == ".gpkg":
             return GpkgValidator
+        if file.suffix == ".json":
+            return JsonValidator
         if file.suffix == ".p":
             return PfileValidator
         if file.suffix == ".feather":

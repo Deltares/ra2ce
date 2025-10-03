@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tests.output_validator.file_validator_protocol import FileValidatorProtocol
+from .file_validator_protocol import FileValidatorProtocol
 
 
 class FeatherValidator(FileValidatorProtocol):

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from tests.output_validator.file_validator_protocol import FileValidatorProtocol
+from .file_validator_protocol import FileValidatorProtocol
 
 
 class CsvValidator(FileValidatorProtocol):
