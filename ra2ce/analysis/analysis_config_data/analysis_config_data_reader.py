@@ -282,6 +282,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.analysis = AnalysisEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
         _section.losses_analysis = (
             _section.losses_analysis
         ) = AnalysisLossesEnum.get_enum(
