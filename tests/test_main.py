@@ -70,7 +70,7 @@ class TestMainCli:
 
         purge_output_dirs()
         yield _test_data_dir
-        # purge_output_dirs()
+        purge_output_dirs()
 
     def _run_with_click(
         self, network_ini: Optional[Path], analysis_ini: Optional[Path]
@@ -121,6 +121,11 @@ class TestMainCli:
             pytest.param(
                 "acceptance_test_data",
                 id="Default test data",
+                marks=[
+                    pytest.mark.skip(
+                        reason="Test superseeded by running all jupyter notebook examples"
+                    )
+                ],
             ),
         ]
         + _external_test_cases,
