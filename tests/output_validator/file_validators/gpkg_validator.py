@@ -24,10 +24,10 @@ class GpkgValidator(FileValidatorProtocol):
                 f"GPKG files {reference_file} and {result_file} differ in schema: {_ref_schema} != {_res_schema}"
             )
 
-        _first_mismatch = _gdf_ref.ne(_gdf_res).any(axis=1).idxmax()
+        _first_mismatch = _gdf_ref.ne(_gdf_res).first_valid_index()
         if not _first_mismatch:
             return
 
         raise AssertionError(
-            f"GPKG files {reference_file} and {result_file} differ at feature {_first_mismatch}."
+            f"GPKG files {reference_file} and {result_file} differ at feature {_first_mismatch}: {_gdf_res.loc[_first_mismatch].to_dict()}"
         )
