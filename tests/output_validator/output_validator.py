@@ -58,7 +58,7 @@ class OutputValidator:
             else:
                 yield from self._get_relative_paths(base, _item)
 
-    def validate_results(self) -> None:
+    def validate_output(self) -> None:
         if not self.reference_path or not self.reference_path.is_dir():
             raise FileNotFoundError(f"Reference path {self.reference_path} not found.")
         for _ref_file in self._get_relative_paths(self.reference_path):

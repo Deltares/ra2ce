@@ -182,4 +182,4 @@ class TestMainCli:
 
         # 3. Then, validate expectations
         assert _click_arguments.exit_code == 0
-        OutputValidator(case_data_dir).validate_results()
+        OutputValidator(case_data_dir).validate_output()

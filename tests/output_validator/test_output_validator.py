@@ -15,7 +15,7 @@ class TestOutputValidator:
         _validator = OutputValidator(result_path=test_data.joinpath("simple_inputs"))
 
         # 2. Run test data.
-        _validator.validate_results()
+        _validator.validate_output()
 
         # 3. Verify expectations.
         # No exception raised means success.
@@ -30,7 +30,7 @@ class TestOutputValidator:
 
         # 2. Run test data and verify expectations.
         with pytest.raises(FileNotFoundError) as exc:
-            _validator.validate_results()
+            _validator.validate_output()
 
         assert str(exc.value) == f"Reference path {_unknown_reference} not found."
 
@@ -64,7 +64,7 @@ class TestOutputValidator:
 
         # 2. Run test data and verify expectations.
         with pytest.raises(AssertionError) as exc:
-            _validator.validate_results()
+            _validator.validate_output()
 
         assert str(exc.value) == f"Path does not exist: {_missing_file}"
 
@@ -89,7 +89,7 @@ class TestOutputValidator:
 
         # 2. Run test data and verify expectations.
         with pytest.raises(NotImplementedError) as exc:
-            _validator.validate_results()
+            _validator.validate_output()
 
         assert (
             str(exc.value)
@@ -115,7 +115,7 @@ class TestOutputValidator:
 
         # 2. Run test data and verify expectations.
         with pytest.raises(AssertionError) as exc:
-            _validator.validate_results()
+            _validator.validate_output()
 
         assert str(exc.value).endswith("differs in number of rows: 1 != 230")
 

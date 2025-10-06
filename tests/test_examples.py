@@ -55,4 +55,4 @@ class TestExamples:
             _example_dir = test_examples.joinpath(_root_dir)
             if not _example_dir or not _example_dir.joinpath("reference").is_dir():
                 continue
-            OutputValidator(_example_dir).validate_results()
+            OutputValidator(_example_dir).validate_output()
