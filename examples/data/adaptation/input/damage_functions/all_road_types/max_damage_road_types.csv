@@ -1,8 +1,12 @@
 Road_type \ lanes;1;2;3;4;5
 unit;euro/m;euro/m;euro/m;euro/m;euro/m
-tertiary_link;110;120;130;140;150
-tertiary;110;120;130;140;150
-secondary_link;11;12;13;14;15
-secondary;11;12;13;14;15
-residential;1100;1200;1300;1400;1500
-['tertiary', 'residential'];510;520;530;540;550
+tertiary_link;200;400;600;800;1000
+tertiary;200;400;600;800;1000
+secondary_link;500;1000;1500;2000;2500
+secondary;500;1000;1500;2000;2500
+residential;200;400;600;800;1000
+['tertiary', 'residential'];200;400;600;800;1000
+motorways;4430;4430;8860;8860;8860
+motorways_link;4430;4430;8860;8860;8860
+primary;991;2000;3000;4000;5000
+primary_link;991;2000;3000;4000;5000
