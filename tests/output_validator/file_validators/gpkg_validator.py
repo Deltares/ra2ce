@@ -39,7 +39,7 @@ class GpkgValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"GPKG file {self.result_file.name} differs in ccontent:\n"
+            f"GPKG file {self.result_file.name} differs in content:\n"
             f"Reference: {_gdf_ref.loc[_first_mismatch].to_dict()}\n"
             f"Result: {_gdf_res.loc[_first_mismatch].to_dict()}"
         )
