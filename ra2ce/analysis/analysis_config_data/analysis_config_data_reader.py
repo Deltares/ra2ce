@@ -35,6 +35,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    BaseLinkLossesConfigData,
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -110,32 +115,31 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
+    def _set_section_common_properties(self, section: AnalysisConfigDataProtocol, section_name: str) -> None:
+        section.name = self._parser.get(section_name, "name", fallback=section.name)
+        section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=section.save_gpkg
+        )
+        section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=section.save_csv
+        )
+
     def _get_single_link_redundancy_config_data(
         self, section_name: str
     ) -> SingleLinkRedundancyConfigData:
         _section = SingleLinkRedundancyConfigData.from_ini_file(
             **self._parser[section_name]
         )
-        _section.name = self._parser.get(section_name, "name", fallback=_section.name)
+        self._set_section_common_properties(_section, section_name)
+        
         _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
-        )
-        _section.save_gpkg = self._parser.getboolean(
-            section_name, "save_gpkg", fallback=_section.save_gpkg
-        )
-        _section.save_csv = self._parser.getboolean(
-            section_name, "save_csv", fallback=_section.save_csv
         )
         return _section
 
     def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
         _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
-        _section.save_gpkg = self._parser.getboolean(
-            section_name, "save_gpkg", fallback=_section.save_gpkg
-        )
-        _section.save_csv = self._parser.getboolean(
-            section_name, "save_csv", fallback=_section.save_csv
-        )
+        self._set_section_common_properties(_section, section_name)
 
         # road damage
         _section.event_type = EventTypeEnum.get_enum(
@@ -157,6 +161,65 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "create_table",
             fallback=_section.create_table,
         )
+        return _section
+
+    def _set_base_link_losses_common_properties(
+        self, section: BaseLinkLossesConfigData, section_name: str
+    ) -> None:
+        self._set_section_common_properties(section, section_name)
+
+        section.event_type = EventTypeEnum.get_enum(
+            self._parser.get(section_name, "event_type", fallback=None)
+        )
+        section.weighing = WeighingEnum.get_enum(
+            self._parser.get(section_name, "weighing", fallback=None)
+        )
+        section.production_loss_per_capita_per_hour = self._parser.getfloat(
+            section_name,
+            "production_loss_per_capita_per_hour",
+            fallback=section.production_loss_per_capita_per_hour,
+        )
+        section.traffic_period = TrafficPeriodEnum.get_enum(
+            self._parser.get(section_name, "traffic_period", fallback=None)
+        )
+        section.trip_purposes = list(
+            map(
+                TripPurposeEnum.get_enum,
+                self._parser.getlist(section_name, "trip_purposes", fallback=[]),
+            )
+        )
+        section.resilience_curves_file = self._parser.get(
+            section_name,
+            "resilience_curves_file",
+            fallback=section.resilience_curves_file,
+        )
+        section.traffic_intensities_file = self._parser.get(
+            section_name,
+            "traffic_intensities_file",
+            fallback=section.traffic_intensities_file,
+        )
+        section.values_of_time_file = self._parser.get(
+            section_name,
+            "values_of_time_file",
+            fallback=section.values_of_time_file,
+        )
+        section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
+        )
+        section.risk_calculation_year = self._parser.getint(
+            section_name,
+            "risk_calculation_year",
+            fallback=section.risk_calculation_year,
+        )
+
+    def _get_single_link_losses_config_data(self, section_name: str) -> BaseLinkLossesConfigData:
+        _section = SingleLinkLossesConfigData.from_ini_file(**self._parser[section_name])
+        self._set_base_link_losses_common_properties(_section, section_name)
+        return _section
+
+    def _get_multi_link_losses_config_data(self, section_name: str) -> BaseLinkLossesConfigData:
+        _section = MultiLinkLossesConfigData.from_ini_file(**self._parser[section_name])
+        self._set_base_link_losses_common_properties(_section, section_name)
         return _section
 
     def _get_analysis_sections_with_new_dataclasses(
@@ -181,6 +244,15 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_single_link_redundancy_config_data(
                     _section_name
                 )
+                _analysis_sections.append(_analysis_section)
+            elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value:
+                _analysis_section = self._get_single_link_losses_config_data(_section_name)
+                _analysis_sections.append(_analysis_section)
+            elif _analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value:
+                _analysis_section = self._get_multi_link_losses_config_data(_section_name)
+                _analysis_sections.append(_analysis_section)
+            elif _analysis_type == AnalysisDamagesEnum.DAMAGES.config_value:
+                _analysis_section = self._get_damages_config_data(_section_name)
                 _analysis_sections.append(_analysis_section)
             else:
                 continue
