@@ -49,9 +49,18 @@ class OutputValidator:
     def _get_relative_paths(
         self, base: Path, folder: Optional[Path] = None
     ) -> Iterator[Path]:
+        # Get relative paths of all files in the folder (recursively).
         if not folder:
             folder = base
+
+        # If `static` folder is present, handle this one first to detect network problems first.
+        _static_folder = "static"
+        if folder.joinpath(_static_folder).is_dir():
+            yield from self._get_relative_paths(base, folder.joinpath(_static_folder))
+
         for _item in folder.iterdir():
+            if _item.name == _static_folder:
+                continue
             if _item.is_file():
                 yield _item.relative_to(base)
             else:
