@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import field
 from typing import Protocol, runtime_checkable
 
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -32,8 +31,8 @@ class AnalysisConfigDataProtocol(Protocol):
     """
 
     name: str
-    save_gpkg: bool = field(default_factory=lambda: False)
-    save_csv: bool = field(default_factory=lambda: False)
+    save_gpkg: bool
+    save_csv: bool
 
 @runtime_checkable
 class AnalysisConfigDataWithIntegrityValidationProtocol(AnalysisConfigDataProtocol, Protocol):

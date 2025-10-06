@@ -36,8 +36,8 @@ class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     """
     # Common properties
     name: str
-    save_gpkg: bool = field(default_factory=lambda: False)
-    save_csv: bool = field(default_factory=lambda: False)
+    save_gpkg: bool = False
+    save_csv: bool = False
 
     # Concrete properties
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)

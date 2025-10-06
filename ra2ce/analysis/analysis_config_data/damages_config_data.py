@@ -43,8 +43,8 @@ class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
     """
     # Common properties
     name: str
-    save_gpkg: bool = False # Save results as GeoPackage
-    save_csv: bool = False  # Save results as CSV   
+    save_gpkg: bool = False  # Save results as GPKG
+    save_csv: bool = False  # Save results as CSV
 
     # Concrete properties
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
