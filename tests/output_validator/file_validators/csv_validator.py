@@ -1,3 +1,4 @@
+import ast
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,10 +17,35 @@ class CsvValidator(FileValidatorProtocol):
     def __post_init__(self) -> None:
         def _get_normalized_content(file_path: Path) -> pd.DataFrame:
             _df = pd.read_csv(file_path)
-            # Sort columns skipping any unnamed index columns that may have been added.
+
+            # Sort columns by name skipping any unnamed index columns that may have been added.
             _df = _df.reindex(
                 sorted(_df.columns[~_df.columns.str.startswith("Unnamed")]), axis=1
             )
+
+            # Sort values that contain lists (or list as string) to ensure consistent order.
+            for _col in _df.select_dtypes(include=["object"]).columns:
+                if (
+                    _df[_col]
+                    .apply(lambda x: isinstance(x, (list, str)) and "[" in str(x))
+                    .any()
+                ):
+
+                    def _sort_list(x):
+                        if isinstance(x, list):
+                            return sorted(x)
+                        if isinstance(x, str) and x.startswith("[") and x.endswith("]"):
+                            try:
+
+                                _list_value = ast.literal_eval(x)
+                                if isinstance(_list_value, list):
+                                    return str(sorted(_list_value))
+                            except (ValueError, SyntaxError):
+                                pass
+                        return x
+
+                    _df[_col] = _df[_col].apply(_sort_list)
+
             # Sort rows based on all columns to ensure consistent order.
             return _df.sort_values(by=_df.columns.to_list()).reset_index(drop=True)
 
@@ -31,7 +57,7 @@ class CsvValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"CSV file {self.result_file.name} differs on row {_first_mismatch}:\n"
+            f"CSV file {self.result_file.name} differs on row {_first_mismatch}.\n"
             f"Reference: {_df_ref.loc[_first_mismatch].to_dict()}\n"
             f"Result: {_df_res.loc[_first_mismatch].to_dict()}"
         )

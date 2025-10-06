@@ -55,9 +55,9 @@ class GpkgValidator(FileValidatorProtocol):
         _res_schema = fiona.open(self.result_file).schema
         if _ref_schema != _res_schema:
             raise AssertionError(
-                f"GPKG file {self.result_file.name} differs in columns:\n"
+                f"GPKG file {self.result_file.name} differs in columns.\n"
                 f"Reference: {_ref_schema}\n"
-                f"Result {_res_schema}"
+                f"Result: {_res_schema}"
             )
 
         _mismatches = _gdf_ref.fillna("").ne(_gdf_res.fillna(""))
@@ -67,7 +67,7 @@ class GpkgValidator(FileValidatorProtocol):
 
         _mismatch_columns = _mismatches.columns[_mismatches.loc[_first_mismatch_row]]
         raise AssertionError(
-            f"GPKG file {self.result_file.name} differs in content on row {_first_mismatch_row}:\n"
+            f"GPKG file {self.result_file.name} differs in content on row {_first_mismatch_row}.\n"
             f"Reference: {_gdf_ref.loc[_first_mismatch_row][_mismatch_columns].to_dict()}\n"
             f"Result: {_gdf_res.loc[_first_mismatch_row][_mismatch_columns].to_dict()}"
         )
