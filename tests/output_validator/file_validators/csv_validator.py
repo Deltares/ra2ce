@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
@@ -7,15 +8,12 @@ from tests.output_validator.file_validators.file_validator_protocol import (
 )
 
 
+@dataclass
 class CsvValidator(FileValidatorProtocol):
     reference_file: Path
     result_file: Path
 
-    def __init__(self, reference_file: Path, result_file: Path):
-        self.reference_file = reference_file
-        self.result_file = result_file
-
-    def validate(self) -> None:
+    def __post_init__(self) -> None:
         def _get_sorted_content(file_path: Path) -> pd.DataFrame:
             _df = pd.read_csv(file_path)
             # Sort columns skipping any unnamed index columns that may have been added.

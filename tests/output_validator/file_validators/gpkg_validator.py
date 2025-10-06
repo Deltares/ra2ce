@@ -2,21 +2,19 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
+from attr import dataclass
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
 )
 
 
+@dataclass
 class GpkgValidator(FileValidatorProtocol):
     reference_file: Path
     result_file: Path
 
-    def __init__(self, reference_file: Path, result_file: Path):
-        self.reference_file = reference_file
-        self.result_file = result_file
-
-    def validate(self) -> None:
+    def __post_init__(self) -> None:
         _gdf_ref = gpd.read_file(self.reference_file)
         _gdf_res = gpd.read_file(self.result_file)
 
