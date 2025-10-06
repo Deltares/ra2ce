@@ -4,6 +4,7 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
+import numpy as np
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
@@ -18,6 +19,9 @@ class GpkgValidator(FileValidatorProtocol):
     def __post_init__(self) -> None:
         def _get_sorted_content(file_path: Path) -> gpd.GeoDataFrame:
             _gdf = gpd.read_file(file_path)
+
+            # Convert None to np.nan for consistent comparison.
+            _gdf = _gdf.applymap(lambda x: np.nan if x is None else x)
 
             # Sort values that contain lists (or list as string) to ensure consistent order.
             for _col in _gdf.select_dtypes(include=["object"]).columns:
