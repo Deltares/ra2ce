@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from dataclasses import field
 from typing import Protocol, runtime_checkable
 
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -30,9 +31,9 @@ class AnalysisConfigDataProtocol(Protocol):
     Reflects all common settings that damages and losses analysis sections might contain.
     """
 
-    name: str = ""
-    save_gpkg: bool = False
-    save_csv: bool = False
+    name: str
+    save_gpkg: bool = field(default_factory=lambda: False)
+    save_csv: bool = field(default_factory=lambda: False)
 
 @runtime_checkable
 class AnalysisConfigDataWithIntegrityValidationProtocol(AnalysisConfigDataProtocol, Protocol):
@@ -47,4 +48,4 @@ class AnalysisConfigDataWithIntegrityValidationProtocol(AnalysisConfigDataProtoc
       Returns:
           ValidationReport: The validation report containing the results of the integrity check.
       """
-      ...
+      pass

@@ -13,20 +13,16 @@ from ra2ce.common.validation.validation_report import ValidationReport
 class TestDamagesConfigData:
     def test_initialize(self):
         # 1. Define test data.
-        test_data = {
-            "name": "Test Damages Analysis",
-            "save_gpkg": True,
-            "save_csv": False
-        }
+        _data_name = "Test Damages Analysis"
 
         # 2. Run test.
-        damages_config = DamagesConfigData(**test_data)
+        damages_config = DamagesConfigData(name=_data_name)
 
         # 3. Verify expectations.
         assert isinstance(damages_config, DamagesConfigData)
         assert isinstance(damages_config, AnalysisConfigDataWithIntegrityValidationProtocol)
-        assert damages_config.name == "Test Damages Analysis"
-        assert damages_config.save_gpkg is True
+        assert damages_config.name == _data_name
+        assert damages_config.save_gpkg is False
         assert damages_config.save_csv is False
 
     @pytest.mark.parametrize(

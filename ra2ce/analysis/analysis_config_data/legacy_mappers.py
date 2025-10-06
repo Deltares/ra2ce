@@ -22,17 +22,22 @@ from dataclasses import fields
 
 
 def with_legacy_mappers(cls):
+    """
+    Method to be used as a decorator to inject the inner defined (class)
+    methods in the assigned (data)class objects.
+
+    E.g.:
+    @with_legacy_mappers
+    @dataclass
+    class ConcreteLegacyIniMapper:
+        name: str
+    """
+
     @classmethod
     def from_ini_file(cls, **kwargs):
         """
-        Legacy helper class method to filter out properties present in the ini files
-        no longer required by ra2ce config data such as `analysis`.
-
-        It can be used at each dataclass as a decorator, IN THIS ORDER, e.g.:
-        @dataclass
-        @from_ini_file
-        class ConcreteLegacyIniMapper:
-            name: str
+        Excludes any unknown fields from the input dictionary
+        and initializes the dataclass object.
         """
         _field_names = set([f.name for f in fields(cls)])
         return cls(**{k: v for k, v in kwargs.items() if k in _field_names})

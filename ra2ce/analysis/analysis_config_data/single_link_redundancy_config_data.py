@@ -34,4 +34,10 @@ class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     """
     Reflects all possible settings that a single link redundancy config might contain.
     """
+    # Common properties
+    name: str
+    save_gpkg: bool = field(default_factory=lambda: False)
+    save_csv: bool = field(default_factory=lambda: False)
+
+    # Concrete properties
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
