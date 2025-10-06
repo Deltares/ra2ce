@@ -62,7 +62,7 @@ class GpkgValidator(FileValidatorProtocol):
                 f"Result: {_res_schema}"
             )
 
-        _mismatches = (_gdf_ref == _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna())
+        _mismatches = (_gdf_ref != _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna())
         _first_mismatch_row = _mismatches.sum(axis=1).idxmax()
         if not _first_mismatch_row:
             return
