@@ -1,3 +1,4 @@
+import logging
 import re
 from configparser import ConfigParser
 from pathlib import Path
@@ -185,6 +186,25 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _section = "origins_destinations"
         if _section not in self._parser:
             return OriginsDestinationsSection()
+
+        # Remove deprecated properties if they exist and log a warning.
+        _deprecated: list[str] = [
+            "id_name_origin_destination",
+            "origins_names",
+            "destinations_names",
+        ]
+        if any(item in self._parser[_section] for item in _deprecated):
+            _ignored_items = []
+            for item in _deprecated:
+                if item in self._parser[_section]:
+                    _ignored_items.append(item)
+                    self._parser[_section].pop(item)
+            if _ignored_items:
+                logging.warning(
+                    "The following properties in the [%s] section are deprecated and will be ignored: %s",
+                    _section,
+                    ", ".join(_ignored_items),
+                )
 
         _od_section = OriginsDestinationsSection(**self._parser[_section])
         _od_section.origin_out_fraction = self._parser.getint(

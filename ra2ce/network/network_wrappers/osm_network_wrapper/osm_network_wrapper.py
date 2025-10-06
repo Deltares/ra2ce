@@ -81,6 +81,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         clean graph as the `polygon_graph` property.
 
         Args:
+            config_data (NetworkConfigData): Network data configuration required for OSM download.
             polygon (BaseGeometry): Base polygon from which to generate the graph.
 
         Returns:
