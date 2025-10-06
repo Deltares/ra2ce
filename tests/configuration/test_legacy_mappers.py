@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ra2ce.analysis.analysis_config_data.legacy_mappers import with_legacy_mappers
+from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
 class TestBaseLegacyIniMapper:
