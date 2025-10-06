@@ -78,7 +78,71 @@ class AnalysisSectionBase:
 @dataclass
 class AnalysisSectionLosses(AnalysisSectionBase):
     """
-    Reflects all possible settings that a losses analysis section might contain.
+    Represents all configurable settings for a losses analysis section in RA2CE.
+
+    This class defines parameters for single link redundancy, accessibility,
+    and risk/loss analyses, including weighing, traffic, thresholds, and
+    output options.
+
+    Attributes
+    ----------
+    analysis
+        Specifies the type of losses/criticality analysis to perform.
+
+    weighing
+        Defines the weighing method for the analysis (e.g., length, travel time).
+
+    production_loss_per_capita_per_hour
+        Economic loss per capita per hour, if applicable. Required only for losses analysis type.
+
+    traffic_period
+        Traffic period for the analysis (e.g., day, peak). Required only for losses analysis type.
+
+    hours_per_traffic_period
+        Number of hours corresponding to the selected traffic period. Required only for losses analysis type.
+
+    trip_purposes
+        Trip purposes to include in the analysis. Required only for losses analysis type.
+
+    resilience_curves_file
+        Path to a file containing resilience curves for losses analysis. Required only for losses analysis type.
+
+    traffic_intensities_file
+        Path to a file containing the traffic intensities information. Required only for losses analysis type.
+
+    values_of_time_file
+        Path to a file containing value-of-time data. Required only for losses analysis type.
+
+    threshold
+        Threshold value used for redundancy or accessibility analyses
+        (e.g., maximum tolerable disruption).
+
+    threshold_destinations
+        Threshold specifically for destination accessibility.
+
+    equity_weight
+        Field name or identifier to apply equity weighting in the analysis.
+
+    calculate_route_without_disruption
+        If True, calculates baseline routes without any disruptions for comparison.
+
+    buffer_meters
+        Buffer distance in meters to consider around network elements, e.g., for exposure or accessibility.
+
+    category_field_name
+        Field name used to categorize links or nodes in the analysis.
+
+    save_traffic
+        If True, saves intermediate traffic results during the analysis.
+
+    event_type : EventTypeEnum
+        Specifies the type of event or hazard for risk/loss calculations.
+
+    risk_calculation_mode
+        Defines the mode of risk calculation (e.g., expected annual loss, scenario-based).
+
+    risk_calculation_year
+        Year used for risk or estimated annual loss calculations.
     """
 
     analysis: AnalysisLossesEnum = field(
@@ -88,12 +152,12 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
 
     # losses
-    production_loss_per_capita_per_hour: float = math.nan
-    traffic_period: TrafficPeriodEnum = field(
+    production_loss_per_capita_per_hour: Optional[float] = math.nan
+    traffic_period: Optional[TrafficPeriodEnum] = field(
         default_factory=lambda: TrafficPeriodEnum.DAY
     )
-    hours_per_traffic_period: int = 0
-    trip_purposes: list[TripPurposeEnum] = field(
+    hours_per_traffic_period: Optional[int] = 0
+    trip_purposes: Optional[list[TripPurposeEnum]] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
     resilience_curves_file: Optional[Path] = None
@@ -101,33 +165,68 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     values_of_time_file: Optional[Path] = None
     # the redundancy analysis) and the intensities
     # accessibility analyses
-    threshold: float = 0.0
-    threshold_destinations: float = math.nan
-    equity_weight: str = ""
-    calculate_route_without_disruption: bool = False
-    buffer_meters: float = math.nan
-    category_field_name: str = ""
-    save_traffic: bool = False
+    threshold: Optional[float] = 0.0
+    threshold_destinations: Optional[float] = math.nan
+    equity_weight: Optional[str] = ""
+    calculate_route_without_disruption: Optional[bool] = False
+    buffer_meters: Optional[float] = math.nan
+    category_field_name: Optional[str] = ""
+    save_traffic: Optional[bool] = False
 
     # risk or estimated annual losses related
-    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
-    risk_calculation_mode: RiskCalculationModeEnum = field(
+    event_type: Optional[EventTypeEnum] = field(
+        default_factory=lambda: EventTypeEnum.NONE
+    )
+    risk_calculation_mode: Optional[RiskCalculationModeEnum] = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
-    risk_calculation_year: int = 0
+    risk_calculation_year: Optional[int] = 0
 
 
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
     """
-    Reflects all possible settings that a damages analysis section might contain.
+    Configuration for a damages analysis section.
+
+    This dataclass reflects all possible settings for performing
+    a damages-related analysis. It defines parameters for how road
+    damages, risks, and associated outputs should be calculated
+    and represented.
+
+    Attributes
+    ----------
+    analysis : AnalysisDamagesEnum
+        Type of damages analysis to perform. Defaults to ``AnalysisDamagesEnum.INVALID``.
+    representative_damage_percentage : float, optional
+        Percentage of representative damage to apply in the analysis
+        (default is 100).
+    event_type : EventTypeEnum
+        Choose if the damages must be calculated from an event perspective (``EventTypeEnum.EVENT``) or a risk perspective (``EventTypeEnum.RETURN_PERIOD``).
+        Defaults to ``EventTypeEnum.NONE``.
+    damage_curve : DamageCurveEnum
+        Type of damage curves to be used: Huizinga (``DamageCurveEnum.HZ``), OSD (``DamageCurveEnum.OSD``), or manual (``DamageCurveEnum.MAN``).
+        Defaults to ``DamageCurveEnum.INVALID``.
+    risk_calculation_mode : RiskCalculationModeEnum, optional
+        Mode used for risk calculation (e.g., deterministic, probabilistic).
+        Defaults to ``RiskCalculationModeEnum.NONE``.
+    risk_calculation_year : int, optional
+        Year used for risk calculation scenarios. Required if risk_calculation_mode is set to ``RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR`` Defaults to 0 (unspecified).
+    create_table : bool, optional
+
+    file_name : Path or None
+
+
+    Notes
+    -----
+    This section is typically part of a larger analysis pipeline and
+    defines only the configuration parameters, not the computational logic.
     """
 
     analysis: AnalysisDamagesEnum = field(
         default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
     # road damage
-    representative_damage_percentage: float = 100
+    representative_damage_percentage: Optional[float] = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
@@ -135,8 +234,8 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     risk_calculation_mode: RiskCalculationModeEnum = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
-    risk_calculation_year: int = 0
-    create_table: bool = False
+    risk_calculation_year: Optional[int] = 0
+    create_table: Optional[bool] = False
     file_name: Optional[Path] = None
 
 
@@ -188,8 +287,41 @@ class ProjectSection:
 @dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
-    Reflects all config data from analysis.ini with defaults set.
-    Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network)
+    Represents all configuration data for analyses in RA2CE, including defaults from analysis.ini.
+
+    This class consolidates analysis configuration settings and integrates relevant network attributes
+    (e.g., network, origins/destinations, hazard names) for convenience.
+
+    Attributes
+    ----------
+    ANALYSIS_SECTION
+        Union type for analysis sections (damages, losses, adaptation).
+
+    root_path
+        Root directory path for the project.
+
+    input_path
+        Input directory path for the project.
+
+    output_path
+        Output directory path where results will be saved.
+
+    static_path
+        Path to static project files.
+
+    project
+        Section containing project metadata.
+
+    analyses
+        List of all analysis to run consecutively.
+
+    origins_destinations
+        Section containing origins and destinations data.
+
+    network
+        Section containing network configuration data.
+
+
     """
 
     ANALYSIS_SECTION = (
@@ -198,13 +330,14 @@ class AnalysisConfigData(ConfigDataProtocol):
         | AnalysisSectionAdaptation
         | AnalysisConfigDataProtocol
     )
-
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=ProjectSection)
-    analyses: list[ANALYSIS_SECTION] = field(default_factory=list)
+    analyses: list[
+        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+    ] = field(default_factory=list)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )

@@ -7,22 +7,33 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 
 @runtime_checkable
 class ToIntegrateShaperProtocol(Protocol):
+    """
+    Protocol for shaping hazard data into objects suitable for risk integration.
+
+    Attributes:
+        gdf (GeoDataFrame): Input GeoDataFrame containing hazard data.
+    """
+
     gdf: gpd.GeoDataFrame
 
     def get_return_periods(self) -> list:
         """
-        Gets the columns' names that have damages calculated
+        Get the names of the columns containing damage data.
 
         Returns:
-            list: columns' name that have damages calculated.
+            list[float]: Column names corresponding to calculated damages.
         """
 
     def shape_to_integrate_object(
         self, return_periods: list
     ) -> dict[str : gpd.GeoDataFrame]:
         """
-        Gets the return periods and create columns for risk calculation for each damage curve and return period
+        Create objects for integration based on damage curves and return periods.
+
+        Args:
+            return_periods: List of return periods to extract and prepare.
+
         Returns:
-            list[GeoDataFrame]:
-            to_integrate objects each corresponding to each vulnerability curve to be used for risk calculation
+            dict[str, GeoDataFrame]: A dictionary mapping each vulnerability curve
+            name to a GeoDataFrame containing the relevant columns for risk calculation.
         """

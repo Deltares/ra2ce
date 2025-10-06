@@ -24,6 +24,14 @@ from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 
 class AvgSpeedReader(FileReaderProtocol):
     def read(self, file_path: Path) -> AvgSpeed:
+        """Read average speed data from a CSV file and populate an `AvgSpeed` object.
+
+        Args:
+            file_path (Path): Path to the CSV file containing average speed data.
+
+        Returns:
+            AvgSpeed: An `AvgSpeed` object populated with the data from the CSV file.
+        """
         _avg_speed_data = pd.read_csv(file_path)
         _avg_speed = AvgSpeed()
         for _, row in _avg_speed_data.iterrows():

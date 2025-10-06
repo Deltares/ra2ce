@@ -45,6 +45,7 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
 
         Returns:
             Any: Dataclass containing the parsed data.
+
         """
         pass
 

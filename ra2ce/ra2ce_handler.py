@@ -1,25 +1,20 @@
+# -*- coding: utf-8 -*-
 """
                     GNU GENERAL PUBLIC LICENSE
                       Version 3, 29 June 2007
-
     Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
     Copyright (C) 2023 Stichting Deltares
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-# -*- coding: utf-8 -*-
 
 from __future__ import annotations
 
@@ -54,7 +49,7 @@ class Ra2ceHandler:
     """
     Top level class to handle the RA2CE analysis process.
     This class is used to orchestrate the analysis process based on the provided network and analysis configuration,
-    including the logging configuration
+    including the logging configuration.
     """
 
     input_config: ConfigWrapper
@@ -69,17 +64,22 @@ class Ra2ceHandler:
 
     @classmethod
     def from_config(
-        cls, network: NetworkConfigData, analysis: AnalysisConfigData
+        cls, network: NetworkConfigData, analysis: Optional[AnalysisConfigData]
     ) -> Ra2ceHandler:
         """
         Create a handler from the provided network and analysis configuration.
 
-        Args:
-            network (NetworkConfigData): Network configuration
-            analysis (AnalysisConfigData): Analysis configuration
+        Parameters
+        ----------
+        network : NetworkConfigData
+            Network configuration.
+        analysis : AnalysisConfigData
+            Analysis configuration. This input is only required when running analyses.
 
-        Returns:
-            Ra2ceHandler: The handler object
+        Returns
+        -------
+        Ra2ceHandler
+            The configured handler object.
         """
 
         def set_config_paths(_analysis_config: AnalysisConfigWrapper) -> None:
@@ -146,7 +146,8 @@ class Ra2ceHandler:
     def configure(self) -> None:
         """
         Configures the `ConfigWrapper` with the current `AnalysisConfigData` and
-        `NetworkConfigData` so that the analyses can be succesfully run.
+        `NetworkConfigData` so that the analyses can be succesfully run. This method will generate files of the network in the folder
+        output_graph if they do not yet exist. This method can also be run if AnalysisConfigData is None.
         """
         self.input_config.configure()
         self.analysis_collection = AnalysisCollection.from_config(
@@ -156,8 +157,6 @@ class Ra2ceHandler:
     def run_analysis(self) -> list[AnalysisResultWrapper]:
         """
         Runs a Ra2ce analysis based on the provided network and analysis files.
-
-        Args: None
 
         Raises:
             ValueError: If the input files are not valid
@@ -177,6 +176,7 @@ class Ra2ceHandler:
         network_ini_file: Path | None, analysis_ini_file: Path | None
     ) -> list[AnalysisResultWrapper]:
         """
+        [Deprecated: .ini files are no longer supported]
         Streamlined method to directly run a `Ra2ce` analysis based
         on the provided `network` and `analysis` `.ini` files.
 
@@ -200,8 +200,7 @@ class Ra2ceHandler:
     ) -> list[AnalysisResultWrapper]:
         """
         Streamlined method to directly run a `Ra2ce` analysis based
-        on the dataclasses for `Network` and `Analysis` instead of
-        using `.ini` files.
+        on the dataclasses for `Network` and `Analysis`.
 
         This streamlined method allows for automatic initialization of the
         logger.

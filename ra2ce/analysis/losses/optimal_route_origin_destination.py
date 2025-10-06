@@ -59,6 +59,7 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         Returns:
             list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
         """
+        # NOTE: this code is duplicated in multi_link_origin_destination.py
         _od_nodes = []
         for n, v in graph.nodes(data=True):
             if "od_id" not in v:
@@ -161,6 +162,7 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
     def _get_origin_destination_pairs(
         self, graph: nx.MultiGraph
     ) -> list[tuple[tuple[str, str], tuple[str, str]]]:
+        # NOTE: this code is duplicated in multi_link_origin_destination.py
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -171,12 +173,19 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
             for b in od.loc[od["d_id"].notnull(), "d_id"]
         ]
         all_nodes = self.extract_od_nodes_from_graph(graph)
-        od_nodes = []
-        for aa, bb in od_pairs:
+
+        def _find_node(name: str, nodes: list[tuple[str, str]]) -> tuple[str, str]:
             # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
-            node_lookup = {n_name: (n, n_name) for n, n_name in all_nodes}
-            od_nodes.append((node_lookup[aa], node_lookup[bb]))
-        return od_nodes
+            return next(
+                (n, n_name)
+                for n, n_name in nodes
+                if n_name == name or name in n_name.split(",")
+            )
+
+        return [
+            (_find_node(aa, all_nodes), _find_node(bb, all_nodes))
+            for aa, bb in od_pairs
+        ]
 
     def optimal_route_origin_destination(
         self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
@@ -195,7 +204,6 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         return TrafficAnalysisFactory.get_analysis(
             road_network,
             od_table,
-            self.origins_destinations.destinations_names,
             equity,
         ).optimal_route_od_link()
 
