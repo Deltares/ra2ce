@@ -22,14 +22,14 @@ class GpkgValidator(FileValidatorProtocol):
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
-                f"GPKG files {self.reference_file.name} and {self.result_file.name} differ in number of rows: {len(_gdf_ref)} != {len(_gdf_res)}"
+                f"GPKG file {self.result_file.name} differs in number of rows: {len(_gdf_ref)} != {len(_gdf_res)}"
             )
 
         _ref_schema = fiona.open(self.reference_file).schema
         _res_schema = fiona.open(self.result_file).schema
         if _ref_schema != _res_schema:
             raise AssertionError(
-                f"GPKG files {self.reference_file.name} and {self.result_file.name} differ in columns: {_ref_schema} != {_res_schema}"
+                f"GPKG file {self.result_file.name} differs in columns: {_ref_schema} != {_res_schema}"
             )
 
         _first_mismatch = (
@@ -39,7 +39,7 @@ class GpkgValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"GPKG files {self.reference_file.name} and {self.result_file.name} differ:\n"
+            f"GPKG file {self.result_file.name} differs in ccontent:\n"
             f"Reference: {_gdf_ref.loc[_first_mismatch].to_dict()}\n"
             f"Result: {_gdf_res.loc[_first_mismatch].to_dict()}"
         )
