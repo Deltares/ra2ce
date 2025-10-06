@@ -52,6 +52,11 @@ class CsvValidator(FileValidatorProtocol):
         _df_ref = _get_normalized_content(self.reference_file)
         _df_res = _get_normalized_content(self.result_file)
 
+        if len(_df_ref) != len(_df_res):
+            raise AssertionError(
+                f"CSV file {self.result_file.name} differs in number of rows: {len(_df_ref)} != {len(_df_res)}"
+            )
+
         _first_mismatch = _df_ref.fillna("").ne(_df_res.fillna("")).sum(axis=1).idxmax()
         if not _first_mismatch:
             return
