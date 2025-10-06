@@ -118,11 +118,12 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
     def _validate_analysis_config_integrity(self) -> ValidationReport:
         _report = ValidationReport()
-        _report.merge(
-            _analysis_cd.validate_integrity()
-            for _analysis_cd in filter(
+        for _analysis_cd in filter(
                 lambda x: isinstance(x, AnalysisConfigDataWithIntegrityValidationProtocol),
-                self._config.analyses))
+                self._config.analyses):
+            _report.merge(
+                _analysis_cd.validate_integrity()
+                )
         return _report
 
     def _validate_analysis_network_compatibility(self) -> ValidationReport:
