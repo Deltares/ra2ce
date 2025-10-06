@@ -18,6 +18,7 @@ class GpkgValidator(FileValidatorProtocol):
     def __post_init__(self) -> None:
         def _get_sorted_content(file_path: Path) -> gpd.GeoDataFrame:
             _gdf = gpd.read_file(file_path)
+
             # Sort values that contain lists (or list as string) to ensure consistent order.
             for _col in _gdf.select_dtypes(include=["object"]).columns:
                 if (
@@ -41,7 +42,8 @@ class GpkgValidator(FileValidatorProtocol):
 
                     _gdf[_col] = _gdf[_col].apply(_sort_list)
 
-            return _gdf
+            # Sort rows based on all columns to ensure consistent order.
+            return _gdf.sort_values(by=_gdf.columns.to_list()).reset_index(drop=True)
 
         _gdf_ref = _get_sorted_content(self.reference_file)
         _gdf_res = _get_sorted_content(self.result_file)
