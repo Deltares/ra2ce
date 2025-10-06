@@ -3,7 +3,9 @@ from pathlib import Path
 import fiona
 import geopandas as gpd
 
-from .file_validator_protocol import FileValidatorProtocol
+from tests.output_validator.file_validators.file_validator_protocol import (
+    FileValidatorProtocol,
+)
 
 
 class GpkgValidator(FileValidatorProtocol):
