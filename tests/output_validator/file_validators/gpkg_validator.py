@@ -34,7 +34,7 @@ class GpkgValidator(FileValidatorProtocol):
 
                                 _list_value = ast.literal_eval(x)
                                 if isinstance(_list_value, list):
-                                    return sorted(_list_value)
+                                    return str(sorted(_list_value))
                             except (ValueError, SyntaxError):
                                 pass
                         return x
