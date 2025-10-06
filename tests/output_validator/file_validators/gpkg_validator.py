@@ -14,20 +14,22 @@ class GpkgValidator(FileValidatorProtocol):
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
-                f"GPKG files {reference_file} and {result_file} differ in number of features: {len(_gdf_ref)} != {len(_gdf_res)}"
+                f"GPKG files {reference_file} and {result_file} differ in number of features (rows): {len(_gdf_ref)} != {len(_gdf_res)}"
             )
 
         _ref_schema = fiona.open(reference_file).schema
         _res_schema = fiona.open(result_file).schema
         if _ref_schema != _res_schema:
             raise AssertionError(
-                f"GPKG files {reference_file} and {result_file} differ in schema: {_ref_schema} != {_res_schema}"
+                f"GPKG files {reference_file} and {result_file} differ in schema (columns): {_ref_schema} != {_res_schema}"
             )
 
-        _first_mismatch = _gdf_ref.ne(_gdf_res).first_valid_index()
+        _first_mismatch = (
+            _gdf_ref.fillna("").ne(_gdf_res.fillna("")).sum(axis=1).idxmax()
+        )
         if not _first_mismatch:
             return
 
         raise AssertionError(
-            f"GPKG files {reference_file} and {result_file} differ at feature {_first_mismatch}: {_gdf_res.loc[_first_mismatch].to_dict()}"
+            f"GPKG files {reference_file} and {result_file} differ at feature (row) {_first_mismatch}: {_gdf_res.loc[_first_mismatch].to_dict()}"
         )
