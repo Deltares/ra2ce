@@ -17,7 +17,7 @@ class GpkgValidator(FileValidatorProtocol):
     result_file: Path
 
     def __post_init__(self) -> None:
-        def _get_sorted_content(file_path: Path) -> gpd.GeoDataFrame:
+        def _get_normalized_content(file_path: Path) -> gpd.GeoDataFrame:
             _gdf = gpd.read_file(file_path)
 
             # Convert None to np.nan for consistent comparison.
@@ -49,8 +49,8 @@ class GpkgValidator(FileValidatorProtocol):
             # Sort rows based on all columns to ensure consistent order.
             return _gdf.sort_values(by=_gdf.columns.to_list()).reset_index(drop=True)
 
-        _gdf_ref = _get_sorted_content(self.reference_file)
-        _gdf_res = _get_sorted_content(self.result_file)
+        _gdf_ref = _get_normalized_content(self.reference_file)
+        _gdf_res = _get_normalized_content(self.result_file)
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
