@@ -22,7 +22,7 @@ class OutputValidator:
         self.result_path = result_path
         self.reference_path = reference_path or result_path.joinpath("reference")
 
-    def _get_file_validator(self, file: Path) -> FileValidatorProtocol:
+    def _get_file_validator(self, file: Path) -> type[FileValidatorProtocol]:
         if file.suffix == ".csv":
             return CsvValidator
         if file.suffix == ".gpkg":

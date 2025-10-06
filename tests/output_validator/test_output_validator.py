@@ -117,7 +117,7 @@ class TestOutputValidator:
         with pytest.raises(AssertionError) as exc:
             _validator.validate_results()
 
-        assert str(exc.value).endswith("differ in number of features: 1 != 230")
+        assert str(exc.value).endswith("differ in number of rows: 1 != 230")
 
     def test_run_output_validator_different_gpkg_schema_raises(
         self, results_dir: Path

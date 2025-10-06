@@ -7,7 +7,7 @@ from .file_validator_protocol import FileValidatorProtocol
 
 class CsvValidator(FileValidatorProtocol):
     @staticmethod
-    def validate(reference_file: Path, result_file: Path) -> pd.DataFrame:
+    def validate(reference_file: Path, result_file: Path) -> None:
         def _get_sorted_content(file_path: Path) -> pd.DataFrame:
             _df = pd.read_csv(file_path)
             # Sort columns skipping any unnamed index columns that may have been added.
@@ -25,5 +25,5 @@ class CsvValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"CSV files {reference_file} and {result_file} differ at row {_first_mismatch}: {_df_res.loc[_first_mismatch].to_dict()}"
+            f"CSV files {reference_file.name} and {result_file.name} differ at row: {_df_res.loc[_first_mismatch].to_dict()}"
         )
