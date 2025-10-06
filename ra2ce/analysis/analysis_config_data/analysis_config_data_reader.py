@@ -128,12 +128,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _get_damages_config_data(
-        self, section_name: str
-    ) -> DamagesConfigData:
-        _section = DamagesConfigData.from_ini_file(
-            **self._parser[section_name]
-        )
+    def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
+        _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
         _section.save_gpkg = self._parser.getboolean(
             section_name, "save_gpkg", fallback=_section.save_gpkg
         )

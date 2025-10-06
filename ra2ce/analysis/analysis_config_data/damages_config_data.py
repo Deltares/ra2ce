@@ -41,6 +41,7 @@ class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
     """
     Configuration data for damages analysis.
     """
+
     # Common properties
     name: str
     save_gpkg: bool = False  # Save results as GPKG

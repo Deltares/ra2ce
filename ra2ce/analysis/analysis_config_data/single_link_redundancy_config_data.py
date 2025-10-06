@@ -34,6 +34,7 @@ class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     """
     Reflects all possible settings that a single link redundancy config might contain.
     """
+
     # Common properties
     name: str
     save_gpkg: bool = False

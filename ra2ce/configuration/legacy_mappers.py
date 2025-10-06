@@ -42,6 +42,5 @@ def with_legacy_mappers(cls):
         _field_names = set([f.name for f in fields(cls)])
         return cls(**{k: v for k, v in kwargs.items() if k in _field_names})
 
-
-    setattr(cls, 'from_ini_file', from_ini_file)    # add new method
+    setattr(cls, "from_ini_file", from_ini_file)  # add new method
     return cls

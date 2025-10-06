@@ -10,7 +10,6 @@ from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data impo
 
 
 class TestSingleLinkRedundancyConfigData:
-    
     def test_initialize_with_required_values(self):
         # 1. Define test data.
         _name = "TestConfig"
@@ -25,7 +24,7 @@ class TestSingleLinkRedundancyConfigData:
         assert config.save_gpkg is False
         assert config.save_csv is False
         assert config.weighing == WeighingEnum.NONE
-    
+
     def test_initialize_without_required_values_fails(self):
         # 1. Define test data.
         _expected_error = "SingleLinkRedundancyConfigData.__init__() missing 1 required positional argument: 'name'"

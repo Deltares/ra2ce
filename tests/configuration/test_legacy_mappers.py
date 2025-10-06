@@ -4,7 +4,6 @@ from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
 class TestBaseLegacyIniMapper:
-
     def test_initialize_subclass_succeeds(self):
         # 1. Define test data.
 

@@ -34,17 +34,20 @@ class AnalysisConfigDataProtocol(Protocol):
     save_gpkg: bool
     save_csv: bool
 
+
 @runtime_checkable
-class AnalysisConfigDataWithIntegrityValidationProtocol(AnalysisConfigDataProtocol, Protocol):
+class AnalysisConfigDataWithIntegrityValidationProtocol(
+    AnalysisConfigDataProtocol, Protocol
+):
     """
     Extension of the protocol AnalysisConfigDataProtocol with integrity validation method.
     """
 
     def validate_integrity(self) -> ValidationReport:
-      """
-      Validates the integrity of the config data instance.
+        """
+        Validates the integrity of the config data instance.
 
-      Returns:
-          ValidationReport: The validation report containing the results of the integrity check.
-      """
-      pass
+        Returns:
+            ValidationReport: The validation report containing the results of the integrity check.
+        """
+        pass
