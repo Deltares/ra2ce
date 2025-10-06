@@ -14,7 +14,7 @@ class CsvValidator(FileValidatorProtocol):
     result_file: Path
 
     def __post_init__(self) -> None:
-        def _get_sorted_content(file_path: Path) -> pd.DataFrame:
+        def _get_normalized_content(file_path: Path) -> pd.DataFrame:
             _df = pd.read_csv(file_path)
             # Sort columns skipping any unnamed index columns that may have been added.
             _df = _df.reindex(
@@ -23,8 +23,8 @@ class CsvValidator(FileValidatorProtocol):
             # Sort rows based on all columns to ensure consistent order.
             return _df.sort_values(by=_df.columns.to_list()).reset_index(drop=True)
 
-        _df_ref = _get_sorted_content(self.reference_file)
-        _df_res = _get_sorted_content(self.result_file)
+        _df_ref = _get_normalized_content(self.reference_file)
+        _df_res = _get_normalized_content(self.result_file)
 
         _first_mismatch = _df_ref.fillna("").ne(_df_res.fillna("")).sum(axis=1).idxmax()
         if not _first_mismatch:

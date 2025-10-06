@@ -1,3 +1,4 @@
+import ast
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -15,8 +16,35 @@ class GpkgValidator(FileValidatorProtocol):
     result_file: Path
 
     def __post_init__(self) -> None:
-        _gdf_ref = gpd.read_file(self.reference_file)
-        _gdf_res = gpd.read_file(self.result_file)
+        def _get_sorted_content(file_path: Path) -> gpd.GeoDataFrame:
+            _gdf = gpd.read_file(file_path)
+            # Sort values that contain lists (or list as string) to ensure consistent order.
+            for _col in _gdf.select_dtypes(include=["object"]).columns:
+                if (
+                    _gdf[_col]
+                    .apply(lambda x: isinstance(x, (list, str)) and "[" in str(x))
+                    .any()
+                ):
+
+                    def _sort_list(x):
+                        if isinstance(x, list):
+                            return sorted(x)
+                        if isinstance(x, str) and x.startswith("[") and x.endswith("]"):
+                            try:
+
+                                _list_value = ast.literal_eval(x)
+                                if isinstance(_list_value, list):
+                                    return sorted(_list_value)
+                            except (ValueError, SyntaxError):
+                                pass
+                        return x
+
+                    _gdf[_col] = _gdf[_col].apply(_sort_list)
+
+            return _gdf
+
+        _gdf_ref = _get_sorted_content(self.reference_file)
+        _gdf_res = _get_sorted_content(self.result_file)
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
