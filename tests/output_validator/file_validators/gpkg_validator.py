@@ -4,7 +4,6 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
-import pandas as pd
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
@@ -63,12 +62,7 @@ class GpkgValidator(FileValidatorProtocol):
                 f"Result: {_res_schema}"
             )
 
-        def _is_equal_allow_nan(val1, val2) -> bool:
-            if pd.isna(val1) and pd.isna(val2):
-                return True
-            return val1 == val2
-
-        _mismatches = _gdf_ref.combine(_gdf_res, func=_is_equal_allow_nan)
+        _mismatches = (_gdf_ref == _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna())
         _first_mismatch_row = _mismatches.sum(axis=1).idxmax()
         if not _first_mismatch_row:
             return
