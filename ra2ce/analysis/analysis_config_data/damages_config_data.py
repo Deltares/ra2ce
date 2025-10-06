@@ -26,9 +26,6 @@ from typing import Optional
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataWithIntegrityValidationProtocol,
 )
-from ra2ce.analysis.analysis_config_data.config_data_integrity_validators import (
-    validate_risk_calculation,
-)
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -67,7 +64,11 @@ class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
     file_name: Optional[Path] = None
     representative_damage_percentage: float = 100
 
-    @validate_risk_calculation
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
+        if self.risk_calculation_mode == RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR:
+            if self.risk_calculation_year is None or self.risk_calculation_year <= 0:
+                _report.error(
+                    f"For damage analysis '{self.name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
+                )
         return _report
