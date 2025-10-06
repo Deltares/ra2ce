@@ -44,7 +44,8 @@ class OutputValidator:
         _result_file = self.result_path.joinpath(file)
         assert _result_file.is_file(), f"Path does not exist: {file}"
 
-        self._get_file_validator(file).validate(_reference_file, _result_file)
+        _validator = self._get_file_validator(file)
+        _validator(_reference_file, _result_file).validate()
 
     def _get_relative_paths(
         self, base: Path, folder: Optional[Path] = None

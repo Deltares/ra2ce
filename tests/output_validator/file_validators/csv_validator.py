@@ -8,8 +8,14 @@ from tests.output_validator.file_validators.file_validator_protocol import (
 
 
 class CsvValidator(FileValidatorProtocol):
-    @staticmethod
-    def validate(reference_file: Path, result_file: Path) -> None:
+    reference_file: Path
+    result_file: Path
+
+    def __init__(self, reference_file: Path, result_file: Path):
+        self.reference_file = reference_file
+        self.result_file = result_file
+
+    def validate(self) -> None:
         def _get_sorted_content(file_path: Path) -> pd.DataFrame:
             _df = pd.read_csv(file_path)
             # Sort columns skipping any unnamed index columns that may have been added.
@@ -19,15 +25,15 @@ class CsvValidator(FileValidatorProtocol):
             # Sort rows based on all columns to ensure consistent order.
             return _df.sort_values(by=_df.columns.to_list()).reset_index(drop=True)
 
-        _df_ref = _get_sorted_content(reference_file)
-        _df_res = _get_sorted_content(result_file)
+        _df_ref = _get_sorted_content(self.reference_file)
+        _df_res = _get_sorted_content(self.result_file)
 
         _first_mismatch = _df_ref.fillna("").ne(_df_res.fillna("")).sum(axis=1).idxmax()
         if not _first_mismatch:
             return
 
         raise AssertionError(
-            f"CSV files {reference_file.name} and {result_file.name} differ:\n"
+            f"CSV files {self.reference_file.name} and {self.result_file.name} differ:\n"
             f"Reference: {_df_ref.loc[_first_mismatch].to_dict()}\n"
             f"Result: {_df_res.loc[_first_mismatch].to_dict()}"
         )
