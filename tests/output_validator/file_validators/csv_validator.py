@@ -57,7 +57,7 @@ class CsvValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"CSV file {self.result_file.name} differs on row {_first_mismatch}.\n"
+            f"CSV file {self.result_file.name} differs.\n"
             f"Reference: {_df_ref.loc[_first_mismatch].to_dict()}\n"
             f"Result: {_df_res.loc[_first_mismatch].to_dict()}"
         )
