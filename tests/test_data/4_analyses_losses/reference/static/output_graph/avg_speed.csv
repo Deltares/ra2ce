@@ -1,0 +1,13 @@
+,road_types,avg_speed
+0,tertiary,53.4
+1,secondary_link,62.3
+2,primary,70.2
+3,primary_link,70.2
+4,motorway_link,104.6
+5,trunk_link,72.4
+6,"['primary_link', 'primary']",70.2
+7,"['secondary', 'primary_link']",62.3
+8,motorway,104.6
+9,trunk,72.4
+10,tertiary_link,53.4
+11,secondary,62.3
