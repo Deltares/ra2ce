@@ -18,26 +18,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-from dataclasses import dataclass, field
-
-from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataProtocol,
-)
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
+from dataclasses import fields
 
 
-@with_legacy_mappers
-@dataclass
-class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+def with_legacy_mappers(cls):
     """
-    Reflects all possible settings that a single link redundancy config might contain.
-    """
-    # Common properties
-    name: str
-    save_gpkg: bool = False
-    save_csv: bool = False
+    Method to be used as a decorator to inject the inner defined (class)
+    methods in the assigned (data)class objects.
 
-    # Concrete properties
-    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
+    E.g.:
+    @with_legacy_mappers
+    @dataclass
+    class ConcreteLegacyIniMapper:
+        name: str
+    """
+
+    @classmethod
+    def from_ini_file(cls, **kwargs):
+        """
+        Excludes any unknown fields from the input dictionary
+        and initializes the dataclass object.
+        """
+        _field_names = set([f.name for f in fields(cls)])
+        return cls(**{k: v for k, v in kwargs.items() if k in _field_names})
+
+
+    setattr(cls, 'from_ini_file', from_ini_file)    # add new method
+    return cls
