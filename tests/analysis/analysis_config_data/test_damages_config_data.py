@@ -74,7 +74,7 @@ class TestDamagesConfigData:
         assert _report.is_valid(), "Expected valid report due to possitive risk_calculation_year"
 
     @pytest.mark.parametrize("risk_calculation_mode", [pytest.param(_mode, id=_mode.name) for _mode in RiskCalculationModeEnum if _mode != RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR] )
-    @pytest.mark.parametrize("risk_calculation_year", [(None), (-5), (0)])
+    @pytest.mark.parametrize("risk_calculation_year", [(None), (-5), (0), (2)])
     def test_given_any_non_triangle_risk_calculation_when_validate_integrity_then_succeeds(self, risk_calculation_mode: RiskCalculationModeEnum, risk_calculation_year: int | None):
         # 1. Define test data.
         _data_name = "Valid Damages Analysis"
