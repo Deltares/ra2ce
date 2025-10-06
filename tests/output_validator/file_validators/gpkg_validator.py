@@ -33,5 +33,7 @@ class GpkgValidator(FileValidatorProtocol):
             return
 
         raise AssertionError(
-            f"GPKG files {reference_file.name} and {result_file.name} differ at row: {_gdf_res.loc[_first_mismatch].to_dict()}"
+            f"GPKG files {reference_file.name} and {result_file.name} differ:\n"
+            f"Reference: {_gdf_ref.loc[_first_mismatch].to_dict()}\n"
+            f"Result: {_gdf_res.loc[_first_mismatch].to_dict()}"
         )
