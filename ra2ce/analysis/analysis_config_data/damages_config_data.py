@@ -41,6 +41,12 @@ class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
     """
     Configuration data for damages analysis.
     """
+    # Common properties
+    name: str = ""
+    save_gpkg: bool = False # Save results as GeoPackage
+    save_csv: bool = False  # Save results as CSV   
+
+    # Concrete properties
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
