@@ -18,14 +18,14 @@ class OutputValidator:
         self.result_path = result_path
         self.reference_path = reference_path or result_path.joinpath("reference")
 
-    def _get_file_validator(self, file: Path) -> type[FileValidatorProtocol]:
+    def _get_file_validator(self, file: Path) -> type[FileValidatorProtocol] | None:
         if file.suffix == ".csv":
             return CsvValidator
         if file.suffix == ".gpkg":
             return GpkgValidator
-        if file.suffix in [".p", ".json", ".feater", ".xlsx"]:
+        if file.suffix in [".p", ".json", ".feather", ".xlsx"]:
             # Don't validate content yet.
-            pass
+            return None
         raise NotImplementedError(
             f"No validator implemented for file type {file.suffix}"
         )
@@ -36,6 +36,8 @@ class OutputValidator:
         assert _result_file.is_file(), f"Path does not exist: {file}"
 
         _validator_type = self._get_file_validator(file)
+        if not _validator_type:
+            return
         _validator_type(reference_file=_reference_file, result_file=_result_file)
 
     def _get_relative_paths(
