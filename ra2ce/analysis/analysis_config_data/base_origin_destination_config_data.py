@@ -7,8 +7,10 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
+@with_legacy_mappers
 @dataclass
 class BaseOriginDestinationConfigData(AnalysisConfigDataProtocol, ABC):
     """Base class for origin-destination configuration data."""
@@ -28,12 +30,12 @@ class OptimalRouteOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-destination analysis."""
     pass
 
-class MultiLinkOriginDestinationConfigData(BaseOriginDestinationConfigData):
-    """Configuration data for multi-link origin-destination analysis."""
-    pass
-
 class OptimalRouteOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-closest destination analysis."""
+    pass
+
+class MultiLinkOriginDestinationConfigData(BaseOriginDestinationConfigData):
+    """Configuration data for multi-link origin-destination analysis."""
     pass
 
 class MultiLinkOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):

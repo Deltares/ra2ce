@@ -2,6 +2,9 @@ from dataclasses import is_dataclass
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     BaseLinkLossesConfigData,
     MultiLinkLossesConfigData,
@@ -32,6 +35,8 @@ class TestLinkLossesConfigData:
 
         # 3. Verify expectations.
         assert isinstance(link_losses_config, link_losses_class)
+        assert isinstance(link_losses_config, BaseLinkLossesConfigData)
+        assert isinstance(link_losses_config, AnalysisConfigDataProtocol)
         assert is_dataclass(link_losses_config)
         assert link_losses_config.name == _data_name
         assert link_losses_config.save_gpkg is False

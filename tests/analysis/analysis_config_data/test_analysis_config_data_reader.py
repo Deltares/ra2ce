@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +13,12 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     MultiLinkLossesConfigData,
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkOriginClosestDestinationConfigData,
+    MultiLinkOriginDestinationConfigData,
+    OptimalRouteOriginClosestDestinationConfigData,
+    OptimalRouteOriginDestinationConfigData,
+)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -21,7 +26,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
+    MultiLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
     SingleLinkRedundancyConfigData,
 )
@@ -72,6 +79,11 @@ class TestAnalysisConfigDataReader:
                 id="Single link redundancy",
             ),
             pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value,
+                MultiLinkRedundancyConfigData,
+                id="Multi link redundancy",
+            ),
+            pytest.param(
                 AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value,
                 SingleLinkLossesConfigData,
                 id="Single link losses",
@@ -80,6 +92,26 @@ class TestAnalysisConfigDataReader:
                 AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value,
                 MultiLinkLossesConfigData,
                 id="Multi link losses",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value,
+                OptimalRouteOriginDestinationConfigData,
+                id="Optimal route origin destination",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value,
+                OptimalRouteOriginClosestDestinationConfigData,
+                id="Optimal route origin closest destination",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value,
+                MultiLinkOriginDestinationConfigData,
+                id="Multi link origin destination",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value,
+                MultiLinkOriginClosestDestinationConfigData,
+                id="Multi link origin closest destination"
             ),
             pytest.param(
                 AnalysisDamagesEnum.DAMAGES.config_value,
@@ -105,6 +137,8 @@ class TestAnalysisConfigDataReader:
         _reader._parser.add_section(_section_name)
         _reader._parser.set(_section_name, "name", _analysis_name)
         _reader._parser.set(_section_name, "analysis", analysis_config_name)
+        _reader._parser.set(_section_name, "save_csv", "True")
+        _reader._parser.set(_section_name, "save_gpkg", "True")
 
         # 2. Run test
 
@@ -117,5 +151,5 @@ class TestAnalysisConfigDataReader:
         _first_slr_cd = _analyses_config_data[0]
         assert isinstance(_first_slr_cd, expected_analysis_type)
         assert _first_slr_cd.name == _analysis_name
-        assert _first_slr_cd.save_csv is False
-        assert _first_slr_cd.save_gpkg is False
+        assert _first_slr_cd.save_csv is True
+        assert _first_slr_cd.save_gpkg is True
