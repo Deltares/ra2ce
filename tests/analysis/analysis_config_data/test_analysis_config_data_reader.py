@@ -63,13 +63,36 @@ class TestAnalysisConfigDataReader:
         # 3. Verify expectations
         assert isinstance(_config.input_path, Path)
 
-    @pytest.mark.parametrize("analysis_config_name, expected_analysis_type", [
-        pytest.param(AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value, SingleLinkRedundancyConfigData, id="Single link redundancy"),
-        pytest.param(AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value, SingleLinkLossesConfigData, id="Single link losses"),
-        pytest.param(AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value, MultiLinkLossesConfigData, id="Multi link losses"),
-        pytest.param(AnalysisDamagesEnum.DAMAGES.config_value, DamagesConfigData, id="Damages")
-    ])
-    def test_get_analysis_sections_with_new_dataclasses(self,analysis_config_name: str, expected_analysis_type: type[AnalysisConfigDataProtocol]):
+    @pytest.mark.parametrize(
+        "analysis_config_name, expected_analysis_type",
+        [
+            pytest.param(
+                AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value,
+                SingleLinkRedundancyConfigData,
+                id="Single link redundancy",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value,
+                SingleLinkLossesConfigData,
+                id="Single link losses",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value,
+                MultiLinkLossesConfigData,
+                id="Multi link losses",
+            ),
+            pytest.param(
+                AnalysisDamagesEnum.DAMAGES.config_value,
+                DamagesConfigData,
+                id="Damages",
+            ),
+        ],
+    )
+    def test_get_analysis_sections_with_new_dataclasses(
+        self,
+        analysis_config_name: str,
+        expected_analysis_type: type[AnalysisConfigDataProtocol],
+    ):
         """
         Integration test targeting multiple 'private' methods and properties.
         It ensures that the correct dataclass is being mapped to the correct analysis type.

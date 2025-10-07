@@ -47,6 +47,7 @@ class BaseLinkLossesConfigData(AnalysisConfigDataProtocol, ABC):
     """
     Reflects all possible settings that a base link losses config might contain.
     """
+
     # Common properties
     name: str
     save_gpkg: bool = False
@@ -82,15 +83,19 @@ class BaseLinkLossesConfigData(AnalysisConfigDataProtocol, ABC):
                     f"For damage analysis '{self.name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
                 )
         return _report
-    
+
+
 class MultiLinkLossesConfigData(BaseLinkLossesConfigData):
     """
     Configuration data for multi-link losses analysis.
     """
+
     pass
+
 
 class SingleLinkLossesConfigData(BaseLinkLossesConfigData):
     """
     Configuration data for single-link losses analysis.
     """
+
     pass

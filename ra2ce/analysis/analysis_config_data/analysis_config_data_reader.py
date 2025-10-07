@@ -115,7 +115,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
-    def _set_section_common_properties(self, section: AnalysisConfigDataProtocol, section_name: str) -> None:
+    def _set_section_common_properties(
+        self, section: AnalysisConfigDataProtocol, section_name: str
+    ) -> None:
         section.name = self._parser.get(section_name, "name", fallback=section.name)
         section.save_gpkg = self._parser.getboolean(
             section_name, "save_gpkg", fallback=section.save_gpkg
@@ -131,7 +133,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             **self._parser[section_name]
         )
         self._set_section_common_properties(_section, section_name)
-        
+
         _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
         )
@@ -212,12 +214,18 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             fallback=section.risk_calculation_year,
         )
 
-    def _get_single_link_losses_config_data(self, section_name: str) -> BaseLinkLossesConfigData:
-        _section = SingleLinkLossesConfigData.from_ini_file(**self._parser[section_name])
+    def _get_single_link_losses_config_data(
+        self, section_name: str
+    ) -> BaseLinkLossesConfigData:
+        _section = SingleLinkLossesConfigData.from_ini_file(
+            **self._parser[section_name]
+        )
         self._set_base_link_losses_common_properties(_section, section_name)
         return _section
 
-    def _get_multi_link_losses_config_data(self, section_name: str) -> BaseLinkLossesConfigData:
+    def _get_multi_link_losses_config_data(
+        self, section_name: str
+    ) -> BaseLinkLossesConfigData:
         _section = MultiLinkLossesConfigData.from_ini_file(**self._parser[section_name])
         self._set_base_link_losses_common_properties(_section, section_name)
         return _section
@@ -246,10 +254,14 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 )
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value:
-                _analysis_section = self._get_multi_link_losses_config_data(_section_name)
+                _analysis_section = self._get_multi_link_losses_config_data(
+                    _section_name
+                )
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value:
-                _analysis_section = self._get_single_link_losses_config_data(_section_name)
+                _analysis_section = self._get_single_link_losses_config_data(
+                    _section_name
+                )
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisDamagesEnum.DAMAGES.config_value:
                 _analysis_section = self._get_damages_config_data(_section_name)

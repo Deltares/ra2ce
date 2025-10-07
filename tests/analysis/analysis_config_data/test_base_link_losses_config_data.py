@@ -19,9 +19,10 @@ from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
-@pytest.mark.parametrize("link_losses_class", [SingleLinkLossesConfigData, MultiLinkLossesConfigData])
+@pytest.mark.parametrize(
+    "link_losses_class", [SingleLinkLossesConfigData, MultiLinkLossesConfigData]
+)
 class TestLinkLossesConfigData:
-
     def test_initialize(self, link_losses_class: type[BaseLinkLossesConfigData]):
         # 1. Define test data.
         _data_name = "Test Link Losses Analysis"
@@ -37,9 +38,18 @@ class TestLinkLossesConfigData:
         assert link_losses_config.save_csv is False
         assert link_losses_config.event_type == EventTypeEnum.NONE
         assert link_losses_config.weighing == WeighingEnum.NONE
-        assert link_losses_config.production_loss_per_capita_per_hour != link_losses_config.production_loss_per_capita_per_hour  # NaN check
-        assert link_losses_config.traffic_period == None or link_losses_config.traffic_period == TrafficPeriodEnum.DAY
-        assert link_losses_config.trip_purposes == None or link_losses_config.trip_purposes == [TripPurposeEnum.NONE]
+        assert (
+            link_losses_config.production_loss_per_capita_per_hour
+            != link_losses_config.production_loss_per_capita_per_hour
+        )  # NaN check
+        assert (
+            link_losses_config.traffic_period == None
+            or link_losses_config.traffic_period == TrafficPeriodEnum.DAY
+        )
+        assert (
+            link_losses_config.trip_purposes == None
+            or link_losses_config.trip_purposes == [TripPurposeEnum.NONE]
+        )
         assert link_losses_config.resilience_curves_file is None
         assert link_losses_config.traffic_intensities_file is None
         assert link_losses_config.values_of_time_file is None
@@ -55,7 +65,9 @@ class TestLinkLossesConfigData:
         ],
     )
     def test_given_risk_calculation_triangle_and_invalid_year_when_validate_integrity_then_fails(
-        self, risk_calculation_year: int | None, link_losses_class: type[BaseLinkLossesConfigData]
+        self,
+        risk_calculation_year: int | None,
+        link_losses_class: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
         _data_name = "Invalid Damages Analysis"
@@ -111,7 +123,7 @@ class TestLinkLossesConfigData:
         self,
         risk_calculation_mode: RiskCalculationModeEnum,
         risk_calculation_year: int | None,
-        link_losses_class: type[BaseLinkLossesConfigData]
+        link_losses_class: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
         _data_name = "Valid Damages Analysis"
