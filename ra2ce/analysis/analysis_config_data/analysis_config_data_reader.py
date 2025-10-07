@@ -35,6 +35,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -124,6 +125,37 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
+        )
+        return _section
+
+    def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
+        _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+
+        # road damage
+        _section.event_type = EventTypeEnum.get_enum(
+            self._parser.get(section_name, "event_type", fallback=None)
+        )
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
+        )
+        _section.risk_calculation_year = self._parser.getint(
+            section_name,
+            "risk_calculation_year",
+            fallback=_section.risk_calculation_year,
+        )
+        _section.damage_curve = DamageCurveEnum.get_enum(
+            self._parser.get(section_name, "damage_curve", fallback=None)
+        )
+        _section.create_table = self._parser.getboolean(
+            section_name,
+            "create_table",
+            fallback=_section.create_table,
         )
         return _section
 

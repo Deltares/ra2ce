@@ -23,9 +23,11 @@ from typing import Any
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionBase,
     DamagesAnalysisNameList,
     LossesAnalysisNameList,
+)
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataWithIntegrityValidationProtocol,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
@@ -114,6 +116,15 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
         return _report
 
+    def _validate_analysis_config_integrity(self) -> ValidationReport:
+        _report = ValidationReport()
+        for _analysis_cd in filter(
+            lambda x: isinstance(x, AnalysisConfigDataWithIntegrityValidationProtocol),
+            self._config.analyses,
+        ):
+            _report.merge(_analysis_cd.validate_integrity())
+        return _report
+
     def _validate_analysis_network_compatibility(self) -> ValidationReport:
         _report = ValidationReport()
 
@@ -136,6 +147,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
         _required_headers = ["project", "analyses"]
 
         _report.merge(self._validate_headers(_required_headers))
+        _report.merge(self._validate_analysis_config_integrity())
         _report.merge(self._validate_analysis_network_compatibility())
 
         return _report

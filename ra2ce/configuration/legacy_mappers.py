@@ -18,36 +18,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-from typing import Protocol, runtime_checkable
-
-from ra2ce.common.validation.validation_report import ValidationReport
+from dataclasses import fields
 
 
-@runtime_checkable
-class AnalysisConfigDataProtocol(Protocol):
+def with_legacy_mappers(cls):
     """
-    Reflects all common settings that damages and losses analysis sections might contain.
-    """
+    Method to be used as a decorator to inject the inner defined (class)
+    methods in the assigned (data)class objects.
 
-    name: str
-    save_gpkg: bool
-    save_csv: bool
-
-
-@runtime_checkable
-class AnalysisConfigDataWithIntegrityValidationProtocol(
-    AnalysisConfigDataProtocol, Protocol
-):
-    """
-    Extension of the protocol AnalysisConfigDataProtocol with integrity validation method.
+    E.g.:
+    @with_legacy_mappers
+    @dataclass
+    class ConcreteLegacyIniMapper:
+        name: str
     """
 
-    def validate_integrity(self) -> ValidationReport:
+    @classmethod
+    def from_ini_file(cls, **kwargs):
         """
-        Validates the integrity of the config data instance.
-
-        Returns:
-            ValidationReport: The validation report containing the results of the integrity check.
+        Excludes any unknown fields from the input dictionary
+        and initializes the dataclass object.
         """
-        pass
+        _field_names = set([f.name for f in fields(cls)])
+        return cls(**{k: v for k, v in kwargs.items() if k in _field_names})
+
+    setattr(cls, "from_ini_file", from_ini_file)  # add new method
+    return cls
