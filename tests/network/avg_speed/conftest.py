@@ -28,5 +28,5 @@ def get_avg_speed_data() -> Iterator[list[tuple[list[RoadTypeEnum], float]]]:
         ([RoadTypeEnum.SECONDARY_LINK], 4.5),
         ([RoadTypeEnum.TRUNK], 5.6),
         ([RoadTypeEnum.TRUNK_LINK], 6.7),
-        ([RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY], 7.8),
+        ([RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY], 7.8),
     ]
