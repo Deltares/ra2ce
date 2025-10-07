@@ -165,13 +165,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "threshold_destinations",
             fallback=_section.threshold_destinations,
         )
-        _section.buffer_meters = self._parser.getfloat( 
+        _section.buffer_meters = self._parser.getfloat(
             section_name,
             "buffer_meters",
             fallback=_section.buffer_meters,
-        )  
+        )
         return _section
-
 
     def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
         _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
@@ -287,7 +286,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                     _section_name
                 )
                 _analysis_sections.append(_analysis_section)
-            elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value:
+            elif (
+                _analysis_type == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value
+            ):
                 _analysis_section = self._get_multi_link_redundancy_config_data(
                     _section_name
                 )
