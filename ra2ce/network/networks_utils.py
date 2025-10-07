@@ -855,7 +855,8 @@ def join_nodes_edges(
                             .iloc[0]
                             .geometry.coords
                         )[0]
-                    )
+                    ),
+                    tolerance=1e-6,
                 )
             ]
             node_b = [
@@ -991,9 +992,9 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
         list[Point]: list with unique points.
     """
     points = [point for point in all_points]
-    uniquepoints = []
+    uniquepoints: list[Point] = []
     for point in points:
-        if not any(p.equals_exact(point) for p in uniquepoints):
+        if not any(p.equals_exact(point, tolerance=1e-6) for p in uniquepoints):
             uniquepoints.append(point)
     return uniquepoints
 
