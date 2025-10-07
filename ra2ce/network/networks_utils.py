@@ -848,7 +848,7 @@ def join_nodes_edges(
             node_a = [
                 i
                 for i, xy in zip(gdf_nodes.node_fid, gdf_nodes.geometry)
-                if xy.almost_equals(
+                if xy.equals_exact(
                     Point(
                         list(
                             gdf_edges.loc[gdf_edges[id_name] == edge]
@@ -861,7 +861,7 @@ def join_nodes_edges(
             node_b = [
                 i
                 for i, xy in zip(gdf_nodes.node_fid, gdf_nodes.geometry)
-                if xy.almost_equals(
+                if xy.equals_exact(
                     Point(
                         list(
                             gdf_edges.loc[gdf_edges[id_name] == edge]
@@ -993,7 +993,7 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
     points = [point for point in all_points]
     uniquepoints = []
     for point in points:
-        if not any(p.almost_equals(point) for p in uniquepoints):
+        if not any(p.equals_exact(point) for p in uniquepoints):
             uniquepoints.append(point)
     return uniquepoints
 
