@@ -38,7 +38,6 @@ import rtree
 from geopy import distance
 from numpy.ma import MaskedArray
 from osmnx import graph_to_gdfs
-from pyproj import CRS
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -690,7 +689,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_: str):
             to_remove.append(idx)
 
     lines_gdf.drop(to_remove, inplace=True)
-    lines_gdf = lines_gdf.append(to_add, ignore_index=True)
+    lines_gdf = pd.concat([lines_gdf] + to_add, ignore_index=True)
     return lines_gdf
 
 
@@ -772,7 +771,7 @@ def join_nodes_edges(
     incorrect_edges = []
 
     # add node attributes to edges
-    gdf = gpd.sjoin(gdf_edges, gdf_nodes, how="left", op="intersects")
+    gdf = gpd.sjoin(gdf_edges, gdf_nodes, how="left", predicate="intersects")
 
     tuples_df = pd.DataFrame({"node_A": [], "node_B": []})
 
@@ -1110,7 +1109,12 @@ def graph_from_gdf(
 
     # create nodes on the Graph
     for _, row in gdf_nodes.iterrows():
-        c = {node_id: row[node_id], "geometry": row.geometry}
+        c = {
+            node_id: row[node_id],
+            "geometry": row.geometry,
+            "x": row.geometry.x,
+            "y": row.geometry.y,
+        }
         _created_graph.add_node(row[node_id], **c)
 
     # create edges on top of the nodes

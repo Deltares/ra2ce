@@ -108,8 +108,14 @@ def graph_to_gdf(
     node_geometry: bool,
     fill_edge_geometry: bool,
 ) -> GeoDataFrame:
-    u, v, k, data = zip(*graph.edges(keys=True, data=True))
-    graph_gdf = graph_to_gdfs(graph, nodes, edges, node_geometry, fill_edge_geometry)
+    _, _, data = zip(*graph.edges(data=True))
+    graph_gdf = graph_to_gdfs(
+        graph,
+        nodes=nodes,
+        edges=edges,
+        node_geometry=node_geometry,
+        fill_edge_geometry=fill_edge_geometry,
+    )
     graph_gdf["data"] = data
     return graph_gdf
 

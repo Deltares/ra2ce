@@ -45,8 +45,13 @@ class NetworkSimplificationWithoutAttributeExclusion:
         """
         _complex_graph = add_x_y_to_nodes(self.nx_graph)
         _simple_graph = simplify_graph(
-            _complex_graph, strict=True, remove_rings=True, track_merged=False
+            _complex_graph, remove_rings=True, track_merged=False
         )
+
+        # # Sort lanes to ensure consistent representation
+        # for _, _, _data in _simple_graph.edges(data=True):
+        #     if "lanes" in _data and isinstance(_data["lanes"], list):
+        #         _data["lanes"] = sorted(_data["lanes"])
 
         logging.info(
             "Graph simplified from %s to %s nodes and %s to %s edges.",

@@ -175,6 +175,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         if not self.is_directed and isinstance(graph_simple, MultiDiGraph):
             graph_simple = graph_simple.to_undirected()
+            # graph_simple = osmnx.utils_graph.get_undirected(graph_simple)
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
