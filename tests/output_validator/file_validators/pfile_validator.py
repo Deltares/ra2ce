@@ -28,4 +28,4 @@ class PfileValidator(FileValidatorProtocol):
         if nx.is_isomorphic(_graph_ref, _graph_res):
             return
 
-        raise AssertionError(f"P file {self.result_file.name} differs in content.")
+        raise AssertionError(f"P file {self.result_file.name} deviates in content.")

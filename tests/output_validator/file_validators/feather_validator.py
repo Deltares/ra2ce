@@ -24,7 +24,7 @@ class FeatherValidator(FileValidatorProtocol):
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
-                f"GPKG file {self.result_file.name} differs in number of rows: {len(_gdf_ref)} != {len(_gdf_res)}"
+                f"GPKG file {self.result_file.name} deviates in number of rows: {len(_gdf_ref)} != {len(_gdf_res)}"
             )
 
         _mismatches = ~((_gdf_ref == _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna()))
@@ -34,7 +34,7 @@ class FeatherValidator(FileValidatorProtocol):
 
         _mismatch_columns = _mismatches.columns[_mismatches.loc[_first_mismatch_row]]
         raise AssertionError(
-            f"Feather file {self.result_file.name} differs in content.\n"
+            f"Feather file {self.result_file.name} deviates in content.\n"
             f"Reference: {_gdf_ref.loc[_first_mismatch_row][_mismatch_columns].to_dict()}\n"
             f"Result: {_gdf_res.loc[_first_mismatch_row][_mismatch_columns].to_dict()}"
         )

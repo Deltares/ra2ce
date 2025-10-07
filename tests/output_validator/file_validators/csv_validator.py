@@ -54,15 +54,18 @@ class CsvValidator(FileValidatorProtocol):
 
         if len(_df_ref) != len(_df_res):
             raise AssertionError(
-                f"CSV file {self.result_file.name} differs in number of rows: {len(_df_ref)} != {len(_df_res)}"
+                f"CSV file {self.result_file.name} deviates in number of rows: {len(_df_ref)} != {len(_df_res)}"
             )
 
-        _first_mismatch = _df_ref.fillna("").ne(_df_res.fillna("")).sum(axis=1).idxmax()
-        if not _first_mismatch:
+        _mismatches = ~((_df_ref == _df_res) | (_df_ref.isna() & _df_res.isna()))
+        _first_mismatch_row = _mismatches.sum(axis=1).idxmax()
+        if not _first_mismatch_row:
             return
 
+        _mismatch_columns = _mismatches.columns[_mismatches.loc[_first_mismatch_row]]
         raise AssertionError(
-            f"CSV file {self.result_file.name} differs in content.\n"
-            f"Reference: {_df_ref.loc[_first_mismatch].to_dict()}\n"
-            f"Result: {_df_res.loc[_first_mismatch].to_dict()}"
+            f"CSV file {self.result_file.name} deviates in content.\n"
+            f"Reference:\n{_df_ref.loc[_first_mismatch_row]}\n"
+            f"Result:\n{_df_res.loc[_first_mismatch_row]}\n"
+            f"Mismatching columns: {_mismatch_columns}"
         )
