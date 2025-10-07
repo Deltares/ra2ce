@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
+    MultiLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
     SingleLinkRedundancyConfigData,
 )
@@ -70,6 +71,11 @@ class TestAnalysisConfigDataReader:
                 AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value,
                 SingleLinkRedundancyConfigData,
                 id="Single link redundancy",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value,
+                MultiLinkRedundancyConfigData,
+                id="Multi link redundancy",
             ),
             pytest.param(
                 AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value,

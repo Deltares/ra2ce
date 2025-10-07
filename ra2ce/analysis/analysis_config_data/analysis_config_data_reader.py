@@ -58,6 +58,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
+    MultiLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
     SingleLinkRedundancyConfigData,
 )
@@ -138,6 +141,37 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             self._parser.get(section_name, "weighing", fallback=None)
         )
         return _section
+
+    def _get_multi_link_redundancy_config_data(
+        self, section_name: str
+    ) -> MultiLinkRedundancyConfigData:
+        _section = MultiLinkRedundancyConfigData.from_ini_file(
+            **self._parser[section_name]
+        )
+        self._set_section_common_properties(_section, section_name)
+
+        _section.calculate_route_without_disruption = self._parser.getboolean(
+            section_name,
+            "calculate_route_without_disruption",
+            fallback=_section.calculate_route_without_disruption,
+        )
+        _section.threshold = self._parser.getfloat(
+            section_name,
+            "threshold",
+            fallback=_section.threshold,
+        )
+        _section.threshold_destinations = self._parser.getfloat(
+            section_name,
+            "threshold_destinations",
+            fallback=_section.threshold_destinations,
+        )
+        _section.buffer_meters = self._parser.getfloat( 
+            section_name,
+            "buffer_meters",
+            fallback=_section.buffer_meters,
+        )  
+        return _section
+
 
     def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
         _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
@@ -250,6 +284,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _analysis_type = self._parser.get(_section_name, "analysis", fallback=None)
             if _analysis_type == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value:
                 _analysis_section = self._get_single_link_redundancy_config_data(
+                    _section_name
+                )
+                _analysis_sections.append(_analysis_section)
+            elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value:
+                _analysis_section = self._get_multi_link_redundancy_config_data(
                     _section_name
                 )
                 _analysis_sections.append(_analysis_section)
