@@ -71,12 +71,12 @@ class TestAnalysisConfigDataReader:
     ])
     def test_get_analysis_sections_with_new_dataclasses(self,analysis_config_name: str, expected_analysis_type: type[AnalysisConfigDataProtocol]):
         """
-        Temporary test, to be better rewritten once all dataclasses are present.
+        Integration test targeting multiple 'private' methods and properties.
+        It ensures that the correct dataclass is being mapped to the correct analysis type.
+        It does so by injecting test data in the parser, instead of creating multiple files.
         """
         # 1. Define test data
         _reader = AnalysisConfigDataReader()
-        # Inject test data just to ensure it gets mapped correctly
-        # instead of creating multiple files.
         _section_name = "dummy_analysis"
         _analysis_name = analysis_config_name + " test"
         _reader._parser.add_section(_section_name)
