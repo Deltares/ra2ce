@@ -23,7 +23,7 @@ class JsonValidator(FileValidatorProtocol):
         _json_ref = _get_normalized_content(self.reference_file)
         _json_res = _get_normalized_content(self.result_file)
 
-        if not _json_ref == _json_res:
+        if _json_ref == _json_res:
             return
 
         raise AssertionError(f"JSON file {self.result_file.name} differs in content.")
