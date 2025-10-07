@@ -158,7 +158,7 @@ def update_edges_with_new_node(
     # edges added to the graph.
     cnt = 0
 
-    if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_a]["geometry"].coords[0]).equals_exact(
         Point(line_b.coords[-1])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -184,7 +184,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_b]["geometry"].coords[0]).equals_exact(
         Point(line_b.coords[0])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -212,7 +212,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_a]["geometry"].coords[0]).equals_exact(
         Point(line_b.coords[0])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -238,7 +238,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_b]["geometry"].coords[0]).equals_exact(
         Point(line_b.coords[-1])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -266,7 +266,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_b]["geometry"].coords[0]).equals_exact(
         Point(line_a.coords[0])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -294,7 +294,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_a]["geometry"].coords[0]).equals_exact(
         Point(line_a.coords[-1])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -320,7 +320,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_b]["geometry"].coords[0]).equals_exact(
         Point(line_a.coords[-1])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
@@ -348,7 +348,7 @@ def update_edges_with_new_node(
 
         cnt += 1
 
-    if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
+    if Point(graph.nodes[node_a]["geometry"].coords[0]).equals_exact(
         Point(line_a.coords[0])
     ):
         if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
