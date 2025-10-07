@@ -42,6 +42,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
     BaseOriginDestinationConfigData,
+    MultiLinkOriginClosestDestinationConfigData,
     MultiLinkOriginDestinationConfigData,
     OptimalRouteOriginClosestDestinationConfigData,
     OptimalRouteOriginDestinationConfigData,
