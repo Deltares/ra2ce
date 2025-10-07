@@ -1,10 +1,25 @@
+from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
+)
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
@@ -13,7 +28,7 @@ from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data impo
 from tests import acceptance_test_data
 
 
-class TestAnalysisConfigReader:
+class TestAnalysisConfigDataReader:
     def test_initialize(self):
         # 1. Run test.
         _reader = AnalysisConfigDataReader()
@@ -48,28 +63,36 @@ class TestAnalysisConfigReader:
         # 3. Verify expectations
         assert isinstance(_config.input_path, Path)
 
-    def test_get_analysis_sections(self):
+    @pytest.mark.parametrize("analysis_config_name, expected_analysis_type", [
+        pytest.param(AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value, SingleLinkRedundancyConfigData, id="Single link redundancy"),
+        pytest.param(AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value, SingleLinkLossesConfigData, id="Single link losses"),
+        pytest.param(AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value, MultiLinkLossesConfigData, id="Multi link losses"),
+        pytest.param(AnalysisDamagesEnum.DAMAGES.config_value, DamagesConfigData, id="Damages")
+    ])
+    def test_get_analysis_sections_with_new_dataclasses(self,analysis_config_name: str, expected_analysis_type: type[AnalysisConfigDataProtocol]):
         """
         Temporary test, to be better rewritten once all dataclasses are present.
         """
         # 1. Define test data
-        _ini_file = acceptance_test_data.joinpath("analyses.ini")
+        _reader = AnalysisConfigDataReader()
+        # Inject test data just to ensure it gets mapped correctly
+        # instead of creating multiple files.
+        _section_name = "dummy_analysis"
+        _analysis_name = analysis_config_name + " test"
+        _reader._parser.add_section(_section_name)
+        _reader._parser.set(_section_name, "name", _analysis_name)
+        _reader._parser.set(_section_name, "analysis", analysis_config_name)
 
         # 2. Run test
-        _reader = AnalysisConfigDataReader()
+
         # Read everything so it gets correctly initialized.
-        _ = _reader.read(_ini_file)
         _analyses_config_data = _reader._get_analysis_sections_with_new_dataclasses()
 
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
-
-        _first_slr_cd = next(
-            _sl_cd
-            for _sl_cd in _analyses_config_data
-            if isinstance(_sl_cd, SingleLinkRedundancyConfigData)
-        )
-        assert _first_slr_cd.name == "single link redundancy test"
-        assert _first_slr_cd.save_csv is True
-        assert _first_slr_cd.save_gpkg is True
-        assert _first_slr_cd.weighing == WeighingEnum.TIME
+        assert len(_analyses_config_data) == 1
+        _first_slr_cd = _analyses_config_data[0]
+        assert isinstance(_first_slr_cd, expected_analysis_type)
+        assert _first_slr_cd.name == _analysis_name
+        assert _first_slr_cd.save_csv is False
+        assert _first_slr_cd.save_gpkg is False

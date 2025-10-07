@@ -246,10 +246,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 )
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value:
-                _analysis_section = self._get_single_link_losses_config_data(_section_name)
+                _analysis_section = self._get_multi_link_losses_config_data(_section_name)
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value:
-                _analysis_section = self._get_multi_link_losses_config_data(_section_name)
+                _analysis_section = self._get_single_link_losses_config_data(_section_name)
                 _analysis_sections.append(_analysis_section)
             elif _analysis_type == AnalysisDamagesEnum.DAMAGES.config_value:
                 _analysis_section = self._get_damages_config_data(_section_name)
