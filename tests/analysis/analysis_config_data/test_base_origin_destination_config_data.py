@@ -30,7 +30,7 @@ class TestOriginDestinationConfigData:
 
         # 2. Run test.
         _origin_destination_config_data = origin_destination_config_data_type(
-            analysis_name="Test Analysis")
+            name="Test Analysis")
         
         # 3. Verify expectations.
         assert isinstance(_origin_destination_config_data, origin_destination_config_data_type)
