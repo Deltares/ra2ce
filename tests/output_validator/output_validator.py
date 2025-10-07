@@ -2,10 +2,13 @@ from pathlib import Path
 from typing import Iterator, Optional
 
 from tests.output_validator.file_validators.csv_validator import CsvValidator
+from tests.output_validator.file_validators.feather_validator import FeatherValidator
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
 )
 from tests.output_validator.file_validators.gpkg_validator import GpkgValidator
+from tests.output_validator.file_validators.json_validator import JsonValidator
+from tests.output_validator.file_validators.pfile_validator import PfileValidator
 
 
 class OutputValidator:
@@ -23,7 +26,13 @@ class OutputValidator:
             return CsvValidator
         if file.suffix == ".gpkg":
             return GpkgValidator
-        if file.suffix in [".p", ".json", ".feather", ".xlsx"]:
+        if file.suffix == ".p":
+            return PfileValidator
+        if file.suffix == ".feather":
+            return FeatherValidator
+        if file.suffix == ".json":
+            return JsonValidator
+        if file.suffix in [".xlsx"]:
             # Don't validate content yet.
             return None
         raise NotImplementedError(
