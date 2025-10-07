@@ -129,12 +129,3 @@ class TestLinkLossesConfigData:
         assert (
             _report.is_valid()
         ), "Expected valid report due to non-triangle risk calculation mode"
-
-        config = BaseLinkLossesConfigData(
-            name="Test Config",
-            event_type=EventTypeEnum.FLOOD,
-            risk_calculation_mode=RiskCalculationModeEnum.SOME_OTHER_MODE,
-            risk_calculation_year=None,  # Year not required
-        )
-        report = config.validate_integrity()
-        assert report.is_valid
