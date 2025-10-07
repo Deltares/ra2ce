@@ -869,7 +869,8 @@ def join_nodes_edges(
                             .iloc[0]
                             .geometry.coords
                         )[-1]
-                    )
+                    ),
+                    tolerance=1e-6,
                 )
             ]
             tuples_df = pd.concat(
