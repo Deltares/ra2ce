@@ -70,8 +70,15 @@ class AvgSpeed:
         else:
             return [RoadTypeEnum.INVALID]
 
+    def _normalize_road_type(self, road_type: list[RoadTypeEnum]) -> list[RoadTypeEnum]:
+        return sorted(set(road_type), key=lambda rt: rt.value)
+
     def get_avg_speed(self, road_type: list[RoadTypeEnum]) -> float:
-        return self.speed_per_road_type[RoadTypeEntry(road_type)]
+        return self.speed_per_road_type[
+            self._normalize_road_type(RoadTypeEntry(road_type))
+        ]
 
     def set_avg_speed(self, road_type: list[RoadTypeEnum], avg_speed: float) -> None:
-        self.speed_per_road_type[RoadTypeEntry(road_type)] = round(avg_speed, 1)
+        self.speed_per_road_type[
+            self._normalize_road_type(RoadTypeEntry(road_type))
+        ] = round(avg_speed, 1)
