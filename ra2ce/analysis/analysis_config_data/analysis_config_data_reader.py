@@ -40,6 +40,13 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     MultiLinkLossesConfigData,
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    BaseOriginDestinationConfigData,
+    MultiLinkOriginClosestDestinationConfigData,
+    MultiLinkOriginDestinationConfigData,
+    OptimalRouteOriginClosestDestinationConfigData,
+    OptimalRouteOriginDestinationConfigData,
+)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -198,69 +205,86 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _set_base_link_losses_common_properties(
-        self, section: BaseLinkLossesConfigData, section_name: str
-    ) -> None:
-        self._set_section_common_properties(section, section_name)
+    def _get_base_link_losses_config_data(self, section_name: str, config_data_type: type[BaseLinkLossesConfigData]) -> AnalysisConfigDataProtocol:
+        _section = config_data_type.from_ini_file(
+            **self._parser[section_name]
+        )
+        self._set_section_common_properties(_section, section_name)
 
-        section.event_type = EventTypeEnum.get_enum(
+        _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
         )
-        section.weighing = WeighingEnum.get_enum(
+        _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
         )
-        section.production_loss_per_capita_per_hour = self._parser.getfloat(
+        _section.production_loss_per_capita_per_hour = self._parser.getfloat(
             section_name,
             "production_loss_per_capita_per_hour",
-            fallback=section.production_loss_per_capita_per_hour,
+            fallback=_section.production_loss_per_capita_per_hour,
         )
-        section.traffic_period = TrafficPeriodEnum.get_enum(
+        _section.traffic_period = TrafficPeriodEnum.get_enum(
             self._parser.get(section_name, "traffic_period", fallback=None)
         )
-        section.trip_purposes = list(
+        _section.trip_purposes = list(
             map(
                 TripPurposeEnum.get_enum,
                 self._parser.getlist(section_name, "trip_purposes", fallback=[]),
             )
         )
-        section.resilience_curves_file = self._parser.get(
+        _section.resilience_curves_file = self._parser.get(
             section_name,
             "resilience_curves_file",
-            fallback=section.resilience_curves_file,
+            fallback=_section.resilience_curves_file,
         )
-        section.traffic_intensities_file = self._parser.get(
+        _section.traffic_intensities_file = self._parser.get(
             section_name,
             "traffic_intensities_file",
-            fallback=section.traffic_intensities_file,
+            fallback=_section.traffic_intensities_file,
         )
-        section.values_of_time_file = self._parser.get(
+        _section.values_of_time_file = self._parser.get(
             section_name,
             "values_of_time_file",
-            fallback=section.values_of_time_file,
+            fallback=_section.values_of_time_file,
         )
-        section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
             self._parser.get(section_name, "risk_calculation_mode", fallback=None)
         )
-        section.risk_calculation_year = self._parser.getint(
+        _section.risk_calculation_year = self._parser.getint(
             section_name,
             "risk_calculation_year",
-            fallback=section.risk_calculation_year,
+            fallback=_section.risk_calculation_year,
         )
-
-    def _get_single_link_losses_config_data(
-        self, section_name: str
-    ) -> BaseLinkLossesConfigData:
-        _section = SingleLinkLossesConfigData.from_ini_file(
-            **self._parser[section_name]
-        )
-        self._set_base_link_losses_common_properties(_section, section_name)
         return _section
 
-    def _get_multi_link_losses_config_data(
-        self, section_name: str
-    ) -> BaseLinkLossesConfigData:
-        _section = MultiLinkLossesConfigData.from_ini_file(**self._parser[section_name])
-        self._set_base_link_losses_common_properties(_section, section_name)
+    def _get_origin_destination_config_data(
+        self, section_name: str, config_data_type: type[BaseOriginDestinationConfigData]) -> AnalysisConfigDataProtocol:
+        _section = config_data_type.from_ini_file(
+            **self._parser[section_name]
+        )
+        self._set_section_common_properties(_section, section_name)
+        _section.weighing = WeighingEnum.get_enum(
+            self._parser.get(section_name, "weighing", fallback=None)
+        )
+        _section.calculate_route_without_disruption = self._parser.getboolean(
+            section_name,
+            "calculate_route_without_disruption",   
+            fallback=_section.calculate_route_without_disruption,
+        )
+        _section.threshold = self._parser.getfloat(
+            section_name,
+            "threshold",
+            fallback=_section.threshold,
+        )
+        _section.threshold_destinations = self._parser.getfloat(
+            section_name,
+            "threshold_destinations",
+            fallback=_section.threshold_destinations,
+        )
+        _section.buffer_meters = self._parser.getfloat(
+            section_name,
+            "buffer_meters",
+            fallback=_section.buffer_meters,
+        )
         return _section
 
     def _get_analysis_sections_with_new_dataclasses(
@@ -272,46 +296,31 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         Returns:
             list[AnalysisConfigDataProtocol]: List of analyses
         """
-        _section_names = list(
-            section_name
+        _mappers = {
+            AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value: self._get_single_link_redundancy_config_data,
+            AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value: self._get_multi_link_redundancy_config_data,
+            AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(x, SingleLinkLossesConfigData),
+            AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(x, MultiLinkLossesConfigData),
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, OptimalRouteOriginDestinationConfigData),
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, OptimalRouteOriginClosestDestinationConfigData),
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, MultiLinkOriginDestinationConfigData),
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, MultiLinkOriginClosestDestinationConfigData),
+            AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
+        }
+
+        def raise_not_supported(analysis_type_name: str):
+            raise ValueError(f"Analysis {analysis_type_name} not supported.")
+        
+        def get_mapping_function(section_name: str) -> AnalysisConfigDataProtocol:
+            _analysis_type = self._parser.get(section_name, "analysis", fallback=None)
+            _mapping_function = _mappers.get(_analysis_type, raise_not_supported)
+            return _mapping_function(section_name)
+
+        return list(
+            get_mapping_function(section_name)
             for section_name in self._parser.sections()
             if "analysis" in section_name
         )
-        _analysis_sections: list[AnalysisConfigDataProtocol] = []
-
-        for _section_name in _section_names:
-            _analysis_type = self._parser.get(_section_name, "analysis", fallback=None)
-            if _analysis_type == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value:
-                _analysis_section = self._get_single_link_redundancy_config_data(
-                    _section_name
-                )
-                _analysis_sections.append(_analysis_section)
-            elif (
-                _analysis_type == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value
-            ):
-                _analysis_section = self._get_multi_link_redundancy_config_data(
-                    _section_name
-                )
-                _analysis_sections.append(_analysis_section)
-            elif _analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value:
-                _analysis_section = self._get_multi_link_losses_config_data(
-                    _section_name
-                )
-                _analysis_sections.append(_analysis_section)
-            elif _analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value:
-                _analysis_section = self._get_single_link_losses_config_data(
-                    _section_name
-                )
-                _analysis_sections.append(_analysis_section)
-            elif _analysis_type == AnalysisDamagesEnum.DAMAGES.config_value:
-                _analysis_section = self._get_damages_config_data(_section_name)
-                _analysis_sections.append(_analysis_section)
-            else:
-                continue
-                # NOTE: Work in progress, we do not need to raise an error just yet.
-                raise ValueError(f"Analysis {_analysis_type} not supported.")
-
-        return _analysis_sections
 
     def _get_analysis_section_losses(self, section_name: str) -> AnalysisSectionLosses:
         _section = AnalysisSectionLosses(**self._parser[section_name])

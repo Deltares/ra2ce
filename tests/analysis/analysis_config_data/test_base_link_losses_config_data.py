@@ -1,7 +1,11 @@
+import math
 from dataclasses import is_dataclass
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     BaseLinkLossesConfigData,
     MultiLinkLossesConfigData,
@@ -32,16 +36,15 @@ class TestLinkLossesConfigData:
 
         # 3. Verify expectations.
         assert isinstance(link_losses_config, link_losses_class)
+        assert isinstance(link_losses_config, BaseLinkLossesConfigData)
+        assert isinstance(link_losses_config, AnalysisConfigDataProtocol)
         assert is_dataclass(link_losses_config)
         assert link_losses_config.name == _data_name
         assert link_losses_config.save_gpkg is False
         assert link_losses_config.save_csv is False
         assert link_losses_config.event_type == EventTypeEnum.NONE
         assert link_losses_config.weighing == WeighingEnum.NONE
-        assert (
-            link_losses_config.production_loss_per_capita_per_hour
-            != link_losses_config.production_loss_per_capita_per_hour
-        )  # NaN check
+        assert math.isnan(link_losses_config.production_loss_per_capita_per_hour)
         assert (
             link_losses_config.traffic_period == None
             or link_losses_config.traffic_period == TrafficPeriodEnum.DAY
