@@ -1,0 +1,9 @@
+,road_types,avg_speed
+0,trunk_link,80.0
+1,"['motorway', 'motorway_link']",100.0
+2,secondary_link,50.0
+3,motorway_link,99.8
+4,primary,50.0
+5,motorway,100.0
+6,secondary,58.3
+7,trunk,84.5
