@@ -1,61 +1,30 @@
-import ast
 from dataclasses import dataclass
 from pathlib import Path
 
 import fiona
 import geopandas as gpd
-import numpy as np
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
 )
+from tests.output_validator.file_validators.pandas_validator_base import (
+    PandasValidatorBase,
+)
 
 
 @dataclass
-class GpkgValidator(FileValidatorProtocol):
+class GpkgValidator(FileValidatorProtocol, PandasValidatorBase):
     reference_file: Path
     result_file: Path
 
+    def _read_file(self, file_path: Path) -> gpd.GeoDataFrame:
+        _gdf = gpd.read_file(file_path)
+        assert isinstance(_gdf, gpd.GeoDataFrame)
+        return _gdf
+
     def __post_init__(self) -> None:
-        def _get_normalized_content(file_path: Path) -> gpd.GeoDataFrame:
-            _gdf = gpd.read_file(file_path)
-
-            # Sort columns by name skipping any unnamed index columns that may have been added.
-            _gdf = _gdf.reindex(
-                sorted(_gdf.columns[~_gdf.columns.str.startswith("Unnamed")]), axis=1
-            )
-
-            # Convert None to np.nan for consistent comparison.
-            _gdf = _gdf.applymap(lambda x: np.nan if x is None else x)
-
-            # Sort values that contain lists (or list as string) to ensure consistent order.
-            for _col in _gdf.select_dtypes(include=["object"]).columns:
-                if (
-                    _gdf[_col]
-                    .apply(lambda x: isinstance(x, (list, str)) and "[" in str(x))
-                    .any()
-                ):
-
-                    def _sort_list(x):
-                        if isinstance(x, list):
-                            return sorted(x)
-                        if isinstance(x, str) and x.startswith("[") and x.endswith("]"):
-                            try:
-
-                                _list_value = ast.literal_eval(x)
-                                if isinstance(_list_value, list):
-                                    return str(sorted(_list_value))
-                            except (ValueError, SyntaxError):
-                                pass
-                        return x
-
-                    _gdf[_col] = _gdf[_col].apply(_sort_list)
-
-            # Sort rows based on all columns to ensure consistent order.
-            return _gdf.sort_values(by=_gdf.columns.to_list()).reset_index(drop=True)
-
-        _gdf_ref = _get_normalized_content(self.reference_file)
-        _gdf_res = _get_normalized_content(self.result_file)
+        _gdf_ref = self._get_normalized_content(self.reference_file)
+        _gdf_res = self._get_normalized_content(self.result_file)
 
         if len(_gdf_ref) != len(_gdf_res):
             raise AssertionError(
