@@ -22,26 +22,25 @@ class PandasValidatorBase(ABC):
         _df = _df.applymap(lambda x: np.nan if x is None else x)
 
         # Sort values that contain lists (or list as string) to ensure consistent order.
+        def _sort_list(x):
+            if isinstance(x, list):
+                return sorted(x)
+            if isinstance(x, str) and x.startswith("[") and x.endswith("]"):
+                try:
+
+                    _list_value = ast.literal_eval(x)
+                    if isinstance(_list_value, list):
+                        return str(sorted(_list_value))
+                except (ValueError, SyntaxError):
+                    pass
+            return x
+
         for _col in _df.select_dtypes(include=["object"]).columns:
             if (
                 _df[_col]
                 .apply(lambda x: isinstance(x, (list, str)) and "[" in str(x))
                 .any()
             ):
-
-                def _sort_list(x):
-                    if isinstance(x, list):
-                        return sorted(x)
-                    if isinstance(x, str) and x.startswith("[") and x.endswith("]"):
-                        try:
-
-                            _list_value = ast.literal_eval(x)
-                            if isinstance(_list_value, list):
-                                return str(sorted(_list_value))
-                        except (ValueError, SyntaxError):
-                            pass
-                    return x
-
                 _df[_col] = _df[_col].apply(_sort_list)
 
         # Sort rows based on all columns to ensure consistent order.
