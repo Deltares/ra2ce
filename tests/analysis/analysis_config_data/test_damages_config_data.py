@@ -1,7 +1,7 @@
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataWithIntegrityValidationProtocol,
+    AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -21,7 +21,7 @@ class TestDamagesConfigData:
         # 3. Verify expectations.
         assert isinstance(damages_config, DamagesConfigData)
         assert isinstance(
-            damages_config, AnalysisConfigDataWithIntegrityValidationProtocol
+            damages_config, AnalysisConfigDataProtocol
         )
         assert damages_config.name == _data_name
         assert damages_config.save_gpkg is False

@@ -318,6 +318,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             ),
             AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
         }
+        # Equity was not supported before, it was being dected whenever 'save_traffic' was true.
 
         def raise_not_supported(analysis_type_name: str):
             raise ValueError(f"Analysis {analysis_type_name} not supported.")
