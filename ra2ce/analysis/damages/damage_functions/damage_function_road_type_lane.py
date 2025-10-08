@@ -102,9 +102,11 @@ class DamageFunctionByRoadTypeByLane:
         assert "lanes" in cols, "no column 'lanes in df"
 
         max_damage_data = self.max_damage.data
-        df["{}_temp_max_dam".format(prefix)] = max_damage_data.lookup(
-            df["infra_type"], df["lanes"]
-        )
+
+        def _get_damage(row):
+            return max_damage_data.at[row["infra_type"], row["lanes"]]
+
+        df["{}_temp_max_dam".format(prefix)] = df.apply(_get_damage, axis=1)
         return df
 
     def calculate_damage(
