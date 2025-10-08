@@ -98,8 +98,8 @@ class TestAvgSpeed:
                 id="from Enum",
             ),
             pytest.param(
-                [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY],
-                f"['{RoadTypeEnum.SECONDARY.config_value}', '{RoadTypeEnum.TERTIARY.config_value}']",
+                [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY],
+                f"['{RoadTypeEnum.TERTIARY.config_value}', '{RoadTypeEnum.SECONDARY.config_value}']",
                 id="from list[Enum]",
             ),
         ],
