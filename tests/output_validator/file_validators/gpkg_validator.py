@@ -68,7 +68,7 @@ class GpkgValidator(FileValidatorProtocol):
             raise AssertionError(
                 f"GPKG file {self.result_file.name} deviates in columns.\n"
                 f"Reference: {_ref_schema}\n"
-                f"Result: {_res_schema}"
+                f"Result   : {_res_schema}"
             )
 
         _mismatches = ~((_gdf_ref == _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna()))
@@ -80,6 +80,6 @@ class GpkgValidator(FileValidatorProtocol):
         raise AssertionError(
             f"GPKG file {self.result_file.name} deviates in content.\n"
             f"Reference row:\n{_gdf_ref.loc[_first_mismatch_row]}\n"
-            f"Result row:\n{_gdf_res.loc[_first_mismatch_row]}\n"
+            f"Result row   :\n{_gdf_res.loc[_first_mismatch_row]}\n"
             f"Mismatching columns: {_mismatch_columns}"
         )

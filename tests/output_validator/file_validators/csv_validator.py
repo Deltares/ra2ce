@@ -66,6 +66,6 @@ class CsvValidator(FileValidatorProtocol):
         raise AssertionError(
             f"CSV file {self.result_file.name} deviates in content.\n"
             f"Reference:\n{_df_ref.loc[_first_mismatch_row]}\n"
-            f"Result:\n{_df_res.loc[_first_mismatch_row]}\n"
+            f"Result   :\n{_df_res.loc[_first_mismatch_row]}\n"
             f"Mismatching columns: {_mismatch_columns}"
         )

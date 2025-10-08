@@ -36,5 +36,5 @@ class FeatherValidator(FileValidatorProtocol):
         raise AssertionError(
             f"Feather file {self.result_file.name} deviates in content.\n"
             f"Reference: {_gdf_ref.loc[_first_mismatch_row][_mismatch_columns].to_dict()}\n"
-            f"Result: {_gdf_res.loc[_first_mismatch_row][_mismatch_columns].to_dict()}"
+            f"Result   : {_gdf_res.loc[_first_mismatch_row][_mismatch_columns].to_dict()}"
         )
