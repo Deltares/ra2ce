@@ -19,6 +19,7 @@ ARG CONDA_ENV="${SRC_ROOT}/.env"
 # This location needs to be mounted with your ra2ce checkout:
 # -v {your_ra2ce_checkout_dir}:/usr/src/app
 WORKDIR $SRC_ROOT/app
+RUN git config --global core.autocrlf true 
 COPY environment.yml $SRC_ROOT/.devcontainer/environment.yml
 
 RUN conda init bash \
