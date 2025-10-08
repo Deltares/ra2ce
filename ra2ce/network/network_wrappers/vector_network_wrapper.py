@@ -26,7 +26,6 @@ from typing import Any
 import geopandas as gpd
 import momepy
 import networkx as nx
-import pandas as pd
 import pyproj
 from shapely.geometry import Point
 from tqdm import tqdm
