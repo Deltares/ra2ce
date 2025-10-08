@@ -20,6 +20,11 @@ class GpkgValidator(FileValidatorProtocol):
         def _get_normalized_content(file_path: Path) -> gpd.GeoDataFrame:
             _gdf = gpd.read_file(file_path)
 
+            # Sort columns by name skipping any unnamed index columns that may have been added.
+            _gdf = _gdf.reindex(
+                sorted(_gdf.columns[~_gdf.columns.str.startswith("Unnamed")]), axis=1
+            )
+
             # Convert None to np.nan for consistent comparison.
             _gdf = _gdf.applymap(lambda x: np.nan if x is None else x)
 
