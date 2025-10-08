@@ -43,10 +43,12 @@ class TestAvgSpeed:
         params=[
             pytest.param([RoadTypeEnum.TERTIARY], id="from Enum"),
             pytest.param(
-                [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY], id="from sorted list[Enum]"
+                [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY],
+                id="from sorted list[Enum]",
             ),
             pytest.param(
-                [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY], id="from unsorted list[Enum]"
+                [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY],
+                id="from unsorted list[Enum]",
             ),
         ],
         name="road_type",
