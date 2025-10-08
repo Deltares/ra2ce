@@ -1,4 +1,5 @@
 import shutil
+from itertools import chain
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -13,11 +14,12 @@ from tests import (
     test_data,
     test_external_data,
 )
-from tests.output_validator.output_validator import OutputValidator
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
 _analysis_ini_name = "analyses.ini"
+_base_graph_p_filename = "base_graph.p"
+_base_network_feather_filename = "base_network.feather"
 _skip_cases = []
 
 
@@ -150,14 +152,51 @@ class TestMainCli:
 
     @pytest.mark.slow_test
     @pytest.mark.parametrize(
-        "case_data_dir",
+        "case_data_dir, expected_graph_files, expected_analysis_files",
         [
             pytest.param(
                 "1_1_network_shape_redundancy",
-                id="Case 1. Given only network shape redundancy",
+                [
+                    _base_graph_p_filename,
+                    _base_network_feather_filename,
+                ],
+                dict(single_link_redundancy=["single_link_redundancy_test.csv"]),
+                id="Case 1. Given only network shape redundancy.",
             ),
             pytest.param(
                 "4_analyses_losses",
+                [],
+                dict(
+                    single_link_redundancy=[
+                        "single_link_redundancy_test.csv",
+                        "single_link_redundancy_test.gpkg",
+                    ],
+                    optimal_route_origin_destination=[
+                        "optimal_origin_dest_test.csv",
+                        "optimal_origin_dest_test.gpkg",
+                    ],
+                    multi_link_redundancy=[
+                        "multi_link_redundancy_test.csv",
+                        "multi_link_redundancy_test.gpkg",
+                    ],
+                    multi_link_origin_destination=[
+                        "multilink_origin_dest_test.csv",
+                        "multilink_origin_dest_test.gpkg",
+                        "multilink_origin_dest_test_impact_summary.csv",
+                        "multilink_origin_dest_test_impact.csv",
+                    ],
+                    multi_link_origin_closest_destination=[
+                        "multilink_origin_closest_dest_test_destinations.csv",
+                        "multilink_origin_closest_dest_test_destinations.gpkg",
+                        "multilink_origin_closest_dest_test_optimal_routes.csv",
+                        "multilink_origin_closest_dest_test_optimal_routes_with_hazard.gpkg",
+                        "multilink_origin_closest_dest_test_optimal_routes_without_hazard.gpkg",
+                        "multilink_origin_closest_dest_test_origins.gpkg",
+                        "multilink_origin_closest_dest_test_results.xlsx",
+                        "multilink_origin_closest_dest_test_results_edges.gpkg",
+                        "multilink_origin_closest_dest_test_results_nodes.gpkg",
+                    ],
+                ),
                 id="Case 2. All losses analyses",
             ),
         ],
@@ -166,6 +205,8 @@ class TestMainCli:
     def test_losses_analysis(
         self,
         case_data_dir: Path,
+        expected_graph_files: list[str],
+        expected_analysis_files: dict[str, list[str]],
     ):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
@@ -182,4 +223,22 @@ class TestMainCli:
 
         # 3. Then, validate expectations
         assert _click_arguments.exit_code == 0
-        OutputValidator(case_data_dir).validate_output()
+
+        def _verify_file(filepath: Path) -> bool:
+            return filepath.exists() and filepath.is_file()
+
+        # Graph files
+        assert all(_verify_file(_graph_dir.joinpath(_f)) for _f in expected_graph_files)
+
+        # Analysis files
+        _not_generated_files = []
+        for _subdir_name, _subdir_files in expected_analysis_files.items():
+            _not_generated_files.extend(
+                filter(
+                    lambda x: not _verify_file(_analysis_dir.joinpath(_subdir_name, x)),
+                    _subdir_files,
+                )
+            )
+        _err_mssg = ", ".join(_not_generated_files)
+        if any(_not_generated_files):
+            pytest.fail(f"The following expected files were not generated: {_err_mssg}")
