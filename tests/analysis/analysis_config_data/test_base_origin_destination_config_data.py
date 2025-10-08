@@ -1,3 +1,4 @@
+import math
 from dataclasses import is_dataclass
 from os import link
 
@@ -43,8 +44,5 @@ class TestOriginDestinationConfigData:
         assert _origin_destination_config_data.weighing == WeighingEnum.NONE
         assert _origin_destination_config_data.calculate_route_without_disruption is False
         assert _origin_destination_config_data.threshold == 0.0
-        assert (
-            _origin_destination_config_data.threshold_destinations
-            != _origin_destination_config_data.threshold_destinations
-        )  # NaN check
-        assert _origin_destination_config_data.buffer_meters != _origin_destination_config_data.buffer_meters  # NaN check
+        assert math.isnan(_origin_destination_config_data.threshold_destinations)
+        assert math.isnan(_origin_destination_config_data.buffer_meters)

@@ -1,3 +1,4 @@
+import math
 from dataclasses import is_dataclass
 
 import pytest
@@ -43,10 +44,7 @@ class TestLinkLossesConfigData:
         assert link_losses_config.save_csv is False
         assert link_losses_config.event_type == EventTypeEnum.NONE
         assert link_losses_config.weighing == WeighingEnum.NONE
-        assert (
-            link_losses_config.production_loss_per_capita_per_hour
-            != link_losses_config.production_loss_per_capita_per_hour
-        )  # NaN check
+        assert math.isnan(link_losses_config.production_loss_per_capita_per_hour)
         assert (
             link_losses_config.traffic_period == None
             or link_losses_config.traffic_period == TrafficPeriodEnum.DAY
