@@ -26,18 +26,26 @@ class BaseOriginDestinationConfigData(AnalysisConfigDataProtocol, ABC):
     threshold_destinations: Optional[float] = math.nan
     buffer_meters: Optional[float] = math.nan
 
+
 class OptimalRouteOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-destination analysis."""
+
     pass
+
 
 class OptimalRouteOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-closest destination analysis."""
+
     pass
+
 
 class MultiLinkOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-destination analysis."""
+
     pass
+
 
 class MultiLinkOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-closest destination analysis."""
+
     pass

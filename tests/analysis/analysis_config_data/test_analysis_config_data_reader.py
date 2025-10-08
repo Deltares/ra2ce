@@ -111,7 +111,7 @@ class TestAnalysisConfigDataReader:
             pytest.param(
                 AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value,
                 MultiLinkOriginClosestDestinationConfigData,
-                id="Multi link origin closest destination"
+                id="Multi link origin closest destination",
             ),
             pytest.param(
                 AnalysisDamagesEnum.DAMAGES.config_value,

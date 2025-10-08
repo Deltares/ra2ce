@@ -205,10 +205,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _get_base_link_losses_config_data(self, section_name: str, config_data_type: type[BaseLinkLossesConfigData]) -> AnalysisConfigDataProtocol:
-        _section = config_data_type.from_ini_file(
-            **self._parser[section_name]
-        )
+    def _get_base_link_losses_config_data(
+        self, section_name: str, config_data_type: type[BaseLinkLossesConfigData]
+    ) -> AnalysisConfigDataProtocol:
+        _section = config_data_type.from_ini_file(**self._parser[section_name])
         self._set_section_common_properties(_section, section_name)
 
         _section.event_type = EventTypeEnum.get_enum(
@@ -257,17 +257,16 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         return _section
 
     def _get_origin_destination_config_data(
-        self, section_name: str, config_data_type: type[BaseOriginDestinationConfigData]) -> AnalysisConfigDataProtocol:
-        _section = config_data_type.from_ini_file(
-            **self._parser[section_name]
-        )
+        self, section_name: str, config_data_type: type[BaseOriginDestinationConfigData]
+    ) -> AnalysisConfigDataProtocol:
+        _section = config_data_type.from_ini_file(**self._parser[section_name])
         self._set_section_common_properties(_section, section_name)
         _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
         )
         _section.calculate_route_without_disruption = self._parser.getboolean(
             section_name,
-            "calculate_route_without_disruption",   
+            "calculate_route_without_disruption",
             fallback=_section.calculate_route_without_disruption,
         )
         _section.threshold = self._parser.getfloat(
@@ -299,18 +298,30 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _mappers = {
             AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value: self._get_single_link_redundancy_config_data,
             AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value: self._get_multi_link_redundancy_config_data,
-            AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(x, SingleLinkLossesConfigData),
-            AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(x, MultiLinkLossesConfigData),
-            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, OptimalRouteOriginDestinationConfigData),
-            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, OptimalRouteOriginClosestDestinationConfigData),
-            AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, MultiLinkOriginDestinationConfigData),
-            AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(x, MultiLinkOriginClosestDestinationConfigData),
+            AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(
+                x, SingleLinkLossesConfigData
+            ),
+            AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(
+                x, MultiLinkLossesConfigData
+            ),
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
+                x, OptimalRouteOriginDestinationConfigData
+            ),
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
+                x, OptimalRouteOriginClosestDestinationConfigData
+            ),
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
+                x, MultiLinkOriginDestinationConfigData
+            ),
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
+                x, MultiLinkOriginClosestDestinationConfigData
+            ),
             AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
         }
 
         def raise_not_supported(analysis_type_name: str):
             raise ValueError(f"Analysis {analysis_type_name} not supported.")
-        
+
         def get_mapping_function(section_name: str) -> AnalysisConfigDataProtocol:
             _analysis_type = self._parser.get(section_name, "analysis", fallback=None)
             _mapping_function = _mappers.get(_analysis_type, raise_not_supported)
