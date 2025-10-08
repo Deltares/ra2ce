@@ -1,0 +1,9 @@
+,road_types,avg_speed
+0,"['motorway', 'primary']",98.7
+1,"['motorway', 'motorway_link']",98.7
+2,motorway,98.7
+3,primary_link,67.3
+4,"['primary', 'primary_link']",72.2
+5,motorway_link,95.7
+6,"['motorway_link', 'primary']",95.7
+7,primary,72.2
