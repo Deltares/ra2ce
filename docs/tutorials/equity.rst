@@ -7,3 +7,9 @@ Frameworks:
 - Utilitarian
 - Egalitarian
 - Prioritarian
+
+
+.. toctree::
+   :maxdepth: 1
+
+   ../_examples/accessibility_equity_analysis

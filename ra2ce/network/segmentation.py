@@ -276,7 +276,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         self.edges_segmented = gpd.GeoDataFrame(data)
 
     def generate_link_tables(
-        self,
+            self,
     ) -> tuple[dict[int, Union[int, list[int]]], dict[int, int]]:
         """Generate mappings between RFIDs and split IDs.
 
