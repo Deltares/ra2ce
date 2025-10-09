@@ -23,9 +23,9 @@ class OutputValidator:
 
     def _get_file_validator(self, file: Path) -> type[FileValidatorProtocol] | None:
         if file.suffix == ".csv":
-            return CsvValidator
+            return None
         if file.suffix == ".gpkg":
-            return GpkgValidator
+            return None
         if file.suffix == ".p":
             return PfileValidator
         if file.suffix == ".feather":
