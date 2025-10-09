@@ -1,0 +1,1078 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Losses Tutorial &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=4b0575c0" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_examples/losses_multi_link_redundancy_losses';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adaptation Tutorial" href="../tutorials/adaptation.html" />
+    <link rel="prev" title="Losses Analysis" href="../tutorials/losses.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../showcases/index.html">Showcases</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/network.html">Network</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="network_from_shapefile.html">Network from shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="network_from_OSM.html">Network from OSM download</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/criticality.html">Criticality Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="criticality_single_link_redundancy.html">Single Link Redundancy Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="criticality_multi_link_redundancy.html">Multi Link Redundancy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/accessibility.html">Accessibility Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/accessibility.prepare_data_origin_destinations.html">Origins and Destinations Data Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_all_pairs_origin_destinations.html">Defined Origin–Destination Pairs Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_closest_origin_destinations.html">Origins to Closest Destinations Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/damages.html">Damages Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="damages_reference_damage_curves.html">Reference Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="damages_manual_curves.html">Manual Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="damages_EAD.html">Expected Annual Damage (EAD) Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../tutorials/losses.html">Losses Analysis</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Losses Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/adaptation.html">Adaptation Tutorial</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/equity.html">Equity Tutorial</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Docstrings Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/network.html">ra2ce.network package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/analysis.html">ra2ce.analysis package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/ra2ce.handler.html">ra2ce.handler package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorials/losses.html" class="nav-link">Losses Analysis</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Losses Tutorial</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Losses-Tutorial">
+<h1>Losses Tutorial<a class="headerlink" href="#Losses-Tutorial" title="Link to this heading">#</a></h1>
+<p>This tutorial demonstrates how to configure and run a <strong>multi-link redundancy loss analysis</strong> in Python using RA2CE. While the Damages analysis estimates direct physical repair costs, the Losses analysis quantifies the <strong>economic (indirect) impacts</strong> of service disruption on users of the network.</p>
+<p>The losses analysis builds on the <strong>criticality of the road network</strong> and translates disruptions into <strong>Vehicle Loss Hours (VLH)</strong>, which are then converted into <strong>monetary values (€)</strong> using traffic data and values of time.</p>
+<section id="Required-Inputs">
+<h2>Required Inputs<a class="headerlink" href="#Required-Inputs" title="Link to this heading">#</a></h2>
+<p>Inputs required include:</p>
+<ul class="simple">
+<li><p><strong>Criticality</strong> of each road link (alternative route length/time).</p></li>
+<li><p><strong>Resilience curve</strong>: how quickly traffic recovers on a disrupted link.</p></li>
+<li><p><strong>Traffic intensities</strong>: how many vehicles use each link, per time period and purpose.</p></li>
+<li><p><strong>Values of time</strong>: the economic value (€/hour) of travel time for different trip purposes.</p></li>
+</ul>
+<p>These input are all necessary to perform a losses analysis. The criticality analysis is automatically performed as part of the losses workflow and does not require further attention in this tutorial. Step 3 explains how to prepare the other required input data.</p>
+<p>The output is expressed as:</p>
+<ul class="simple">
+<li><p><strong>Vehicle Loss Hours (VLH)</strong> → total hours of lost accessibility due to disruptions.</p></li>
+<li><p>Broken down per <strong>trip purpose</strong> (commute, freight, business, etc.) and <strong>time of day</strong> (daily, rush hour, etc.), but also aggregated totals.</p></li>
+</ul>
+<p>This makes the Losses module essential for answering questions like:</p>
+<ul class="simple">
+<li><p><em>“What is the expected economic loss due to a non-availability of a road network from a natural hazard (e.g. flood event) ?”</em></p></li>
+<li><p><em>“What is the Expected Annual Loss (EAL) from repeated hazard events with different return periods?”</em></p></li>
+</ul>
+</section>
+<section id="Step-1:-Project-Setup">
+<h2>Step 1: Project Setup<a class="headerlink" href="#Step-1:-Project-Setup" title="Link to this heading">#</a></h2>
+<p>We start by defining the root project directory and paths for input/output data:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;losses&quot;</span><span class="p">)</span>
+
+<span class="n">static_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;static&quot;</span><span class="p">)</span>
+<span class="n">hazard_path</span> <span class="o">=</span> <span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;hazard&quot;</span><span class="p">)</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span>
+<span class="n">input_analysis_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_analysis_data&quot;</span><span class="p">)</span>  <span class="c1"># This is a path where input data for the losses analysis is stored</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Step-2:-Define-the-Network">
+<h2>Step 2: Define the Network<a class="headerlink" href="#Step-2:-Define-the-Network" title="Link to this heading">#</a></h2>
+<p>We configure the <strong>network section</strong> by providing the shapefile with road links.</p>
+<p>The losses analysis requires specific additional data (e.g., traffic intensity for every link). Therefore, it is <strong>not recommended</strong> to use OSM data for this analysis, as it would be difficult to collect all required input data for every OSM link. We strongly recommend using a pre-defined shapefile as source for the road network.</p>
+<p>It is essential to specify a unique <code class="docutils literal notranslate"><span class="pre">file_id</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">ID</span></code>), which corresponds to a unique identifier in the network shapefile. This will later be used in Step 3 to match traffic intensities with the corresponding road links.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.network_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.source_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkSection</span>
+
+<span class="n">network_section</span> <span class="o">=</span> <span class="n">NetworkSection</span><span class="p">(</span>
+    <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">SourceEnum</span><span class="o">.</span><span class="n">SHAPEFILE</span><span class="p">,</span>
+    <span class="n">primary_file</span><span class="o">=</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s1">&#39;network.shp&#39;</span><span class="p">),</span>
+    <span class="n">file_id</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>  <span class="c1"># Needed for matching with traffic intensity</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>We now specify the hazard data. The hazard maps (e.g., flood depth rasters) are read as GeoTIFFs.</p>
+<p>The losses analysis provides results solely for road links (node to node) and not on segmented networks (every 100m for example). Therefore, we set <code class="docutils literal notranslate"><span class="pre">overlay_segmented_network=False</span></code> to speed up computational time.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.aggregate_wl_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateWlEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">HazardSection</span>
+
+<span class="n">hazard_section</span> <span class="o">=</span> <span class="n">HazardSection</span><span class="p">(</span>
+    <span class="n">hazard_map</span><span class="o">=</span><span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">hazard_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tif&quot;</span><span class="p">)],</span>
+    <span class="n">aggregate_wl</span><span class="o">=</span><span class="n">AggregateWlEnum</span><span class="o">.</span><span class="n">MAX</span><span class="p">,</span>      <span class="c1"># use maximum water level for losses</span>
+    <span class="n">hazard_crs</span><span class="o">=</span><span class="s2">&quot;EPSG:32736&quot;</span><span class="p">,</span>               <span class="c1"># CRS of flood maps</span>
+    <span class="n">overlay_segmented_network</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Both the network and hazard sections are passed to a single configuration object:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkConfigData</span>
+
+<span class="n">network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span>
+    <span class="n">root_path</span><span class="o">=</span><span class="n">root_dir</span><span class="p">,</span>
+    <span class="n">network</span><span class="o">=</span><span class="n">network_section</span><span class="p">,</span>
+    <span class="n">hazard</span><span class="o">=</span><span class="n">hazard_section</span><span class="p">,</span>
+    <span class="n">static_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;static&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Step-3:-Prepare-required-input-data">
+<h2>Step 3: Prepare required input data<a class="headerlink" href="#Step-3:-Prepare-required-input-data" title="Link to this heading">#</a></h2>
+<p>Three CSV input files are required for the losses workflow:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>File</strong></p></th>
+<th class="head"><p><strong>Content</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resilience_curve.csv</span></code></p></td>
+<td><p>Recovery speed of road links after disruption (0–1 scale).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">traffic_intensities.csv</span></code></p></td>
+<td><p>Traffic volumes per link, per trip purpose, per period.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">values_of_time.csv</span></code></p></td>
+<td><p>Economic value of time per trip purpose (€/hour).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="Traffic-Intensity">
+<h3>Traffic Intensity<a class="headerlink" href="#Traffic-Intensity" title="Link to this heading">#</a></h3>
+<p>The <strong>traffic intensity</strong> CSV file contains the average number of vehicles for every link in the network. A distinction can be made between different trip purposes (e.g., commute, freight, business, other) and time periods (e.g., day, evening) since the traffic patterns can vary significantly throughout the day.</p>
+<p>The traffic intensity must be expressed in <strong>number of vehicles per day</strong>.</p>
+<p>The traffic intensity can be differentiated between classes of trips. You have to choose among the pre-defined trip purposes from <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum">TripPurposeEnum</a> (<code class="docutils literal notranslate"><span class="pre">BUSINESS</span></code>, <code class="docutils literal notranslate"><span class="pre">COMMUTE</span></code>, <code class="docutils literal notranslate"><span class="pre">FREIGHT</span></code>, <code class="docutils literal notranslate"><span class="pre">OTHER</span></code>) and use the following structure for column names: <code class="docutils literal notranslate"><span class="pre">day_typeoftrip</span></code> or <code class="docutils literal notranslate"><span class="pre">evening_typeoftrip</span></code>.</p>
+<p>For example:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>ID</strong></p></th>
+<th class="head"><p><strong>evening_commute</strong></p></th>
+<th class="head"><p><strong>evening_freight</strong></p></th>
+<th class="head"><p><strong>evening_total</strong></p></th>
+<th class="head"><p><strong>day_commute</strong></p></th>
+<th class="head"><p><strong>day_freight</strong></p></th>
+<th class="head"><p><strong>day_total</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>100</p></td>
+<td><p>200</p></td>
+<td><p>300</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>50</p></td>
+<td><p>20</p></td>
+<td><p>70</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>10</p></td>
+<td><p>2</p></td>
+<td><p>12</p></td>
+<td><p>30</p></td>
+<td><p>32</p></td>
+<td><p>62</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="Values-of-time">
+<h3>Values of time<a class="headerlink" href="#Values-of-time" title="Link to this heading">#</a></h3>
+<p>As a user, you also need to specify the <strong>value of time</strong> for every class of trip defined in the traffic intensity. It represents the amount of money lost per unit of time (or distance) due to the unavailability of a disrupted link.</p>
+<p>The value of time can be expressed either:</p>
+<ul class="simple">
+<li><p>per <strong>hour of delay</strong> (€/hour), or</p></li>
+<li><p>per <strong>kilometer of detour</strong> (€/km).</p></li>
+</ul>
+<p>The unit of currency depends on the values entered in this table, but must be consistent across all rows.</p>
+<p>The <strong>average number of occupants per vehicle</strong> is also required for each trip purpose. This is especially important to compute the losses for links without alternative routes.</p>
+<p>Example (<code class="docutils literal notranslate"><span class="pre">values_of_time.csv</span></code>):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>trip_types</strong></p></th>
+<th class="head"><p><strong>value_of_time</strong></p></th>
+<th class="head"><p><strong>occupants</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>commute</p></td>
+<td><p>10</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>freight</p></td>
+<td><p>20</p></td>
+<td><p>2</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In this example, vehicles in the <em>commute</em> class experience an economic loss of <strong>10 €/hour of disruption</strong>, while <em>freight</em> vehicles lose <strong>20 €/hour</strong>, with two occupants per vehicle.</p>
+</section>
+<section id="Resilience-Curves">
+<h3>Resilience Curves<a class="headerlink" href="#Resilience-Curves" title="Link to this heading">#</a></h3>
+<p>The last required input file defines the <strong>resilience curves</strong> for the different road types in the network. Each road type (e.g., highway, residential) is affected differently by a given hazard level and recovers at its own pace.</p>
+<p>The column <code class="docutils literal notranslate"><span class="pre">link_type_hazard_intensity</span></code> controls which resilience curve is selected for each road type and hazard level. The hazard intensity uses the same unit as in the hazard map. For example, for <code class="docutils literal notranslate"><span class="pre">highway_0-0.5</span></code>, the corresponding resilience curve applies to all links of type <em>highway</em> with a hazard intensity between 0 and 0.5.</p>
+<p>The table must cover <strong>all road types</strong> and <strong>all expected hazard intensities</strong>.</p>
+<p>The resilience curves are defined with:</p>
+<ul class="simple">
+<li><p><strong>duration steps</strong> (in hours)</p></li>
+<li><p><strong>functionality loss ratio</strong></p></li>
+</ul>
+<p><strong>Example interpretation</strong> (first row of the table):</p>
+<ul class="simple">
+<li><p>At t = 0, the link is 100% functional</p></li>
+<li><p>Between t = 0 and t = 10 h, the link is 50% functional</p></li>
+<li><p>Between t = 10 h and t = 40 h (10+30), the link is 70% functional</p></li>
+<li><p>Between t = 40 h and t = 90 h (10+30+50), the link is 90% functional</p></li>
+<li><p>After t &gt; 90 h, the link is fully functional again</p></li>
+</ul>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>link_type_hazard_intensity</strong></p></th>
+<th class="head"><p><strong>duration_steps</strong></p></th>
+<th class="head"><p><strong>functionality_loss_ratio</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>highway_0-0.5</p></td>
+<td><p>[10.0, 30.0, 50.0]</p></td>
+<td><p>[0.5, 0.3, 0.1]</p></td>
+</tr>
+<tr class="row-odd"><td><p>highway_0.5-2</p></td>
+<td><p>[10.0, 40.0, 100.0]</p></td>
+<td><p>[0.75, 0.5, 0.25]</p></td>
+</tr>
+<tr class="row-even"><td><p>residential_0-2</p></td>
+<td><p>[5.0, 10.0, 15.0]</p></td>
+<td><p>[0.75, 0.5, 0.25]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="Step-4:-Define-the-Losses-Analysis">
+<h2>Step 4: Define the Losses Analysis<a class="headerlink" href="#Step-4:-Define-the-Losses-Analysis" title="Link to this heading">#</a></h2>
+<p>Now we configure the <strong>losses analysis</strong> using <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses">AnalysisSectionLosses</a> and the analysis type set to <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_LOSSES">MULTI_LINK_LOSSES</a>. It is required for this analysis to provide the three CSV input files prepared in Step 3,
+and to specify the <strong>production loss per capita per hour</strong> (in €/hour) as well as the traffic period (<a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.traffic_period_enum">TrafficPeriodEnum</a>) and trip purposes (<a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum">TripPurposeEnum</a>) to consider.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AnalysisConfigData</span><span class="p">,</span> <span class="n">AnalysisSectionLosses</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisLossesEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">TripPurposeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.weighing_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeighingEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.event_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.traffic_period_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrafficPeriodEnum</span>
+
+<span class="n">losses_analysis</span> <span class="o">=</span> <span class="p">[</span><span class="n">AnalysisSectionLosses</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;losses&#39;</span><span class="p">,</span>
+    <span class="n">analysis</span><span class="o">=</span><span class="n">AnalysisLossesEnum</span><span class="o">.</span><span class="n">MULTI_LINK_LOSSES</span><span class="p">,</span>  <span class="c1"># MULTI_LINK_LOSSES or SINGLE_LINK_LOSSES</span>
+    <span class="n">event_type</span><span class="o">=</span><span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span>                 <span class="c1"># EVENT-based analysis (single hazard event)</span>
+    <span class="n">weighing</span><span class="o">=</span><span class="n">WeighingEnum</span><span class="o">.</span><span class="n">TIME</span><span class="p">,</span>                     <span class="c1"># losses weighted by time (instead of length)</span>
+    <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>                                  <span class="c1"># water depth threshold for disruption</span>
+    <span class="n">production_loss_per_capita_per_hour</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">traffic_period</span><span class="o">=</span><span class="n">TrafficPeriodEnum</span><span class="o">.</span><span class="n">DAY</span><span class="p">,</span>
+    <span class="n">trip_purposes</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">TripPurposeEnum</span><span class="o">.</span><span class="n">BUSINESS</span><span class="p">,</span>
+        <span class="n">TripPurposeEnum</span><span class="o">.</span><span class="n">COMMUTE</span><span class="p">,</span>
+        <span class="n">TripPurposeEnum</span><span class="o">.</span><span class="n">FREIGHT</span><span class="p">,</span>
+        <span class="n">TripPurposeEnum</span><span class="o">.</span><span class="n">OTHER</span><span class="p">,</span>
+    <span class="p">],</span>
+
+    <span class="c1"># CSV input files</span>
+    <span class="n">resilience_curves_file</span><span class="o">=</span><span class="n">input_analysis_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;resilience_curve.csv&quot;</span><span class="p">),</span>
+    <span class="n">traffic_intensities_file</span><span class="o">=</span><span class="n">input_analysis_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;traffic_intensities.csv&quot;</span><span class="p">),</span>
+    <span class="n">values_of_time_file</span><span class="o">=</span><span class="n">input_analysis_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;values_of_time.csv&quot;</span><span class="p">),</span>
+
+    <span class="n">save_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)]</span>
+
+<span class="n">analysis_config_data</span> <span class="o">=</span> <span class="n">AnalysisConfigData</span><span class="p">(</span>
+    <span class="n">analyses</span><span class="o">=</span><span class="n">losses_analysis</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Step-5:-Run-the-Analysis">
+<h2>Step 5: Run the Analysis<a class="headerlink" href="#Step-5:-Run-the-Analysis" title="Link to this heading">#</a></h2>
+<p>Finally, we create a RA2CE handler, configure the analysis, and run it:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.ra2ce_handler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ra2ceHandler</span>
+
+<span class="n">handler</span> <span class="o">=</span> <span class="n">Ra2ceHandler</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">network_config_data</span><span class="p">,</span> <span class="n">analysis_config_data</span><span class="p">)</span>
+
+<span class="n">handler</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">run_analysis</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+c:\Users\hauth\miniforge3\envs\ra2ce_env\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+100%|██████████| 460/460 [00:00&lt;00:00, 153613.04it/s]
+2025-09-28 05:31:50 PM - [avg_speed_calculator.py:176] - root - WARNING - No valid file found with average speeds data\losses\static\output_graph\avg_speed.csv, calculating and saving them instead.
+2025-09-28 05:31:50 PM - [avg_speed_calculator.py:151] - root - WARNING - Default speed have been assigned to road type [&lt;RoadTypeEnum.TRUNK_LINK: 4&gt;]. Please check the average speed CSV, enter the right average speed for this road type and run RA2CE again.
+2025-09-28 05:31:50 PM - [avg_speed_calculator.py:151] - root - WARNING - Default speed have been assigned to road type [&lt;RoadTypeEnum.SECONDARY: 7&gt;]. Please check the average speed CSV, enter the right average speed for this road type and run RA2CE again.
+2025-09-28 05:31:50 PM - [avg_speed_calculator.py:151] - root - WARNING - Default speed have been assigned to road type [&lt;RoadTypeEnum.TRUNK: 3&gt;]. Please check the average speed CSV, enter the right average speed for this road type and run RA2CE again.
+2025-09-28 05:31:51 PM - [hazard_overlay.py:381] - root - WARNING - Hazard crs EPSG:32736 and graph crs EPSG:4326 are inconsistent, we try to reproject the graph crs
+Graph hazard overlay with RP_10: 100%|██████████| 230/230 [00:02&lt;00:00, 100.15it/s]
+Graph fraction with hazard overlay with RP_10: 100%|██████████| 230/230 [00:20&lt;00:00, 11.24it/s]
+c:\Users\hauth\miniforge3\envs\ra2ce_env\Lib\site-packages\geopandas\geodataframe.py:1528: SettingWithCopyWarning:
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  super().__setitem__(key, value)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[AnalysisResultWrapper(results_collection=[AnalysisResult(analysis_result=      ID    u    v   RP10_fr   RP10_ma alt_nodes  alt_time  avgspeed bridge  \
+ 0     86    2   42  0.014318  1.369213       nan       NaN      58.0    yes
+ 1    100   30   82  0.100808  0.654458       nan       NaN      30.0    yes
+ 2    264   46   51  0.002634  0.766717       nan       NaN      50.0    nan
+ 3     58   47   49  0.932580  7.217377       nan       NaN      58.0    nan
+ 4     51   47   50  0.615422  1.324971       nan       NaN      58.0    nan
+ ..   ...  ...  ...       ...       ...       ...       ...       ...    ...
+ 223  253  153  156  0.000000  0.000000       nan       NaN      50.0    nan
+ 224  246  154  155  0.000000  0.000000       nan       NaN      50.0    nan
+ 225  249  154  156  0.000000  0.000000       nan       NaN      50.0    nan
+ 226  248  156  157  0.000000  0.000000       nan       NaN      50.0    nan
+ 227  257  157  158  0.000000  0.000000       nan       NaN      50.0    nan
+
+     connected  ... node_A node_B rfid rfid_c   time vlh_business_RP10_ma  \
+ 0         nan  ...      2     42  125      6  0.045               0.0000
+ 1         nan  ...     30     82  233     61  0.008               0.0000
+ 2           0  ...     46     51  151     89  0.003            1060.9375
+ 3           0  ...     47     49  145     91  0.000           14229.6000
+ 4           0  ...     47     50  148     92  0.001            1968.7500
+ ..        ...  ...    ...    ...  ...    ...    ...                  ...
+ 223       nan  ...    153    156  448    231  0.001               0.0000
+ 224       nan  ...    154    155  447    232  0.001               0.0000
+ 225       nan  ...    154    156  449    233  0.000               0.0000
+ 226       nan  ...    156    157  452    234  0.004               0.0000
+ 227       nan  ...    157    158  454    235  0.030               0.0000
+
+      vlh_commute_RP10_ma vlh_freight_RP10_ma vlh_other_RP10_ma  \
+ 0                   0.00               0.000              0.00
+ 1                   0.00               0.000              0.00
+ 2                1181.25             240.625           4156.25
+ 3               20859.30            2182.950          97020.00
+ 4                5643.75            1859.375          10500.00
+ ..                   ...                 ...               ...
+ 223                 0.00               0.000              0.00
+ 224                 0.00               0.000              0.00
+ 225                 0.00               0.000              0.00
+ 226                 0.00               0.000              0.00
+ 227                 0.00               0.000              0.00
+
+     vlh_RP10_ma_total
+ 0              0.0000
+ 1              0.0000
+ 2           6639.0625
+ 3         134291.8500
+ 4          19971.8750
+ ..                ...
+ 223            0.0000
+ 224            0.0000
+ 225            0.0000
+ 226            0.0000
+ 227            0.0000
+
+ [228 rows x 29 columns], analysis_config=AnalysisSectionLosses(name=&#39;losses&#39;, save_gpkg=True, save_csv=True, analysis=&lt;AnalysisLossesEnum.MULTI_LINK_LOSSES: 8&gt;, weighing=&lt;WeighingEnum.TIME: 2&gt;, production_loss_per_capita_per_hour=42, traffic_period=&lt;TrafficPeriodEnum.DAY: 1&gt;, hours_per_traffic_period=0, trip_purposes=[&lt;TripPurposeEnum.BUSINESS: 1&gt;, &lt;TripPurposeEnum.COMMUTE: 2&gt;, &lt;TripPurposeEnum.FREIGHT: 3&gt;, &lt;TripPurposeEnum.OTHER: 4&gt;], resilience_curves_file=WindowsPath(&#39;data/losses/input_analysis_data/resilience_curve.csv&#39;), traffic_intensities_file=WindowsPath(&#39;data/losses/input_analysis_data/traffic_intensities.csv&#39;), values_of_time_file=WindowsPath(&#39;data/losses/input_analysis_data/values_of_time.csv&#39;), threshold=0.5, threshold_destinations=nan, equity_weight=&#39;&#39;, calculate_route_without_disruption=False, buffer_meters=nan, category_field_name=&#39;&#39;, save_traffic=False, event_type=&lt;EventTypeEnum.EVENT: 1&gt;, risk_calculation_mode=&lt;RiskCalculationModeEnum.NONE: 0&gt;, risk_calculation_year=0), output_path=WindowsPath(&#39;data/losses/output&#39;), _custom_name=&#39;&#39;)])]
+</pre></div></div>
+</div>
+</section>
+<section id="Output">
+<h2>Output<a class="headerlink" href="#Output" title="Link to this heading">#</a></h2>
+<p>The results are saved in the <code class="docutils literal notranslate"><span class="pre">output</span></code> folder as:</p>
+<ul class="simple">
+<li><p><strong>losses.gpkg</strong> → GeoPackage with results per link</p></li>
+</ul>
+<p>The attributes of interest include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vlh_RP10_ma_total</span></code> → Loss (in €) for hazard event RP10, all trip purposes aggregated</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vlh_commute_RP10_ma</span></code> → Loss (in €) for hazard event RP10, commute trips only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vlh_freight_RP10_ma</span></code> → Loss (in €) for hazard event RP10, freight trips only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vlh_business_RP10_ma</span></code> → Loss (in €) for hazard event RP10, business trips only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vlh_other_RP10_ma</span></code> → Loss (in €) for hazard event RP10, other trips only</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorials/losses.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Losses Analysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../tutorials/adaptation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Adaptation Tutorial</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Required-Inputs">Required Inputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-1:-Project-Setup">Step 1: Project Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-2:-Define-the-Network">Step 2: Define the Network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-3:-Prepare-required-input-data">Step 3: Prepare required input data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Traffic-Intensity">Traffic Intensity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Values-of-time">Values of time</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Resilience-Curves">Resilience Curves</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-4:-Define-the-Losses-Analysis">Step 4: Define the Losses Analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-5:-Run-the-Analysis">Step 5: Run the Analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Output">Output</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/_examples/losses_multi_link_redundancy_losses.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_examples/losses_multi_link_redundancy_losses.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
