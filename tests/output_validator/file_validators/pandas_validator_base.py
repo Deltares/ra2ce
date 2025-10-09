@@ -47,8 +47,17 @@ class PandasValidatorBase(ABC):
         return _df.sort_values(by=_df.columns.to_list()).reset_index(drop=True)
 
     def _get_mismatches(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
-        return ~(
-            (df1 == df2)
-            | (df1.isna() & df2.isna())
-            | np.isclose(df1, df2, rtol=1e-6, equal_nan=True)
-        )
+        _mismatches = pd.DataFrame(False, index=df1.index, columns=df1.columns)
+        for col in df1.columns:
+            if pd.api.types.is_numeric_dtype(df1[col]):
+                # Compare numeric columns with tolerance
+                _mismatches[col] = ~(
+                    (df1[col].isna() & df2[col].isna())
+                    | np.isclose(df1[col], df2[col], rtol=1e-6, equal_nan=True)
+                )
+            else:
+                # Compare non-numeric columns by exact equality or both NaN
+                _mismatches[col] = ~(
+                    (df1[col] == df2[col]) | (df1[col].isna() & df2[col].isna())
+                )
+        return _mismatches
