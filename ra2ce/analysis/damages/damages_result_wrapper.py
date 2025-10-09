@@ -1,4 +1,4 @@
-from attr import dataclass
+from dataclasses import dataclass
 
 from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
