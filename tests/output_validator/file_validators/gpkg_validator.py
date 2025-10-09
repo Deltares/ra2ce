@@ -3,6 +3,7 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
+import numpy as np
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
@@ -40,7 +41,7 @@ class GpkgValidator(FileValidatorProtocol, PandasValidatorBase):
                 f"Result   : {_res_schema}"
             )
 
-        _mismatches = ~((_gdf_ref == _gdf_res) | (_gdf_ref.isna() & _gdf_res.isna()))
+        _mismatches = self._get_mismatches(_gdf_ref, _gdf_res)
         _first_mismatch_row = _mismatches.sum(axis=1).idxmax()
         if not _first_mismatch_row:
             return
