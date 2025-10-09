@@ -4,9 +4,12 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
@@ -27,6 +30,16 @@ class TestDamagesConfigData:
         assert damages_config.save_gpkg is False
         assert damages_config.save_csv is False
 
+    @pytest.fixture(name="valid_damages_config")
+    def fixture_valid_damages_config(self) -> DamagesConfigData:
+        return DamagesConfigData(
+            name="Valid Damages Analysis",
+            event_type=EventTypeEnum.EVENT,
+            damage_curve=DamageCurveEnum.HZ,
+            risk_calculation_mode=RiskCalculationModeEnum.NONE,
+            risk_calculation_year=None,
+        )
+
     @pytest.mark.parametrize(
         "risk_calculation_year",
         [
@@ -36,15 +49,14 @@ class TestDamagesConfigData:
         ],
     )
     def test_given_risk_calculation_triangle_and_invalid_year_when_validate_integrity_then_fails(
-        self, risk_calculation_year: int | None
+        self, risk_calculation_year: int | None, valid_damages_config: DamagesConfigData
     ):
         # 1. Define test data.
         _data_name = "Invalid Damages Analysis"
-        _damages_config = DamagesConfigData(
-            name=_data_name,
-            risk_calculation_mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
-            risk_calculation_year=risk_calculation_year,
-        )
+        _damages_config = valid_damages_config
+        _damages_config.name = _data_name
+        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        _damages_config.risk_calculation_year = risk_calculation_year
 
         _expected_error = f"For damage analysis '{_data_name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
 
@@ -61,14 +73,14 @@ class TestDamagesConfigData:
 
     def test_given_risk_calculation_triangle_and_valid_year_when_validate_integrity_then_succeeds(
         self,
+        valid_damages_config: DamagesConfigData
     ):
         # 1. Define test data.
         _data_name = "Invalid Damages Analysis"
-        _damages_config = DamagesConfigData(
-            name=_data_name,
-            risk_calculation_mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
-            risk_calculation_year=1,
-        )
+        _damages_config = valid_damages_config
+        _damages_config.name = _data_name
+        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        _damages_config.risk_calculation_year = 10
 
         # 2. Run test.
         _report = _damages_config.validate_integrity()
@@ -92,14 +104,14 @@ class TestDamagesConfigData:
         self,
         risk_calculation_mode: RiskCalculationModeEnum,
         risk_calculation_year: int | None,
+        valid_damages_config: DamagesConfigData,
     ):
         # 1. Define test data.
         _data_name = "Valid Damages Analysis"
-        _damages_config = DamagesConfigData(
-            name=_data_name,
-            risk_calculation_mode=risk_calculation_mode,
-            risk_calculation_year=risk_calculation_year,
-        )
+        _damages_config = valid_damages_config
+        _damages_config.name = _data_name
+        _damages_config.risk_calculation_mode = risk_calculation_mode
+        _damages_config.risk_calculation_year = risk_calculation_year
 
         # 2. Run test.
         _report = _damages_config.validate_integrity()
