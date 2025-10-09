@@ -45,3 +45,10 @@ class PandasValidatorBase(ABC):
 
         # Sort rows based on all columns to ensure consistent order.
         return _df.sort_values(by=_df.columns.to_list()).reset_index(drop=True)
+
+    def _get_mismatches(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+        return ~(
+            (df1 == df2)
+            | (df1.isna() & df2.isna())
+            | np.isclose(df1, df2, rtol=1e-6, equal_nan=True)
+        )

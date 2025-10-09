@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from tests.output_validator.file_validators.file_validator_protocol import (
@@ -31,7 +32,7 @@ class CsvValidator(FileValidatorProtocol, PandasValidatorBase):
                 f"CSV file {self.result_file.name} deviates in number of rows: {len(_df_ref)} != {len(_df_res)}"
             )
 
-        _mismatches = ~((_df_ref == _df_res) | (_df_ref.isna() & _df_res.isna()))
+        _mismatches = self._get_mismatches(_df_ref, _df_res)
         _first_mismatch_row = _mismatches.sum(axis=1).idxmax()
         if not _first_mismatch_row:
             return
