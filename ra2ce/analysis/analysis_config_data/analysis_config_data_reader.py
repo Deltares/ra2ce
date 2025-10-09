@@ -24,6 +24,8 @@ from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
     AdaptationConfigData,
+)
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
     AdaptationOptionConfigData,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (

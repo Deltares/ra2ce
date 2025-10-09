@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptationOption,
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
@@ -34,7 +34,7 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     climate_factor: float = 0.0
     hazard_fraction_cost: bool = False
     # First option is the no adaptation option
-    adaptation_options: list[AnalysisSectionAdaptationOption] = field(
+    adaptation_options: list[AdaptationOptionConfigData] = field(
         default_factory=list
     )
 
@@ -45,17 +45,3 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
             _report.error("An analysis 'name' must be provided.")
 
         return _report
-    
-@dataclass
-class AdaptationOptionConfigData:
-    """
-    Reflects all possible settings that an adaptation option might contain.
-    The id should be unique and is used to determine the location of the input and output files.
-    """
-
-    id: str = ""
-    name: str = ""
-    construction_cost: float = 0.0
-    construction_interval: float = 1000.0
-    maintenance_cost: float = 0.0
-    maintenance_interval: float = 1000.0    
