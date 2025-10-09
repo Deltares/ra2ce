@@ -3,7 +3,9 @@ from typing import Any
 
 import pytest
 
-from ra2ce import analysis
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
@@ -24,6 +26,7 @@ from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfi
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -120,6 +123,11 @@ class TestAnalysisConfigDataReader:
                 DamagesConfigData,
                 id="Damages",
             ),
+            pytest.param(
+                AnalysisEnum.ADAPTATION.config_value,
+                AdaptationConfigData,
+                id="Adaptation",
+            )
         ],
     )
     def test_get_analysis_sections_with_new_dataclasses(
