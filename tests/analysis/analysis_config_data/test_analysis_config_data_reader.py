@@ -3,6 +3,7 @@ from typing import Any
 
 import pytest
 
+from ra2ce import analysis
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
@@ -26,6 +27,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
     MultiLinkRedundancyConfigData,
 )
@@ -153,3 +155,31 @@ class TestAnalysisConfigDataReader:
         assert _first_slr_cd.name == _analysis_name
         assert _first_slr_cd.save_csv is True
         assert _first_slr_cd.save_gpkg is True
+
+    def test_get_analysis_sections_with_equity_values_returns_equity_config_data(self):
+        # 1. Define test data
+        _reader = AnalysisConfigDataReader()
+        _section_name = "dummy_analysis"
+        _analysis_config_name = AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+        _analysis_name = _analysis_config_name + " test"
+        _reader._parser.add_section(_section_name)
+        _reader._parser.set(_section_name, "name", _analysis_name)
+        _reader._parser.set(_section_name, "analysis", _analysis_config_name)
+        _reader._parser.set(_section_name, "save_csv", "True")
+        _reader._parser.set(_section_name, "save_gpkg", "True")
+        _reader._parser.set(_section_name, "save_traffic", "True")
+
+        # 2. Run test
+
+        # Read everything so it gets correctly initialized.
+        _analyses_config_data = _reader._get_analysis_sections_with_new_dataclasses()
+
+        # 3. Verify expectations
+        assert isinstance(_analyses_config_data, list)
+        assert len(_analyses_config_data) == 1
+        _first_slr_cd = _analyses_config_data[0]
+        assert isinstance(_first_slr_cd, EquityConfigData)
+        assert _first_slr_cd.name == _analysis_name
+        assert _first_slr_cd.save_csv is True
+        assert _first_slr_cd.save_gpkg is True
+

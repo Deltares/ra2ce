@@ -1,5 +1,6 @@
 import math
 from dataclasses import is_dataclass
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +12,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     MultiLinkLossesConfigData,
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.enums import weighing_enum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -134,6 +136,15 @@ class TestLinkLossesConfigData:
             name=_data_name,
             risk_calculation_mode=risk_calculation_mode,
             risk_calculation_year=risk_calculation_year,
+            weighing=WeighingEnum.LENGTH,
+            event_type=EventTypeEnum.EVENT,
+            production_loss_per_capita_per_hour=10.0,
+            traffic_period=TrafficPeriodEnum.DAY,
+            trip_purposes=[TripPurposeEnum.BUSINESS],
+            resilience_curves_file=Path(__file__),
+            traffic_intensities_file=Path(__file__),
+            values_of_time_file=Path(__file__),
+
         )
 
         # 2. Run test.
