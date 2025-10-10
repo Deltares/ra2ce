@@ -85,7 +85,7 @@ class AvgSpeedCalculator:
             return 0.0
 
         def get_uncombined_speed(combined_types: list[RoadTypeEnum]) -> float:
-            for _rt in combined_types:
+            for _rt in sorted(combined_types, key=lambda rt: rt.value):
                 if [_rt] in avg_speed.road_types:
                     return avg_speed.get_avg_speed([_rt])
             return 0.0
