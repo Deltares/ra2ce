@@ -215,7 +215,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         _normalized_polygon = nut.get_normalized_geojson_polygon(polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
-            polygon=_normalized_polygon,
+            polygon=_normalized_polygon.buffer(1e-6),
             network_type=self.network_type,
             road_types=self.road_types,
         )

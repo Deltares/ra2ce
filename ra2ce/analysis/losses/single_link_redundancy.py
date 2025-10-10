@@ -2,7 +2,6 @@ from pathlib import Path
 
 import networkx as nx
 import numpy as np
-import osmnx
 
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -16,6 +15,7 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.networks_utils import graph_to_gdf
 
 
 class SingleLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
@@ -47,7 +47,7 @@ class SingleLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
         #     road_usage_data = pd.DataFrame()
 
         # create a geodataframe from the graph
-        _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.get_graph(), nodes=False)
+        _gdf_graph = graph_to_gdf(self.graph_file.get_graph())[0]
 
         # list for the length of the alternative routes
         _current_value_list = []

@@ -3,7 +3,6 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
-import numpy as np
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,

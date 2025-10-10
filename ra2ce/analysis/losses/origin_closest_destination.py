@@ -28,6 +28,7 @@ from typing import Any, Optional
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
+from shapely import Point
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
@@ -493,7 +494,9 @@ class OriginClosestDestination:
         # The origins without access are indicated later
         origins[name_save.format("A")] = "access"
 
-        disrupted_graph.add_node("special", speciallabel="special")
+        disrupted_graph.add_node(
+            "special", geometry=Point(0, 0), speciallabel="special"
+        )
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():

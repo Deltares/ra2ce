@@ -262,7 +262,7 @@ class TestDeleteDuplicates:
         assert len(_unique_points) == 3
 
         for _point in _unique_points:
-            assert any(_point.almost_equals(_p) for _p in _points[:3])
+            assert any(_point.equals_exact(_p) for _p in _points[:3])
 
 
 class TestGdfCheckCreateUniqueIds:

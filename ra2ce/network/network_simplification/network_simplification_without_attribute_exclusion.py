@@ -45,7 +45,7 @@ class NetworkSimplificationWithoutAttributeExclusion:
         """
         _complex_graph = add_x_y_to_nodes(self.nx_graph)
         _simple_graph = simplify_graph(
-            _complex_graph, strict=True, remove_rings=True, track_merged=False
+            _complex_graph, remove_rings=True, track_merged=False
         )
 
         logging.info(

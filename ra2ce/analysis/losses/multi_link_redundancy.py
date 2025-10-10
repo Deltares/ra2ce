@@ -4,7 +4,6 @@ from pathlib import Path
 import geopandas as gpd
 import networkx as nx
 import numpy as np
-import osmnx
 import pandas as pd
 
 from ra2ce.analysis.analysis_base import AnalysisBase
@@ -20,6 +19,7 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.networks_utils import graph_to_gdf
 
 
 class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
@@ -103,7 +103,7 @@ class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
 
             _graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
-            gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
+            gdf = graph_to_gdf(master_graph)[0]
             if "rfid" in gdf:
                 gdf["rfid"] = gdf["rfid"].astype(str)
 

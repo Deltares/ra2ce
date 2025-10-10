@@ -2,6 +2,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
+import numpy as np
 import pytest
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
@@ -101,7 +102,7 @@ class TestVectorNetworkWrapper:
 
         # Then
         assert vector.crs == _expected_region.crs
-        assert _expected_region.covers(vector.unary_union).all()
+        assert np.all(_expected_region.geometry.buffer(1e-9).covers(vector.unary_union))
 
     @pytest.mark.parametrize(
         "region_path",
