@@ -53,7 +53,7 @@ class PandasValidatorBase(ABC):
                 # Compare numeric columns with tolerance
                 _mismatches[col] = ~(
                     (df1[col].isna() & df2[col].isna())
-                    | np.isclose(df1[col], df2[col], rtol=5e-4, equal_nan=True)
+                    | np.isclose(df1[col], df2[col], rtol=1e-4, equal_nan=True)
                 )
             else:
                 # Compare non-numeric columns by exact equality or both NaN
