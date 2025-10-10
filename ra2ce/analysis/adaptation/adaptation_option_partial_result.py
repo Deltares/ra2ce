@@ -97,9 +97,23 @@ class AdaptationOptionPartialResult:
                     self.data_frame.drop(columns=[_col], inplace=True)
 
         # Merge the dataframes on the key column
-        self.data_frame = self.data_frame.merge(
+        merged = self.data_frame.merge(
             other.data_frame, on=self._key_col, how="outer"
         ).fillna(math.nan)
+
+        # Restore the original order based on the dataframe with the most rows
+        if self.data_frame.shape[1] >= other.data_frame.shape[1]:
+            self.data_frame = (
+                merged.set_index(self._key_col)
+                .reindex(self.data_frame[self._key_col])
+                .reset_index()
+            )
+        else:
+            self.data_frame = (
+                merged.set_index(self._key_col)
+                .reindex(other.data_frame[self._key_col])
+                .reset_index()
+            )
 
         return self
 
@@ -111,11 +125,9 @@ class AdaptationOptionPartialResult:
             other (AdaptationOptionPartialResult): The object to compare with.
 
         Returns:
-            bool: True if the key columns are equal (sorting does not matter).
+            bool: True if the key columns are equal.
         """
-        return set(self.data_frame[self._key_col]) == set(
-            other.data_frame[self._key_col]
-        )
+        return self.data_frame[self._key_col].equals(other.data_frame[self._key_col])
 
     @property
     def standard_cols(self) -> list[str]:
