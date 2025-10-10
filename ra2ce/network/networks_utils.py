@@ -45,8 +45,6 @@ from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
 
-from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
-
 
 def convert_unit(unit: str) -> Optional[float]:
     """Converts unit to meters.
@@ -1137,7 +1135,8 @@ def graph_to_gdf(
     save_nodes: bool = False,
     save_edges: bool = True,
     to_save: bool = False,
-):
+    node_geometry: bool = False,
+) -> tuple[gpd.GeoDataFrame | None, gpd.GeoDataFrame | None]:
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
 
     Arguments:
@@ -1150,11 +1149,16 @@ def graph_to_gdf(
         edges (GeoDataFrame): contains the edges
         nodes (GeoDataFrame): contains the nodes
     """
+    # Add x and y to nodes if not present
+    graph_to_convert = add_x_y_to_nodes(graph_to_convert)
 
     nodes, edges = None, None
     if save_nodes and save_edges:
         nodes, edges = graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
+            graph_to_convert,
+            nodes=save_nodes,
+            edges=save_edges,
+            node_geometry=node_geometry,
         )
         if to_save:
             for df in [edges, nodes]:
@@ -1189,7 +1193,7 @@ def get_nodes_and_edges_from_origin_graph(
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    _nodes, _edges = graph_to_gdfs(origin_graph, node_geometry=False)
+    _edges, _nodes = graph_to_gdf(origin_graph, save_nodes=True)
 
     dfs = [_edges, _nodes]
     for df in dfs:

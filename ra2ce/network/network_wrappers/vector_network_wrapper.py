@@ -127,7 +127,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         ).assign()
 
         logging.info("Start converting the graph to a geodataframe")
-        edges_complex, _ = nut.graph_to_gdf(graph_complex)
+        edges_complex = nut.graph_to_gdf(graph_complex)[0]
         logging.info("Finished converting the graph to a geodataframe")
 
         # Segment the complex graph

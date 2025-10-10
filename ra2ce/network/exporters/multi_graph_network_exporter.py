@@ -26,9 +26,6 @@ from typing import Optional
 
 from geopandas import GeoDataFrame
 
-from ra2ce.network.exporters.geodataframe_network_exporter import (
-    GeoDataFrameNetworkExporter,
-)
 from ra2ce.network.exporters.network_exporter_base import (
     MULTIGRAPH_TYPE,
     NetworkExporterBase,
