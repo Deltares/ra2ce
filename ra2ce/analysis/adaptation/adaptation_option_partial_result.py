@@ -111,9 +111,11 @@ class AdaptationOptionPartialResult:
             other (AdaptationOptionPartialResult): The object to compare with.
 
         Returns:
-            bool: True if the key columns are equal.
+            bool: True if the key columns are equal (sorting does not matter).
         """
-        return self.data_frame[self._key_col].equals(other.data_frame[self._key_col])
+        return set(self.data_frame[self._key_col]) == set(
+            other.data_frame[self._key_col]
+        )
 
     @property
     def standard_cols(self) -> list[str]:
