@@ -42,4 +42,5 @@ class CsvValidator(FileValidatorProtocol, PandasValidatorBase):
             f"Reference:\n{_df_ref.loc[_first_mismatch_row]}\n"
             f"Result   :\n{_df_res.loc[_first_mismatch_row]}\n"
             f"Mismatching columns: {_mismatch_columns}"
+            f"Total mismatches: {_mismatches.sum().sum()} of {_df_ref.shape[0] * _df_ref.shape[1]} values"
         )

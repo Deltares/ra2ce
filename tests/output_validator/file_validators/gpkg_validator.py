@@ -51,4 +51,5 @@ class GpkgValidator(FileValidatorProtocol, PandasValidatorBase):
             f"Reference row:\n{_gdf_ref.loc[_first_mismatch_row]}\n"
             f"Result row   :\n{_gdf_res.loc[_first_mismatch_row]}\n"
             f"Mismatching columns: {_mismatch_columns}"
+            f"Total mismatches: {_mismatches.sum().sum()} of {_gdf_ref.shape[0] * _gdf_ref.shape[1]} values"
         )
