@@ -7,6 +7,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
@@ -25,6 +26,16 @@ class BaseOriginDestinationConfigData(AnalysisConfigDataProtocol, ABC):
     threshold: Optional[float] = 0.0
     threshold_destinations: Optional[float] = math.nan
     buffer_meters: Optional[float] = math.nan
+
+    def validate_integrity(self) -> ValidationReport:
+        _report = ValidationReport()
+        if not self.name:
+            _report.error("An analysis 'name' must be provided.")
+        if not isinstance(self.weighing, WeighingEnum) or self.weighing == WeighingEnum.INVALID or self.weighing == WeighingEnum.NONE:
+            _report.error(
+                f"For origin-destination analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."
+            )
+        return _report
 
 
 class OptimalRouteOriginDestinationConfigData(BaseOriginDestinationConfigData):

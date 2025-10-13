@@ -19,24 +19,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
 @with_legacy_mappers
 @dataclass
 class MultiLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+    # Common properties
     name: str
     save_gpkg: bool = False
     save_csv: bool = False
 
     # Concrete properties
+    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     calculate_route_without_disruption: Optional[bool] = False
     threshold: Optional[float] = 0.0
     threshold_destinations: Optional[float] = math.nan
     buffer_meters: Optional[float] = math.nan
+
+    def validate_integrity(self) -> ValidationReport:
+        _report = ValidationReport()
+        if not self.name:
+            _report.error("An analysis 'name' must be provided.")
+        if not isinstance(self.weighing, WeighingEnum) or self.weighing == WeighingEnum.INVALID or self.weighing == WeighingEnum.NONE:
+            _report.error(
+                f"For multi link redundancy analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."
+            )
+        return _report

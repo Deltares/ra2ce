@@ -19,27 +19,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol, runtime_checkable
-
-from ra2ce.common.validation.validation_report import ValidationReport
+from dataclasses import dataclass
 
 
-@runtime_checkable
-class AnalysisConfigDataProtocol(Protocol):
+@dataclass
+class AdaptationOptionConfigData:
     """
-    Reflects all common settings that damages and losses analysis sections might contain.
+    Reflects all possible settings that an adaptation option might contain.
+    The id should be unique and is used to determine the location of the input and output files.
+    This dataclass does not implement `AnalysisConfigDataProtocol` because it is not an analysis itself.
     """
 
-    name: str
-    save_gpkg: bool
-    save_csv: bool
-
-    def validate_integrity(self) -> ValidationReport:
-        """
-        Validates the integrity of the config data instance. This includes checking for required fields,
-        valid value ranges, and consistency between related fields.
-
-        Returns:
-            ValidationReport: The validation report containing the results of the integrity check.
-        """
-        pass
+    id: str = ""
+    name: str = ""
+    construction_cost: float = 0.0
+    construction_interval: float = 1000.0
+    maintenance_cost: float = 0.0
+    maintenance_interval: float = 1000.0    

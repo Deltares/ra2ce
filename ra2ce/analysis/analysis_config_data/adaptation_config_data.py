@@ -21,35 +21,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass, field
 
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
 @with_legacy_mappers
 @dataclass
-class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+class AdaptationConfigData(AnalysisConfigDataProtocol):
     """
-    Reflects all possible settings that a single link redundancy config might contain.
+    Configuration data for adaptation analysis.
     """
 
-    # Common properties
     name: str
-    save_gpkg: bool = False
-    save_csv: bool = False
+    save_csv: bool = False  # Save results as CSV
+    save_gpkg: bool = False  # Save results as GPKG
 
-    # Concrete properties
-    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
+    losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+
+    # Economical settings
+    time_horizon: float = 0.0
+    discount_rate: float = 0.0
+    # Hazard settings
+    initial_frequency: float = 0.0
+    climate_factor: float = 0.0
+    hazard_fraction_cost: bool = False
+    # First option is the no adaptation option
+    adaptation_options: list[AdaptationOptionConfigData] = field(
+        default_factory=list
+    )
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
+
         if not self.name:
             _report.error("An analysis 'name' must be provided.")
-        if not isinstance(self.weighing, WeighingEnum) or self.weighing == WeighingEnum.INVALID or self.weighing == WeighingEnum.NONE:
-            _report.error(
-                f"For single link redundancy analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."
-            )
+
         return _report

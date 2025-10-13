@@ -19,27 +19,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol, runtime_checkable
+from pathlib import Path
 
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    OptimalRouteOriginDestinationConfigData,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
-@runtime_checkable
-class AnalysisConfigDataProtocol(Protocol):
-    """
-    Reflects all common settings that damages and losses analysis sections might contain.
-    """
-
-    name: str
-    save_gpkg: bool
-    save_csv: bool
+class EquityConfigData(OptimalRouteOriginDestinationConfigData):
+    """Configuration data for equity analysis."""
+    equity_weight: Path = None
+    # save_traffic: bool = True ; Should always be true!
 
     def validate_integrity(self) -> ValidationReport:
-        """
-        Validates the integrity of the config data instance. This includes checking for required fields,
-        valid value ranges, and consistency between related fields.
-
-        Returns:
-            ValidationReport: The validation report containing the results of the integrity check.
-        """
-        pass
+        _report = super().validate_integrity()
+        if self.equity_weight is None:
+            _report.error(
+                f"For equity analysis '{self.name}': 'equity_weight' must be provided."
+            )
+        else:
+            if self.equity_weight.suffix.lower() != ".csv" or not self.equity_weight.exists():
+                _report.error(
+                    f"For equity analysis '{self.name}': 'equity_weight' file '{self.equity_weight}' is not a .csv file."
+                )
+        return _report
+        
