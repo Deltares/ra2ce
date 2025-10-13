@@ -38,10 +38,8 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
-@with_legacy_mappers
 @dataclass
 class BaseLinkLossesConfigData(AnalysisConfigDataProtocol, ABC):
     """

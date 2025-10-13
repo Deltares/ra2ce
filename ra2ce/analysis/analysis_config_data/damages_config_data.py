@@ -32,10 +32,8 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
     RiskCalculationModeEnum,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
-@with_legacy_mappers
 @dataclass
 class DamagesConfigData(AnalysisConfigDataProtocol):
     """

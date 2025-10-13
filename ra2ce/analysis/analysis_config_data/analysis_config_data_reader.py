@@ -132,6 +132,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
+    def _without_analysis_property(self, section: dict) -> dict:
+        if "analysis" in section:
+            section.pop("analysis")
+        return section
+
     def _set_section_common_properties(
         self, section: AnalysisConfigDataProtocol, section_name: str
     ) -> None:
@@ -146,8 +151,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def _get_single_link_redundancy_config_data(
         self, section_name: str
     ) -> SingleLinkRedundancyConfigData:
-        _section = SingleLinkRedundancyConfigData.from_ini_file(
-            **self._parser[section_name]
+        _section = SingleLinkRedundancyConfigData(
+            **self._without_analysis_property(self._parser[section_name])
         )
         self._set_section_common_properties(_section, section_name)
 
@@ -159,8 +164,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def _get_multi_link_redundancy_config_data(
         self, section_name: str
     ) -> MultiLinkRedundancyConfigData:
-        _section = MultiLinkRedundancyConfigData.from_ini_file(
-            **self._parser[section_name]
+        _section = MultiLinkRedundancyConfigData(
+            **self._without_analysis_property(self._parser[section_name])
         )
         self._set_section_common_properties(_section, section_name)
 
@@ -187,7 +192,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         return _section
 
     def _get_damages_config_data(self, section_name: str) -> DamagesConfigData:
-        _section = DamagesConfigData.from_ini_file(**self._parser[section_name])
+        _section = DamagesConfigData(
+            **self._without_analysis_property(self._parser[section_name])
+        )
         self._set_section_common_properties(_section, section_name)
 
         # road damage
@@ -215,7 +222,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def _get_base_link_losses_config_data(
         self, section_name: str, config_data_type: type[BaseLinkLossesConfigData]
     ) -> BaseLinkLossesConfigData:
-        _section = config_data_type.from_ini_file(**self._parser[section_name])
+        _section = config_data_type(**self._without_analysis_property(self._parser[section_name]))
         self._set_section_common_properties(_section, section_name)
 
         _section.event_type = EventTypeEnum.get_enum(
@@ -268,8 +275,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         if "save_traffic" not in self._parser[section_name]:
             return self._get_origin_destination_config_data(
                 section_name, OptimalRouteOriginDestinationConfigData)
-        
-        _section = EquityConfigData.from_ini_file(**self._parser[section_name])
+
+        _section = EquityConfigData(**self._without_analysis_property(self._parser[section_name]))
         self._set_section_common_properties(_section, section_name)
         _section.equity_weight = self._parser.get(
             section_name,
@@ -281,7 +288,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def _get_origin_destination_config_data(
         self, section_name: str, config_data_type: type[BaseOriginDestinationConfigData]
     ) -> BaseOriginDestinationConfigData:
-        _section = config_data_type.from_ini_file(**self._parser[section_name])
+        _section = config_data_type(**self._without_analysis_property(self._parser[section_name]))
         self._set_section_common_properties(_section, section_name)
         _section.weighing = WeighingEnum.get_enum(
             self._parser.get(section_name, "weighing", fallback=None)
@@ -316,7 +323,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         ) -> AdaptationOptionConfigData:
             return AdaptationOptionConfigData(**self._parser[section_name])
 
-        _section = AdaptationConfigData.from_ini_file(**self._parser[section_name])
+        _section = AdaptationConfigData(**self._parser[section_name])
         _section.analysis = AnalysisEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
@@ -347,7 +354,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
         return _section
 
-    def _get_analysis_sections_with_new_dataclasses(
+    def get_analysis_sections(
         self,
     ) -> list[AnalysisConfigDataProtocol]:
         """
@@ -393,183 +400,3 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             for section_name in self._parser.sections()
             if "analysis" in section_name
         )
-
-    def _get_analysis_section_losses(self, section_name: str) -> AnalysisSectionLosses:
-        _section = AnalysisSectionLosses(**self._parser[section_name])
-        _section.analysis = AnalysisLossesEnum.get_enum(
-            self._parser.get(section_name, "analysis", fallback=None)
-        )
-        _section.save_gpkg = self._parser.getboolean(
-            section_name, "save_gpkg", fallback=_section.save_gpkg
-        )
-        _section.save_csv = self._parser.getboolean(
-            section_name, "save_csv", fallback=_section.save_csv
-        )
-        _weighing = self._parser.get(section_name, "weighing", fallback=None)
-        # Map distance -> length
-        if _weighing == "distance":
-            _section.weighing = WeighingEnum.LENGTH
-        else:
-            _section.weighing = WeighingEnum.get_enum(_weighing)
-
-        # losses
-        _section.event_type = EventTypeEnum.get_enum(
-            self._parser.get(section_name, "event_type", fallback=None)
-        )
-        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
-            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
-        )
-        _section.risk_calculation_year = self._parser.getint(
-            section_name,
-            "risk_calculation_year",
-            fallback=_section.risk_calculation_year,
-        )
-        _section.traffic_period = TrafficPeriodEnum.get_enum(
-            self._parser.get(section_name, "traffic_period", fallback=None)
-        )
-        _section.hours_per_traffic_period = self._parser.getint(
-            section_name,
-            "hours_per_traffic_period",
-            fallback=_section.hours_per_traffic_period,
-        )
-        _section.trip_purposes = list(
-            map(
-                TripPurposeEnum.get_enum,
-                self._parser.getlist(section_name, "trip_purposes", fallback=[]),
-            )
-        )
-        _section.production_loss_per_capita_per_hour = self._parser.getfloat(
-            section_name,
-            "production_loss_per_capita_per_hour",
-            fallback=_section.production_loss_per_capita_per_hour,
-        )
-
-        # accessibility analyses
-        _section.threshold = self._parser.getfloat(
-            section_name,
-            "threshold",
-            fallback=_section.threshold,
-        )
-        _section.threshold_destinations = self._parser.getfloat(
-            section_name,
-            "threshold_destinations",
-            fallback=_section.threshold_destinations,
-        )
-        _section.calculate_route_without_disruption = self._parser.getboolean(
-            section_name,
-            "calculate_route_without_disruption",
-            fallback=_section.calculate_route_without_disruption,
-        )
-        _section.buffer_meters = self._parser.getfloat(
-            section_name,
-            "buffer_meters",
-            fallback=_section.buffer_meters,
-        )
-        _section.save_traffic = self._parser.getboolean(
-            section_name, "save_traffic", fallback=_section.save_traffic
-        )
-
-        return _section
-
-    def _get_analysis_section_damages(
-        self, section_name: str
-    ) -> AnalysisSectionDamages:
-        _section = AnalysisSectionDamages(**self._parser[section_name])
-        _section.analysis = AnalysisDamagesEnum.get_enum(
-            self._parser.get(section_name, "analysis", fallback=None)
-        )
-        _section.save_gpkg = self._parser.getboolean(
-            section_name, "save_gpkg", fallback=_section.save_gpkg
-        )
-        _section.save_csv = self._parser.getboolean(
-            section_name, "save_csv", fallback=_section.save_csv
-        )
-
-        # road damage
-        _section.event_type = EventTypeEnum.get_enum(
-            self._parser.get(section_name, "event_type", fallback=None)
-        )
-        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
-            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
-        )
-        _section.risk_calculation_year = self._parser.getint(
-            section_name,
-            "risk_calculation_year",
-            fallback=_section.risk_calculation_year,
-        )
-        _section.damage_curve = DamageCurveEnum.get_enum(
-            self._parser.get(section_name, "damage_curve", fallback=None)
-        )
-        _section.create_table = self._parser.getboolean(
-            section_name,
-            "create_table",
-            fallback=_section.create_table,
-        )
-        return _section
-
-    def _get_analysis_section_adaptation(
-        self, section_name: str
-    ) -> AnalysisSectionAdaptation:
-        def _get_adaptation_option(
-            section_name: str,
-        ) -> AnalysisSectionAdaptationOption:
-            return AnalysisSectionAdaptationOption(**self._parser[section_name])
-
-        _section = AnalysisSectionAdaptation(**self._parser[section_name])
-        _section.analysis = AnalysisEnum.get_enum(
-            self._parser.get(section_name, "analysis", fallback=None)
-        )
-        _section.losses_analysis = AnalysisLossesEnum.get_enum(
-            self._parser.get(section_name, "losses_analysis", fallback=None)
-        )
-        _section.save_gpkg = self._parser.getboolean(
-            section_name, "save_gpkg", fallback=_section.save_gpkg
-        )
-        _section.save_csv = self._parser.getboolean(
-            section_name, "save_csv", fallback=_section.save_csv
-        )
-        _section.hazard_fraction_cost = self._parser.getboolean(
-            section_name,
-            "hazard_fraction_costs",
-            fallback=_section.hazard_fraction_cost,
-        )
-
-        _adaptation_options = list(
-            _adaptation_option
-            for _adaptation_option in self._parser.sections()
-            if "adaptationoption" in _adaptation_option
-        )
-        for _adaptation_option in _adaptation_options:
-            _section.adaptation_options.append(
-                _get_adaptation_option(_adaptation_option)
-            )
-
-        return _section
-
-    def get_analysis_sections(self) -> list[AnalysisConfigData.ANALYSIS_SECTION]:
-        """
-        Extracts info from [analysis<n>] sections
-
-        Returns:
-            list[ANALYSIS_SECTION]: List of analyses
-        """
-        _analysis_sections: list[AnalysisConfigData.ANALYSIS_SECTION] = []
-
-        _section_names = list(
-            section_name
-            for section_name in self._parser.sections()
-            if "analysis" in section_name
-        )
-        for _section_name in _section_names:
-            _analysis_type = self._parser.get(_section_name, "analysis")
-            if _analysis_type in DamagesAnalysisNameList:
-                _analysis_section = self._get_analysis_section_damages(_section_name)
-            elif _analysis_type in LossesAnalysisNameList:
-                _analysis_section = self._get_analysis_section_losses(_section_name)
-            elif _analysis_type == AnalysisEnum.ADAPTATION.config_value:
-                _analysis_section = self._get_analysis_section_adaptation(_section_name)
-            else:
-                raise ValueError(f"Analysis {_analysis_type} not supported.")
-            _analysis_sections.append(_analysis_section)
-
-        return _analysis_sections

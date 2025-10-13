@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -8,8 +10,10 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 
 class TestAnalysisInputWrapper:
     @dataclass
-    class MockAnalysisSection(AnalysisSectionBase):
-        pass
+    class MockAnalysisSection(AnalysisConfigDataProtocol):
+        name: str = "Mock Analysis"
+        save_csv: bool = False
+        save_gpkg: bool = False
 
     def test_initialize(self):
         # 1. Define test data

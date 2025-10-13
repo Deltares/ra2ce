@@ -8,10 +8,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
-@with_legacy_mappers
 @dataclass
 class BaseOriginDestinationConfigData(AnalysisConfigDataProtocol, ABC):
     """Base class for origin-destination configuration data."""

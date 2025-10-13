@@ -9,9 +9,9 @@ import pytest
 from geopandas import GeoDataFrame
 from rasterio import open as rasterio_open
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionBase,
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
@@ -182,7 +182,7 @@ class TestRa2ceHandler:
         assert any(_found_result.results_collection)
         for _ra in _found_result.results_collection:
             assert isinstance(_ra.analysis_result, GeoDataFrame)
-            assert isinstance(_ra.analysis_config, AnalysisSectionBase)
+            assert isinstance(_ra.analysis_config, AnalysisConfigDataProtocol)
             assert isinstance(_ra.output_path, Path)
 
     @pytest.mark.slow_test

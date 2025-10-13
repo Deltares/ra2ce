@@ -5,9 +5,6 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionBase,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
     ProjectSection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
@@ -172,7 +169,7 @@ class TestAnalysisConfigDataValidator:
         ],
     )
     def test_validate_given_shp_network_without_id_when_any_valid_analysis_given_then_succeeds(
-        self, analysis_enum: Any
+        self, analysis_enum: AnalysisConfigDataProtocol
     ):
         # 1. Define test data
         _test_config_data = AnalysisConfigData(
