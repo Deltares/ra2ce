@@ -55,9 +55,7 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     climate_factor: float = 0.0
     hazard_fraction_cost: bool = False
     # First option is the no adaptation option
-    adaptation_options: list[AdaptationOptionConfigData] = field(
-        default_factory=list
-    )
+    adaptation_options: list[AdaptationOptionConfigData] = field(default_factory=list)
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()

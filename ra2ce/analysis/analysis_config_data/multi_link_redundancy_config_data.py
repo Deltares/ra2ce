@@ -49,7 +49,11 @@ class MultiLinkRedundancyConfigData(AnalysisConfigDataProtocol):
         _report = ValidationReport()
         if not self.name:
             _report.error("An analysis 'name' must be provided.")
-        if not isinstance(self.weighing, WeighingEnum) or self.weighing == WeighingEnum.INVALID or self.weighing == WeighingEnum.NONE:
+        if (
+            not isinstance(self.weighing, WeighingEnum)
+            or self.weighing == WeighingEnum.INVALID
+            or self.weighing == WeighingEnum.NONE
+        ):
             _report.error(
                 f"For multi link redundancy analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."
             )

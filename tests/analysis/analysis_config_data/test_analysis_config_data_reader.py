@@ -127,7 +127,7 @@ class TestAnalysisConfigDataReader:
                 AnalysisEnum.ADAPTATION.config_value,
                 AdaptationConfigData,
                 id="Adaptation",
-            )
+            ),
         ],
     )
     def test_get_analysis_sections_with_new_dataclasses(
@@ -168,7 +168,9 @@ class TestAnalysisConfigDataReader:
         # 1. Define test data
         _reader = AnalysisConfigDataReader()
         _section_name = "dummy_analysis"
-        _analysis_config_name = AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+        _analysis_config_name = (
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+        )
         _analysis_name = _analysis_config_name + " test"
         _reader._parser.add_section(_section_name)
         _reader._parser.set(_section_name, "name", _analysis_name)
@@ -190,4 +192,3 @@ class TestAnalysisConfigDataReader:
         assert _equity_cd.name == _analysis_name
         assert _equity_cd.save_csv is True
         assert _equity_cd.save_gpkg is True
-

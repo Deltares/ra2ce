@@ -35,4 +35,4 @@ class AdaptationOptionConfigData:
     construction_cost: float = 0.0
     construction_interval: float = 1000.0
     maintenance_cost: float = 0.0
-    maintenance_interval: float = 1000.0    
+    maintenance_interval: float = 1000.0

@@ -23,9 +23,7 @@ class TestDamagesConfigData:
 
         # 3. Verify expectations.
         assert isinstance(damages_config, DamagesConfigData)
-        assert isinstance(
-            damages_config, AnalysisConfigDataProtocol
-        )
+        assert isinstance(damages_config, AnalysisConfigDataProtocol)
         assert damages_config.name == _data_name
         assert damages_config.save_gpkg is False
         assert damages_config.save_csv is False
@@ -55,7 +53,9 @@ class TestDamagesConfigData:
         _data_name = "Invalid Damages Analysis"
         _damages_config = valid_damages_config
         _damages_config.name = _data_name
-        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        _damages_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        )
         _damages_config.risk_calculation_year = risk_calculation_year
 
         _expected_error = f"For damage analysis '{_data_name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
@@ -72,14 +72,15 @@ class TestDamagesConfigData:
         assert _report._errors[0] == _expected_error
 
     def test_given_risk_calculation_triangle_and_valid_year_when_validate_integrity_then_succeeds(
-        self,
-        valid_damages_config: DamagesConfigData
+        self, valid_damages_config: DamagesConfigData
     ):
         # 1. Define test data.
         _data_name = "Invalid Damages Analysis"
         _damages_config = valid_damages_config
         _damages_config.name = _data_name
-        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        _damages_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        )
         _damages_config.risk_calculation_year = 10
 
         # 2. Run test.

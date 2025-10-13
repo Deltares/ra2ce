@@ -264,11 +264,13 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         return _section
 
     def _get_equity_or_optimal_route_config_data(
-        self, section_name: str) -> EquityConfigData | OptimalRouteOriginDestinationConfigData:
+        self, section_name: str
+    ) -> EquityConfigData | OptimalRouteOriginDestinationConfigData:
         if "save_traffic" not in self._parser[section_name]:
             return self._get_origin_destination_config_data(
-                section_name, OptimalRouteOriginDestinationConfigData)
-        
+                section_name, OptimalRouteOriginDestinationConfigData
+            )
+
         _section = EquityConfigData.from_ini_file(**self._parser[section_name])
         self._set_section_common_properties(_section, section_name)
         _section.equity_weight = self._parser.get(
@@ -308,9 +310,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _get_adaptation_config_data(
-        self, section_name: str
-    ) -> AdaptationConfigData:
+    def _get_adaptation_config_data(self, section_name: str) -> AdaptationConfigData:
         def _get_adaptation_option(
             section_name: str,
         ) -> AdaptationOptionConfigData:
