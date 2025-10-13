@@ -158,11 +158,11 @@ class TestAnalysisConfigDataReader:
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
         assert len(_analyses_config_data) == 1
-        _first_slr_cd = _analyses_config_data[0]
-        assert isinstance(_first_slr_cd, expected_analysis_type)
-        assert _first_slr_cd.name == _analysis_name
-        assert _first_slr_cd.save_csv is True
-        assert _first_slr_cd.save_gpkg is True
+        _matching_cd = _analyses_config_data[0]
+        assert isinstance(_matching_cd, expected_analysis_type)
+        assert _matching_cd.name == _analysis_name
+        assert _matching_cd.save_csv is True
+        assert _matching_cd.save_gpkg is True
 
     def test_get_analysis_sections_with_equity_values_returns_equity_config_data(self):
         # 1. Define test data
@@ -185,9 +185,9 @@ class TestAnalysisConfigDataReader:
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
         assert len(_analyses_config_data) == 1
-        _first_slr_cd = _analyses_config_data[0]
-        assert isinstance(_first_slr_cd, EquityConfigData)
-        assert _first_slr_cd.name == _analysis_name
-        assert _first_slr_cd.save_csv is True
-        assert _first_slr_cd.save_gpkg is True
+        _equity_cd = _analyses_config_data[0]
+        assert isinstance(_equity_cd, EquityConfigData)
+        assert _equity_cd.name == _analysis_name
+        assert _equity_cd.save_csv is True
+        assert _equity_cd.save_gpkg is True
 
