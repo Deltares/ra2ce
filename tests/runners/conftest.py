@@ -5,13 +5,17 @@ import pytest
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionAdaptation,
-    AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -51,8 +55,7 @@ def _get_valid_analysis_config_fixture() -> Iterator[AnalysisConfigWrapper]:
     _analysis_config = DummyAnalysisConfigWrapper()
     assert isinstance(_analysis_config, AnalysisConfigWrapper)
     _analysis_config.config_data.analyses = [
-        AnalysisSectionDamages(
-            analysis=AnalysisDamagesEnum.DAMAGES,
+        DamagesConfigData(
             name="Damages",
             event_type=EventTypeEnum.EVENT,
             damage_curve=DamageCurveEnum.HZ,
@@ -61,11 +64,10 @@ def _get_valid_analysis_config_fixture() -> Iterator[AnalysisConfigWrapper]:
         ),
         AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
         AnalysisSectionLosses(analysis=AnalysisLossesEnum.MULTI_LINK_REDUNDANCY),
-        AnalysisSectionAdaptation(
-            analysis=AnalysisEnum.ADAPTATION,
+        AdaptationConfigData(
             name="Adaptation",
             adaptation_options=[
-                AnalysisSectionAdaptationOption(id="AO0"),
+                AdaptationOptionConfigData(id="AO0"),
             ],
             save_csv=True,
             save_gpkg=True,

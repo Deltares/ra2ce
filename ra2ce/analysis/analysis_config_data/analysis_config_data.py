@@ -35,7 +35,6 @@ from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfi
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -132,7 +131,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
         # Rewrite the paths of the input files in the analysis config
         _analysis = self.get_analysis(analysis_type)
-        if isinstance(_analysis, AnalysisSectionDamages):
+        if isinstance(_analysis, DamagesConfigData):
             _analysis.file_name = reroot_path(_analysis.file_name)
         elif isinstance(_analysis, AnalysisSectionLosses):
             _analysis.resilience_curves_file = reroot_path(
@@ -185,16 +184,15 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     def get_analysis(
-        self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
-    ) -> AnalysisConfigData | None:
+        self, analysis_type: type[AnalysisConfigDataProtocol]
+    ) -> AnalysisConfigDataProtocol | None:
         """
         Get a certain analysis from config.
 
         Returns:
-            AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation:
-                The analysis.
+            AnalysisConfigDataProtocol: The analysis.
         """
-        return next(filter(lambda x: x.analysis == analysis, self.analyses), None)
+        return next(filter(lambda x: isinstance(x, analysis_type), self.analyses), None)
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:

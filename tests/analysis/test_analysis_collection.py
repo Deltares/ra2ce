@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Type
 
 import pytest
 
-from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
-    AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -19,16 +19,13 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.analysis.losses.losses_base import LossesBase
 
 
 class TestAnalysisCollection:
     @dataclass
-    class MockAnalysisSectionDamages(AnalysisSectionDamages):
+    class MockAnalysisSectionDamages(DamagesConfigData):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
@@ -120,7 +117,7 @@ class TestAnalysisCollection:
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("Any path")
         _config.config_data.analyses.append(
-            AnalysisSectionAdaptation(analysis=AnalysisEnum.ADAPTATION)
+            AdaptationConfigData(name="Any name")
         )
 
         # 2. Run test.

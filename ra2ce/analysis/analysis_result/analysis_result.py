@@ -24,7 +24,9 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 
 
 @dataclass(kw_only=True)
@@ -34,7 +36,7 @@ class AnalysisResult:
     """
 
     analysis_result: GeoDataFrame
-    analysis_config: AnalysisConfigData.ANALYSIS_SECTION
+    analysis_config: AnalysisConfigDataProtocol
     output_path: Path
 
     _custom_name: str = ""

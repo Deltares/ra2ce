@@ -20,11 +20,13 @@
 """
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
-    AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -61,14 +63,14 @@ from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
 class AnalysisFactory:
     @staticmethod
     def get_damages_analysis(
-        analysis: AnalysisSectionDamages,
+        analysis: DamagesConfigData,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDamagesProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionDamages): Analysis section.
+            analysis (DamagesConfigData): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -199,14 +201,14 @@ class AnalysisFactory:
 
     @staticmethod
     def get_adaptation_analysis(
-        analysis: AnalysisSectionAdaptation,
+        analysis: AdaptationConfigData,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDamagesProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionAdaptation): Analysis section.
+            analysis (AdaptationConfigData): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:

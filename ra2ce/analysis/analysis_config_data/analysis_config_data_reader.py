@@ -30,12 +30,6 @@ from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionAdaptation,
-    AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
-    DamagesAnalysisNameList,
-    LossesAnalysisNameList,
     ProjectSection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (

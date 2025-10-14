@@ -2,16 +2,17 @@ from pathlib import Path
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionAdaptation,
-    AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
-    DamagesAnalysisNameList,
-    LossesAnalysisNameList,
     ProjectSection,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -38,15 +39,15 @@ class TestAnalysisConfigData:
             )
         for _damages in DamagesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_damages))
+                DamagesConfigData(analysis=AnalysisDamagesEnum.get_enum(_damages))
             )
-        _adaptation_config = AnalysisSectionAdaptation()
+        _adaptation_config = AdaptationConfigData()
         _adaptation_config.adaptation_options = [
-            AnalysisSectionAdaptationOption(id="AO0"),
-            AnalysisSectionAdaptationOption(id="AO1"),
-            AnalysisSectionAdaptationOption(id="AO2"),
+            AdaptationOptionConfigData(id="AO0"),
+            AdaptationOptionConfigData(id="AO1"),
+            AdaptationOptionConfigData(id="AO2"),
         ]
-        _config.analyses.append(AnalysisSectionAdaptation())
+        _config.analyses.append(_adaptation_config)
         yield _config
 
     def test_losses(self, valid_config: AnalysisConfigData):
@@ -72,9 +73,9 @@ class TestAnalysisConfigData:
         _adaptation = valid_config.adaptation
 
         # 3. Verify expectations
-        assert isinstance(_adaptation, AnalysisSectionAdaptation)
+        assert isinstance(_adaptation, AdaptationConfigData)
         assert all(
-            isinstance(_item, AnalysisSectionAdaptationOption)
+            isinstance(_item, AdaptationOptionConfigData)
             for _item in _adaptation.adaptation_options
         )
 

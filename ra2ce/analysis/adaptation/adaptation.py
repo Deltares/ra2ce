@@ -22,8 +22,8 @@ from pathlib import Path
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -38,7 +38,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     For each adaptation option a damages and/or losses analysis is executed.
     """
 
-    analysis: AnalysisSectionAdaptation
+    analysis: AdaptationConfigData
     graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path

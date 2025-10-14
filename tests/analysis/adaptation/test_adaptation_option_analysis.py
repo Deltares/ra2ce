@@ -11,7 +11,9 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
     AdaptationOptionPartialResult,
 )
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -107,7 +109,7 @@ class TestAnalysisOptionAnalysis:
 
     def test_execute_returns_result(self):
         class MockAnalysis(AnalysisBase, AnalysisProtocol):
-            analysis: AnalysisConfigData.ANALYSIS_SECTION = None
+            analysis: AnalysisConfigDataProtocol = None
             output_path: Path = None
 
             def __init__(self, *args) -> None:

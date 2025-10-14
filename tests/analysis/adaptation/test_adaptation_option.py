@@ -17,8 +17,8 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
 )
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -106,7 +106,7 @@ class TestAdaptationOption:
         with pytest.raises(ValueError) as _exc:
             AdaptationOption.from_config(
                 analysis_config=_config,
-                adaptation_option=AnalysisSectionAdaptation(),
+                adaptation_option=AdaptationConfigData(),
             )
 
         # 3. Verify expectations.

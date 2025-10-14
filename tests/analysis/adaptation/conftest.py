@@ -4,13 +4,17 @@ from typing import Iterator
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionAdaptation,
-    AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -42,12 +46,12 @@ class AdaptationOptionCases:
     Test cases for the adaptation options.
     """
 
-    config_cases: list[AnalysisSectionAdaptationOption] = [
-        AnalysisSectionAdaptationOption(
+    config_cases: list[AdaptationOptionConfigData] = [
+        AdaptationOptionConfigData(
             id="AO0",
             name="No adaptation",
         ),
-        AnalysisSectionAdaptationOption(
+        AdaptationOptionConfigData(
             id="AO1",
             name="Cheap construction, expensive maintenance",
             construction_cost=1000.0,
@@ -55,7 +59,7 @@ class AdaptationOptionCases:
             maintenance_cost=200.0,
             maintenance_interval=3.0,
         ),
-        AnalysisSectionAdaptationOption(
+        AdaptationOptionConfigData(
             id="AO2",
             name="Expensive construction, cheap maintenance",
             construction_cost=5000.0,
@@ -68,7 +72,7 @@ class AdaptationOptionCases:
     total_benefit: list[float] = [0.0, 0.0, 0.0]
     total_bc_ratio: list[float] = [0.0, 0.0, 0.0]
     cases: list[
-        tuple[AnalysisSectionAdaptationOption, tuple[float, float, float]]
+        tuple[AdaptationOptionConfigData, tuple[float, float, float]]
     ] = list(zip(config_cases, zip(total_cost, total_benefit, total_bc_ratio)))
 
 
@@ -134,8 +138,7 @@ def _get_valid_adaptation_config_fixture(
     _network_config = NetworkConfigWrapper.from_data(None, _network_config_data)
 
     # - damages
-    _damages_section = AnalysisSectionDamages(
-        analysis=AnalysisDamagesEnum.DAMAGES,
+    _damages_section = DamagesConfigData(
         name="Damages",
         event_type=EventTypeEnum.EVENT,
         damage_curve=DamageCurveEnum.MAN,
@@ -150,7 +153,7 @@ def _get_valid_adaptation_config_fixture(
         AnalysisLossesEnum.MULTI_LINK_LOSSES
     )
     # - adaptation
-    _adaptation_section = AnalysisSectionAdaptation(
+    _adaptation_section = AdaptationConfigData(
         analysis=AnalysisEnum.ADAPTATION,
         name="Adaptation",
         losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
