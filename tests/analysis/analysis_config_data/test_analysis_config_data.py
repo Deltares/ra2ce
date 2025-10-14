@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
 from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
     AdaptationConfigData,
 )
@@ -12,6 +13,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     ProjectSection,
 )
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    SingleLinkLossesConfigData,
+)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -20,9 +24,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
-from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
-)
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 from tests import test_results
 
 
@@ -36,15 +38,15 @@ class TestAnalysisConfigData:
     @pytest.fixture
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
-        for _losses in LossesAnalysisNameList:
+        for _losses_config in LossesConfigDataTypes:
             _config.analyses.append(
-                LossesAnalysisConfigDataProtocol(name=_losses)
+                _losses_config(name=_losses_config.__name__.lower())
             )
         
         _config.analyses.append(
             DamagesConfigData(name="damages_analysis")
         )
-        _adaptation_config = AdaptationConfigData()
+        _adaptation_config = AdaptationConfigData(name="adaptation_analysis")
         _adaptation_config.adaptation_options = [
             AdaptationOptionConfigData(id="AO0"),
             AdaptationOptionConfigData(id="AO1"),
@@ -56,20 +58,21 @@ class TestAnalysisConfigData:
     def test_losses(self, valid_config: AnalysisConfigData):
         # 1./2. Define test data/Run test
         _losses = [
-            _config.analysis.config_value for _config in valid_config.losses_list
+            type(_config) for _config in valid_config.losses_list
         ]
 
         # 3. Verify expectations
-        assert all(item in _losses for item in LossesAnalysisNameList)
+        assert all(item in _losses for item in LossesConfigDataTypes)
 
     def test_damages(self, valid_config: AnalysisConfigData):
         # 1./2. Define test data/Run test
         _damages = [
-            _config.analysis.config_value for _config in valid_config.damages_list
+            type(_config) for _config in valid_config.damages_list
         ]
 
         # 3. Verify expectations
-        assert all(item in _damages for item in DamagesAnalysisNameList)
+        assert len(_damages) == 1
+        assert all(_damage_type == DamagesConfigData for _damage_type in _damages)
 
     def test_adaptation(self, valid_config: AnalysisConfigData):
         # 1./2. Define test data/Run test
@@ -96,9 +99,9 @@ class TestAnalysisConfigData:
     @pytest.mark.parametrize(
         "analysis_type",
         (
-            *AnalysisLossesEnum.list_valid_options(),
-            *AnalysisDamagesEnum.list_valid_options(),
-            AnalysisEnum.ADAPTATION,
+            *LossesConfigDataTypes,
+            DamagesConfigData,
+            AdaptationConfigData,
         ),
     )
     def test_get_analysis_returns_analysis_config(
@@ -110,12 +113,12 @@ class TestAnalysisConfigData:
         _result = valid_config.get_analysis(analysis_type)
 
         # 3. Verify expectations
-        assert _result.analysis == analysis_type
+        assert isinstance(_result, analysis_type)
 
     def test_reroot_analysis_config(self, valid_config: AnalysisConfigData):
         # 1. Define test data
         _analysis_type = AnalysisLossesEnum.SINGLE_LINK_LOSSES
-        _analysis = valid_config.get_analysis(_analysis_type)
+        _analysis = valid_config.get_analysis(SingleLinkLossesConfigData)
         _file = Path("old_root/a_dir/file.ext")
         valid_config.root_path = _file.parent
         _analysis.resilience_curves_file = _file
