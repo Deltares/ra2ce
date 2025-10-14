@@ -7,9 +7,16 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     ProjectSection,
 )
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -53,8 +60,8 @@ class TestAnalysisConfigDataValidator:
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
             analyses=[
-                AnalysisSectionDamages(
-                    analysis=AnalysisDamagesEnum.DAMAGES,
+                DamagesConfigData(
+                    name="damages_analysis",
                     event_type=EventTypeEnum.EVENT,
                     damage_curve=DamageCurveEnum.HZ,
                 )
@@ -93,7 +100,7 @@ class TestAnalysisConfigDataValidator:
             root_path=test_results,
             output_path=test_results.joinpath("output"),
             project=ProjectSection(),
-            analyses=[AnalysisSectionDamages(analysis="invalid_analysis_type")],
+            analyses=[DamagesConfigData(name="damages_analysis")],
         )
 
         # 2. Run test.
@@ -115,9 +122,8 @@ class TestAnalysisConfigDataValidator:
             network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=file_id),
             project=ProjectSection(),
             analyses=[
-                AnalysisSectionLosses(
-                    name="Test Analysis",
-                    analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLossesConfigData(
+                    name="Test Analysis"
                 )
             ],
         )
@@ -178,7 +184,7 @@ class TestAnalysisConfigDataValidator:
             network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=None),
             project=ProjectSection(),
             analyses=[
-                AnalysisSectionBase(name="Test Analysis", analysis=analysis_enum)
+                AnalysisConfigDataProtocol(name="Test Analysis")
             ],
         )
 
@@ -206,7 +212,7 @@ class TestAnalysisConfigDataValidator:
             network=NetworkSection(source=SourceEnum.SHAPEFILE, file_id=None),
             project=ProjectSection(),
             analyses=[
-                AnalysisSectionBase(name="Test Analysis", analysis=analysis_enum)
+                AnalysisConfigDataProtocol(name="Test Analysis")
             ],
         )
 

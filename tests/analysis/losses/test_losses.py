@@ -7,15 +7,18 @@ import pytest
 from shapely.geometry import LineString
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    BaseLinkLossesConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
@@ -54,7 +57,7 @@ class TestLosses:
         )
 
         _config.config_data.input_path = Path("sth")
-        _analysis = AnalysisSectionLosses(traffic_period=None)
+        _analysis = LossesAnalysisConfigDataProtocol(traffic_period=None)
 
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
@@ -93,7 +96,7 @@ class TestLosses:
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
-        _analysis = AnalysisSectionLosses(
+        _analysis = LossesAnalysisConfigDataProtocol(
             traffic_period=TrafficPeriodEnum.DAY,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,
@@ -165,7 +168,7 @@ class TestLosses:
             "losses" "csv_data_for_losses"
         )
 
-        _analysis = AnalysisSectionLosses(
+        _analysis = BaseLinkLossesConfigData(
             traffic_period=TrafficPeriodEnum.DAY,
             hours_per_traffic_period=24,
             threshold=0,

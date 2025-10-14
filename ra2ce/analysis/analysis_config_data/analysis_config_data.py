@@ -38,6 +38,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.network_config_data import (
@@ -133,7 +136,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         _analysis = self.get_analysis(analysis_type)
         if isinstance(_analysis, DamagesConfigData):
             _analysis.file_name = reroot_path(_analysis.file_name)
-        elif isinstance(_analysis, AnalysisSectionLosses):
+        elif isinstance(_analysis, LossesAnalysisConfigDataProtocol):
             _analysis.resilience_curves_file = reroot_path(
                 _analysis.resilience_curves_file
             )
@@ -159,15 +162,15 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def losses_list(self) -> list[AnalysisSectionLosses]:
+    def losses_list(self) -> list[LossesAnalysisConfigDataProtocol]:
         """
         Get all losses analyses from config.
 
         Returns:
-            list[AnalysisSectionLosses]: List of all losses analyses.
+            list[LossesAnalysisConfigDataProtocol]: List of all losses analyses.
         """
         return list(
-            filter(lambda x: isinstance(x, AnalysisSectionLosses), self.analyses)
+            filter(lambda x: isinstance(x, LossesAnalysisConfigDataProtocol), self.analyses)
         )
 
     @property

@@ -22,7 +22,7 @@ It is expected that the impact of a certain adaptation option is smaller than th
 The impact of an option is calculated by determining the cost of the different analyses (damages and/or losses) that are caused by a certain hazard.
 Which losses analysis is run is determined by `AnalysisConfigData.AdaptationConfigData.losses_analysis`.
 
-The configuration of the damages and the losses analyses are derived from their standard configuration in the section `AnalysisSectionDamages` and `AnalysisSectionLosses`, which are stored in `AdaptationOptionAnalysis` for a specific option.
+The configuration of the damages and the losses analyses are derived from their standard configuration in the section `DamagesConfigData` and `LossesAnalysisConfigDataProtocol`, which are stored in `AdaptationOptionAnalysis` for a specific option.
 One of these needs to be configured.
 
 In `AdaptationOptionAnalysis.get_analysis_info` it can be found which analysis to run.

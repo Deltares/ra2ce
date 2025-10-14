@@ -23,8 +23,15 @@ from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
     AdaptationConfigData,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkOriginClosestDestinationConfigData,
+    MultiLinkOriginDestinationConfigData,
+    OptimalRouteOriginClosestDestinationConfigData,
+    OptimalRouteOriginDestinationConfigData,
 )
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
@@ -33,6 +40,15 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
+)
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
+    MultiLinkRedundancyConfigData,
+)
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -98,14 +114,14 @@ class AnalysisFactory:
 
     @staticmethod
     def get_losses_analysis(
-        analysis: AnalysisSectionLosses,
+        analysis: LossesAnalysisConfigDataProtocol,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisLossesProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionLosses): Analysis section.
+            analysis (LossesAnalysisConfigDataProtocol): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -117,7 +133,7 @@ class AnalysisFactory:
         if not analysis:
             return None
 
-        if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY:
+        if isinstance(analysis, SingleLinkRedundancyConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -125,7 +141,7 @@ class AnalysisFactory:
             )
             return SingleLinkRedundancy(_analysis_input)
 
-        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY:
+        if isinstance(analysis, MultiLinkRedundancyConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -133,7 +149,7 @@ class AnalysisFactory:
             )
             return MultiLinkRedundancy(_analysis_input)
 
-        if analysis.analysis == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
+        if isinstance(analysis, OptimalRouteOriginDestinationConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -141,7 +157,7 @@ class AnalysisFactory:
             )
             return OptimalRouteOriginDestination(_analysis_input)
 
-        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION:
+        if isinstance(analysis, MultiLinkOriginDestinationConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -149,9 +165,8 @@ class AnalysisFactory:
             )
             return MultiLinkOriginDestination(_analysis_input)
 
-        if (
-            analysis.analysis
-            == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+        if isinstance(
+            analysis, OptimalRouteOriginClosestDestinationConfigData
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -161,9 +176,8 @@ class AnalysisFactory:
             )
             return OptimalRouteOriginClosestDestination(_analysis_input)
 
-        if (
-            analysis.analysis
-            == AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+        if isinstance(
+            analysis, MultiLinkOriginClosestDestinationConfigData
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -173,7 +187,7 @@ class AnalysisFactory:
             )
             return MultiLinkOriginClosestDestination(_analysis_input)
 
-        if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
+        if isinstance(analysis, SingleLinkLossesConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -181,7 +195,7 @@ class AnalysisFactory:
             )
             return SingleLinkLosses(_analysis_input, analysis_config)
 
-        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
+        if isinstance(analysis, MultiLinkLossesConfigData):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -189,13 +203,13 @@ class AnalysisFactory:
             )
             return MultiLinkLosses(_analysis_input, analysis_config)
 
-        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS:
-            _analysis_input = AnalysisInputWrapper.from_input(
-                analysis=analysis,
-                analysis_config=analysis_config,
-                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
-            )
-            return MultiLinkIsolatedLocations(_analysis_input)
+        # if isinstance(analysis, MultiLinkIsolatedLocationsConfigData):
+        #     _analysis_input = AnalysisInputWrapper.from_input(
+        #         analysis=analysis,
+        #         analysis_config=analysis_config,
+        #         graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
+        #     )
+        #     return MultiLinkIsolatedLocations(_analysis_input)
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 

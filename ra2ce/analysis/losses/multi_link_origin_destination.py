@@ -7,8 +7,8 @@ import pandas as pd
 from geopandas import GeoDataFrame, read_feather, read_file
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkOriginDestinationConfigData,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -24,7 +24,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: MultiLinkOriginDestinationConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
@@ -98,14 +98,14 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ]
 
     def multi_link_origin_destination(
-        self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
+        self, graph: nx.MultiGraph, analysis: MultiLinkOriginDestinationConfigData
     ) -> GeoDataFrame:
         """
         Calculates the connectivity between origins and destinations.
 
         Args:
             graph: The MultiGraph representing the network.
-            analysis: The AnalysisSectionLosses object containing OD information.
+            analysis: The MultiLinkOriginDestinationConfigData object containing OD information.
 
         Returns:
             GeoDataFrame: Connectivity results between origins and destinations.

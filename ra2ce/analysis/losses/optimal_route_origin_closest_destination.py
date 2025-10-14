@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    OptimalRouteOriginClosestDestinationConfigData,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -16,7 +16,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: OptimalRouteOriginClosestDestinationConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path

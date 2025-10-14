@@ -7,16 +7,12 @@ from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
     AdaptationConfigData,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
-)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
+)
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
@@ -24,13 +20,10 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 
 
 class TestAnalysisCollection:
-    @dataclass
-    class MockAnalysisSectionDamages(DamagesConfigData):
-        analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionLosses(AnalysisSectionLosses):
-        analysis: AnalysisLossesEnum = None
+    class MockAnalysisSectionLosses(LossesAnalysisConfigDataProtocol):
+        name: str = "Any name"
 
     def test_initialize(self):
         # 1./2. Define test data / Run test.
@@ -53,22 +46,14 @@ class TestAnalysisCollection:
         assert not any(_collection.damages_analyses)
         assert not any(_collection.losses_analyses)
 
-    @pytest.mark.parametrize(
-        "analysis",
-        [
-            pytest.param(_analysis_type)
-            for _analysis_type in AnalysisDamagesEnum.list_valid_options()
-        ],
-    )
     def test_create_collection_with_damages_analyses(
-        self,
-        analysis: AnalysisDamagesEnum,
+        self
     ):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("Any path")
         _config.config_data.analyses.append(
-            self.MockAnalysisSectionDamages(analysis=analysis)
+            DamagesConfigData(name="Any name")
         )
 
         # 2. Run test.
@@ -80,7 +65,7 @@ class TestAnalysisCollection:
 
         _generated_analysis = _collection.damages_analyses[0]
         assert isinstance(_generated_analysis, AnalysisDamagesProtocol)
-        assert _collection.damages_analyses[0].analysis.analysis == analysis
+        assert isinstance(_collection.damages_analyses[0].analysis, DamagesConfigData)
 
     @pytest.mark.parametrize(
         "analysis",
@@ -125,6 +110,6 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert (
-            _collection.adaptation_analysis.analysis.analysis == AnalysisEnum.ADAPTATION
+        assert isinstance(
+            _collection.adaptation_analysis.analysis, AdaptationConfigData
         )

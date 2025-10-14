@@ -20,6 +20,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from tests import test_results
 
 
@@ -35,12 +38,12 @@ class TestAnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
         for _losses in LossesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionLosses(analysis=AnalysisLossesEnum.get_enum(_losses))
+                LossesAnalysisConfigDataProtocol(name=_losses)
             )
-        for _damages in DamagesAnalysisNameList:
-            _config.analyses.append(
-                DamagesConfigData(analysis=AnalysisDamagesEnum.get_enum(_damages))
-            )
+        
+        _config.analyses.append(
+            DamagesConfigData(name="damages_analysis")
+        )
         _adaptation_config = AdaptationConfigData()
         _adaptation_config.adaptation_options = [
             AdaptationOptionConfigData(id="AO0"),

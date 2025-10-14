@@ -1,18 +1,11 @@
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
@@ -21,18 +14,11 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 
 
 class TestAnalysisFactory:
-    @dataclass
-    class MockAnalysisSectionDamages(AnalysisSectionDamages):
-        analysis: AnalysisDamagesEnum = None
-
-    @dataclass
-    class MockAnalysisSectionLosses(AnalysisSectionLosses):
-        analysis: AnalysisLossesEnum = None
 
     def test_get_damages_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDamages(
-            analysis=AnalysisDamagesEnum.INVALID
+        _analysis = DamagesConfigData(
+            name="sth"
         )
         _config = AnalysisConfigWrapper()
 
@@ -42,12 +28,12 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
-            _analysis.analysis
+            _analysis
         )
 
     def test_get_losses_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionLosses(analysis=AnalysisLossesEnum.INVALID)
+        _analysis = LossesAnalysisConfigDataProtocol()
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
@@ -57,14 +43,12 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
-            _analysis.analysis
+            _analysis
         )
 
     def test_get_analysis_with_damages(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDamages(
-            analysis=AnalysisDamagesEnum.DAMAGES
-        )
+        _analysis = DamagesConfigData(name="sth")
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -78,9 +62,7 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_losses(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionLosses(
-            analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
-        )
+        _analysis = LossesAnalysisConfigDataProtocol()
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 

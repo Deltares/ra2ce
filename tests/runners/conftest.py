@@ -11,20 +11,13 @@ from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
 from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
     AdaptationOptionConfigData,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionLosses,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
@@ -62,8 +55,8 @@ def _get_valid_analysis_config_fixture() -> Iterator[AnalysisConfigWrapper]:
             save_csv=True,
             save_gpkg=True,
         ),
-        AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
-        AnalysisSectionLosses(analysis=AnalysisLossesEnum.MULTI_LINK_REDUNDANCY),
+        SingleLinkRedundancyConfigData(name="SLR_1"),
+        SingleLinkRedundancyConfigData(name="SLR_2"),
         AdaptationConfigData(
             name="Adaptation",
             adaptation_options=[

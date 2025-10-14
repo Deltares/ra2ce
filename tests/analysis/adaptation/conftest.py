@@ -10,14 +10,8 @@ from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
 from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
     AdaptationOptionConfigData,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionLosses,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
 from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
@@ -29,6 +23,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -92,9 +89,8 @@ def _get_valid_adaptation_config_fixture(
         Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
-    def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
-        return AnalysisSectionLosses(
-            analysis=analysis,
+    def get_losses_section(analysis: AnalysisLossesEnum) -> LossesAnalysisConfigDataProtocol:
+        return LossesAnalysisConfigDataProtocol(
             name="Losses",
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,

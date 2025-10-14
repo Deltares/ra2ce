@@ -5,8 +5,8 @@ import numpy as np
 import osmnx
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -19,7 +19,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class SingleLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: SingleLinkRedundancyConfigData
     graph_file: GraphFile
     input_path: Path
     static_path: Path

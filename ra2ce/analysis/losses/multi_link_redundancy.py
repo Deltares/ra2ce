@@ -8,10 +8,10 @@ import osmnx
 import pandas as pd
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
-)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
+    MultiLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
@@ -23,7 +23,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: MultiLinkRedundancyConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
