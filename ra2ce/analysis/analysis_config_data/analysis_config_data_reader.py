@@ -42,6 +42,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
     BaseOriginDestinationConfigData,
+    MultiLinkIsolatedLocationsConfigData,
     MultiLinkOriginClosestDestinationConfigData,
     MultiLinkOriginDestinationConfigData,
     OptimalRouteOriginClosestDestinationConfigData,
@@ -66,6 +67,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
     MultiLinkRedundancyConfigData,
 )
@@ -126,9 +130,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
-    def _without_analysis_property(self, section: dict) -> dict:
+    def _without_analysis_property(self, section: dict, *args: list[str]) -> dict:
         if "analysis" in section:
             section.pop("analysis")
+        for arg in args:
+            if arg in section:
+                section.pop(arg)
         return section
 
     def _set_section_common_properties(
@@ -270,7 +277,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             return self._get_origin_destination_config_data(
                 section_name, OptimalRouteOriginDestinationConfigData)
 
-        _section = EquityConfigData(**self._without_analysis_property(self._parser[section_name]))
+        _section = EquityConfigData(**self._without_analysis_property(self._parser[section_name], "save_traffic"))
         self._set_section_common_properties(_section, section_name)
         _section.equity_weight = self._parser.get(
             section_name,
@@ -309,6 +316,21 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_losses_analysis_type_from_string(self, analysis_type_name: str) -> LossesAnalysisConfigDataProtocol:
+        _mappers = {
+            AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value: SingleLinkRedundancyConfigData,
+            AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value: MultiLinkRedundancyConfigData,
+            AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value: SingleLinkLossesConfigData,
+            AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value: MultiLinkLossesConfigData,
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: OptimalRouteOriginDestinationConfigData,
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value: OptimalRouteOriginClosestDestinationConfigData,
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value: MultiLinkOriginDestinationConfigData,
+            AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value: MultiLinkOriginClosestDestinationConfigData,
+            AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS.config_value: MultiLinkIsolatedLocationsConfigData,
+        }
+
+        return _mappers.get(analysis_type_name, None)
+
     def _get_adaptation_config_data(
         self, section_name: str
     ) -> AdaptationConfigData:
@@ -317,13 +339,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         ) -> AdaptationOptionConfigData:
             return AdaptationOptionConfigData(**self._parser[section_name])
 
-        _section = AdaptationConfigData(**self._parser[section_name])
+        _section = AdaptationConfigData(**self._without_analysis_property(self._parser[section_name]))
         _section.analysis = AnalysisEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
-        _section.losses_analysis = AnalysisLossesEnum.get_enum(
-            self._parser.get(section_name, "losses_analysis", fallback=None)
-        )
+
+        _section.losses_analysis = self._get_losses_analysis_type_from_string(self._parser.get(section_name, "losses_analysis", fallback=""))
         _section.save_gpkg = self._parser.getboolean(
             section_name, "save_gpkg", fallback=_section.save_gpkg
         )
@@ -375,6 +396,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             ),
             AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
                 x, MultiLinkOriginClosestDestinationConfigData
+            ),
+            AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS.config_value: lambda x: self._get_origin_destination_config_data(
+                x, MultiLinkIsolatedLocationsConfigData
             ),
             AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
             AnalysisEnum.ADAPTATION.config_value: self._get_adaptation_config_data,

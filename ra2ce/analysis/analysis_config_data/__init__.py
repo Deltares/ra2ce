@@ -1,4 +1,8 @@
 
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
+)
+
 from .adaptation_config_data import AdaptationConfigData
 from .base_link_losses_config_data import (
     MultiLinkLossesConfigData,
@@ -18,6 +22,7 @@ from .multi_link_redundancy_config_data import MultiLinkRedundancyConfigData
 LossesConfigDataTypes: list[type[LossesAnalysisConfigDataProtocol]] = [
     SingleLinkLossesConfigData,
     MultiLinkLossesConfigData,
+    SingleLinkRedundancyConfigData,
     MultiLinkRedundancyConfigData,
     MultiLinkOriginDestinationConfigData,
     MultiLinkOriginClosestDestinationConfigData,

@@ -62,3 +62,9 @@ class MultiLinkOriginClosestDestinationConfigData(BaseOriginDestinationConfigDat
     """Configuration data for multi-link origin-closest destination analysis."""
 
     pass
+
+@dataclass
+class MultiLinkIsolatedLocationsConfigData(BaseOriginDestinationConfigData):
+    """Configuration data for multi-link isolated locations analysis."""
+
+    category_field_name: Optional[str] = None
