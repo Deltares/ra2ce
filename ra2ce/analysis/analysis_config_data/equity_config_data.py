@@ -39,9 +39,11 @@ class EquityConfigData(OptimalRouteOriginDestinationConfigData):
                 f"For equity analysis '{self.name}': 'equity_weight' must be provided."
             )
         else:
-            if self.equity_weight.suffix.lower() != ".csv" or not self.equity_weight.exists():
+            if (
+                self.equity_weight.suffix.lower() != ".csv"
+                or not self.equity_weight.exists()
+            ):
                 _report.error(
                     f"For equity analysis '{self.name}': 'equity_weight' file '{self.equity_weight}' is not a .csv file."
                 )
         return _report
-        

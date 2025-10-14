@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from dataclasses import fields
-from typing import Callable
 
 
 def with_legacy_mappers(cls):

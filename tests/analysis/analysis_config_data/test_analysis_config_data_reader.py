@@ -127,7 +127,7 @@ class TestAnalysisConfigDataReader:
                 AnalysisEnum.ADAPTATION.config_value,
                 AdaptationConfigData,
                 id="Adaptation",
-            )
+            ),
         ],
     )
     def test_get_analysis_sections_with_new_dataclasses(
@@ -158,17 +158,19 @@ class TestAnalysisConfigDataReader:
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
         assert len(_analyses_config_data) == 1
-        _first_slr_cd = _analyses_config_data[0]
-        assert isinstance(_first_slr_cd, expected_analysis_type)
-        assert _first_slr_cd.name == _analysis_name
-        assert _first_slr_cd.save_csv is True
-        assert _first_slr_cd.save_gpkg is True
+        _matching_cd = _analyses_config_data[0]
+        assert isinstance(_matching_cd, expected_analysis_type)
+        assert _matching_cd.name == _analysis_name
+        assert _matching_cd.save_csv is True
+        assert _matching_cd.save_gpkg is True
 
     def test_get_analysis_sections_with_equity_values_returns_equity_config_data(self):
         # 1. Define test data
         _reader = AnalysisConfigDataReader()
         _section_name = "dummy_analysis"
-        _analysis_config_name = AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+        _analysis_config_name = (
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+        )
         _analysis_name = _analysis_config_name + " test"
         _reader._parser.add_section(_section_name)
         _reader._parser.set(_section_name, "name", _analysis_name)
@@ -180,14 +182,13 @@ class TestAnalysisConfigDataReader:
         # 2. Run test
 
         # Read everything so it gets correctly initialized.
-        _analyses_config_data = _reader.get_analysis_sections()
+        _analyses_config_data = _reader._get_analysis_sections_with_new_dataclasses()
 
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
         assert len(_analyses_config_data) == 1
-        _first_slr_cd = _analyses_config_data[0]
-        assert isinstance(_first_slr_cd, EquityConfigData)
-        assert _first_slr_cd.name == _analysis_name
-        assert _first_slr_cd.save_csv is True
-        assert _first_slr_cd.save_gpkg is True
-
+        _equity_cd = _analyses_config_data[0]
+        assert isinstance(_equity_cd, EquityConfigData)
+        assert _equity_cd.name == _analysis_name
+        assert _equity_cd.save_csv is True
+        assert _equity_cd.save_gpkg is True

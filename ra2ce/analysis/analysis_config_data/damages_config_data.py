@@ -68,11 +68,18 @@ class DamagesConfigData(AnalysisConfigDataProtocol):
         if not self.name:
             _report.error("An analysis 'name' must be provided.")
 
-        if not isinstance(self.event_type, EventTypeEnum) or self.event_type == EventTypeEnum.INVALID or self.event_type == EventTypeEnum.NONE:
+        if (
+            not isinstance(self.event_type, EventTypeEnum)
+            or self.event_type == EventTypeEnum.INVALID
+            or self.event_type == EventTypeEnum.NONE
+        ):
             _report.error(
                 f"For damage analysis '{self.name}': 'event_type' must be a valid EventTypeEnum value."
             )
-        if not isinstance(self.damage_curve, DamageCurveEnum) or self.damage_curve == DamageCurveEnum.INVALID:
+        if (
+            not isinstance(self.damage_curve, DamageCurveEnum)
+            or self.damage_curve == DamageCurveEnum.INVALID
+        ):
             _report.error(
                 f"For damage analysis '{self.name}': 'damage_curve' must be a valid DamageCurveEnum value."
             )

@@ -62,7 +62,9 @@ class TestLinkLossesConfigData:
         assert link_losses_config.risk_calculation_year is None
 
     @pytest.fixture(name="valid_link_losses_config")
-    def fixture_valid_link_losses_config(self, link_losses_class: type[BaseLinkLossesConfigData]):
+    def fixture_valid_link_losses_config(
+        self, link_losses_class: type[BaseLinkLossesConfigData]
+    ):
         return link_losses_class(
             name="Valid Link Losses Analysis",
             weighing=WeighingEnum.LENGTH,
@@ -90,17 +92,19 @@ class TestLinkLossesConfigData:
         valid_link_losses_config: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Invalid Damages Analysis"
+        _data_name = "Invalid Base Link Losses Analysis"
         # Set risk calculation mode to TRIANGLE_TO_NULL_YEAR to trigger the year validation.
-        _damages_config = valid_link_losses_config
-        _damages_config.name = _data_name
-        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
-        _damages_config.risk_calculation_year = risk_calculation_year
+        _link_losses_config = valid_link_losses_config
+        _link_losses_config.name = _data_name
+        _link_losses_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        )
+        _link_losses_config.risk_calculation_year = risk_calculation_year
 
         _expected_error = f"For link losses analysis '{_data_name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
@@ -111,17 +115,20 @@ class TestLinkLossesConfigData:
         assert _report._errors[0] == _expected_error
 
     def test_given_risk_calculation_triangle_and_valid_year_when_validate_integrity_then_succeeds(
-        self, valid_link_losses_config: type[BaseLinkLossesConfigData],
+        self,
+        valid_link_losses_config: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Invalid Damages Analysis"
-        _damages_config = valid_link_losses_config
-        _damages_config.name = _data_name
-        _damages_config.risk_calculation_mode = RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
-        _damages_config.risk_calculation_year = 10
+        _data_name = "Invalid Base Link Losses Analysis"
+        _link_losses_config = valid_link_losses_config
+        _link_losses_config.name = _data_name
+        _link_losses_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
+        )
+        _link_losses_config.risk_calculation_year = 10
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
@@ -145,8 +152,8 @@ class TestLinkLossesConfigData:
         link_losses_class: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Valid Damages Analysis"
-        _damages_config = link_losses_class(
+        _data_name = "Valid Link Losses Analysis"
+        _link_losses_config = link_losses_class(
             name=_data_name,
             risk_calculation_mode=risk_calculation_mode,
             risk_calculation_year=risk_calculation_year,
@@ -158,11 +165,10 @@ class TestLinkLossesConfigData:
             resilience_curves_file=Path(__file__),
             traffic_intensities_file=Path(__file__),
             values_of_time_file=Path(__file__),
-
         )
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
