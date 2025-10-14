@@ -25,9 +25,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataProtocol,
-)
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -37,11 +34,14 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class BaseLinkLossesConfigData(AnalysisConfigDataProtocol, ABC):
+class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, ABC):
     """
     Reflects all possible settings that a base link losses config might contain.
     """

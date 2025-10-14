@@ -3,15 +3,15 @@ from abc import ABC
 from dataclasses import dataclass, field
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataProtocol,
-)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class BaseOriginDestinationConfigData(AnalysisConfigDataProtocol, ABC):
+class BaseOriginDestinationConfigData(LossesAnalysisConfigDataProtocol, ABC):
     """Base class for origin-destination configuration data."""
 
     name: str
