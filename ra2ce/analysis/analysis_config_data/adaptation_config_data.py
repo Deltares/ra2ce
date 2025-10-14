@@ -27,8 +27,11 @@ from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    LossesAnalysisConfigDataProtocol,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
 
@@ -43,7 +46,7 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     save_csv: bool = False  # Save results as CSV
     save_gpkg: bool = False  # Save results as GPKG
 
-    losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+    losses_analysis: type[LossesAnalysisConfigDataProtocol] = SingleLinkLossesConfigData
 
     # Economical settings
     time_horizon: float = 0.0
