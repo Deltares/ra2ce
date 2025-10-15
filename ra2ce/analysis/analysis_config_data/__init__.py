@@ -19,6 +19,14 @@ from .equity_config_data import EquityConfigData
 from .losses_analysis_config_data_protocol import LossesAnalysisConfigDataProtocol
 from .multi_link_redundancy_config_data import MultiLinkRedundancyConfigData
 
+AdaptationConfigTypes: list[type[AdaptationConfigData]] = [
+    AdaptationConfigData,
+]
+
+DamagesConfigTypes: list[type[DamagesConfigData]] = [
+    DamagesConfigData,
+]
+
 LossesConfigDataTypes: list[type[LossesAnalysisConfigDataProtocol]] = [
     SingleLinkLossesConfigData,
     MultiLinkLossesConfigData,

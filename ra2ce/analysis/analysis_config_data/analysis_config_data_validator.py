@@ -50,10 +50,10 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
             for key, value in header.__dict__.items():
                 if not value:
                     continue
-                if isinstance(value, Ra2ceEnumBase):
-                    # enumerations
-                    _expected_values_list = value.list_valid_options()
-
+                if not isinstance(value, Ra2ceEnumBase):
+                    continue
+                # enumerations
+                _expected_values_list = value.list_valid_options()
                 if value not in _expected_values_list:
                     _report.error(
                         f"Wrong input to property [ {key} ]; has to be one of: {_expected_values_list}."
