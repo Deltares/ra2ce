@@ -1,0 +1,7 @@
+,road_types,avg_speed
+0,residential,47.2
+1,unclassified,50.0
+2,"['trunk', 'primary']",58.3
+3,trunk,58.3
+4,primary,56.3
+5,primary_link,56.3
