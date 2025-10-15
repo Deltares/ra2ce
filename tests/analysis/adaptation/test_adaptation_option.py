@@ -17,8 +17,15 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
 )
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
-from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
-    AdaptationConfigData,
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -36,14 +43,14 @@ class TestAdaptationOption:
     @pytest.mark.parametrize(
         "losses_analysis_type, losses_analysis",
         [
-            (AnalysisLossesEnum.SINGLE_LINK_LOSSES, SingleLinkLosses),
-            (AnalysisLossesEnum.MULTI_LINK_LOSSES, MultiLinkLosses),
+            (SingleLinkLossesConfigData, SingleLinkLosses),
+            (MultiLinkLossesConfigData, MultiLinkLosses),
         ],
     )
     def test_from_config_returns_object_with_2_analyses(
         self,
         valid_adaptation_config: AnalysisConfigWrapper,
-        losses_analysis_type: AnalysisLossesEnum,
+        losses_analysis_type: type[AnalysisConfigDataProtocol],
         losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
@@ -106,7 +113,7 @@ class TestAdaptationOption:
         with pytest.raises(ValueError) as _exc:
             AdaptationOption.from_config(
                 analysis_config=_config,
-                adaptation_option=AdaptationConfigData(),
+                adaptation_option=AdaptationOptionConfigData(id="Option1"),
             )
 
         # 3. Verify expectations.

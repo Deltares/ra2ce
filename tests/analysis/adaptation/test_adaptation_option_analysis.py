@@ -14,6 +14,11 @@ from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -72,14 +77,14 @@ class TestAnalysisOptionAnalysis:
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
         [
-            pytest.param(AnalysisDamagesEnum.DAMAGES, Damages, id="damages"),
+            pytest.param(DamagesConfigData, Damages, id="damages"),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 SingleLinkLosses,
                 id="single_link_losses",
             ),
             pytest.param(
-                AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLossesConfigData,
                 MultiLinkLosses,
                 id="multi_link_losses",
             ),
@@ -88,7 +93,7 @@ class TestAnalysisOptionAnalysis:
     def test_from_config_returns_object(
         self,
         valid_adaptation_config: AnalysisConfigWrapper,
-        analysis_type: AnalysisLossesEnum,
+        analysis_type: AnalysisConfigDataProtocol,
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1. Define test data.

@@ -20,11 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from dataclasses import dataclass, field
+from logging import config
 from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.base_rootable_paths import BaseRootablePaths
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -35,7 +40,7 @@ from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class DamagesConfigData(AnalysisConfigDataProtocol):
+class DamagesConfigData(BaseRootablePaths, AnalysisConfigDataProtocol):
     """
     Configuration data for damages analysis.
     """
@@ -61,6 +66,15 @@ class DamagesConfigData(AnalysisConfigDataProtocol):
     create_table: bool = False
     file_name: Optional[Path] = None
     representative_damage_percentage: float = 100
+
+    @property
+    def config_name(self) -> str:
+        return AnalysisDamagesEnum.DAMAGES.config_value
+
+    def reroot_fields(self, old_root: Path, new_root: Path):
+        _new_root = self._get_new_root(old_root, new_root.joinpath(self.config_name))
+        if self.file_name is not None:
+            self.file_name = _new_root.joinpath(self.file_name.name)
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()

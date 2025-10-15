@@ -1,4 +1,5 @@
 from pathlib import Path
+from re import S
 
 import pytest
 
@@ -117,13 +118,13 @@ class TestAnalysisConfigData:
 
     def test_reroot_analysis_config(self, valid_config: AnalysisConfigData):
         # 1. Define test data
-        _analysis_type = AnalysisLossesEnum.SINGLE_LINK_LOSSES
-        _analysis = valid_config.get_analysis(SingleLinkLossesConfigData)
+        _analysis_type = SingleLinkLossesConfigData
+        _analysis = valid_config.get_analysis(_analysis_type)
         _file = Path("old_root/a_dir/file.ext")
         valid_config.root_path = _file.parent
         _analysis.resilience_curves_file = _file
         _root_path = Path("new_root/another_dir")
-        _expected_path = _root_path.joinpath(_analysis_type.config_value, _file.name)
+        _expected_path = _root_path.joinpath(AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value, _file.name)
 
         # 2. Run test
         _result = valid_config.reroot_analysis_config(_analysis_type, _root_path)

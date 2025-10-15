@@ -20,11 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import math
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.base_rootable_paths import BaseRootablePaths
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -41,7 +45,7 @@ from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, ABC):
+class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, BaseRootablePaths, ABC):
     """
     Reflects all possible settings that a base link losses config might contain.
     """
@@ -72,6 +76,20 @@ class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, ABC):
     )
     # Risk calculation year is required if 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'
     risk_calculation_year: Optional[int] = None
+
+    @property
+    @abstractmethod
+    def config_name(self) -> str:
+        pass
+
+    def reroot_fields(self, old_root: Path, new_root: Path):
+        _new_root = self._get_new_root(old_root, new_root.joinpath(self.config_name))
+        if self.resilience_curves_file:
+            self.resilience_curves_file = _new_root.joinpath(self.resilience_curves_file.name)
+        if self.traffic_intensities_file:
+            self.traffic_intensities_file = _new_root.joinpath(self.traffic_intensities_file.name)
+        if self.values_of_time_file:
+            self.values_of_time_file = _new_root.joinpath(self.values_of_time_file.name)
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
@@ -152,18 +170,22 @@ class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, ABC):
 
         return _report
 
-
+@dataclass
 class MultiLinkLossesConfigData(BaseLinkLossesConfigData):
     """
     Configuration data for multi-link losses analysis.
     """
 
-    pass
-
-
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value
+    
+@dataclass
 class SingleLinkLossesConfigData(BaseLinkLossesConfigData):
     """
     Configuration data for single-link losses analysis.
     """
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value
 
-    pass

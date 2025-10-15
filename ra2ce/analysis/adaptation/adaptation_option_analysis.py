@@ -26,6 +26,9 @@ from dataclasses import dataclass
 from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
     AdaptationOptionPartialResult,
 )
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -78,7 +81,7 @@ class AdaptationOptionAnalysis:
     def from_config(
         cls,
         analysis_config: AnalysisConfigWrapper,
-        analysis_type: AnalysisLossesEnum | AnalysisDamagesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
         option_id: str,
     ) -> AdaptationOptionAnalysis:
         """
@@ -86,7 +89,7 @@ class AdaptationOptionAnalysis:
 
         Args:
             analysis_config (AnalysisConfigWrapper): The analysis configuration.
-            analysis_type (AnalysisLossesEnum | AnalysisDamagesEnum): The type of analysis.
+            analysis_type (type[AnalysisConfigDataProtocol]): The type of analysis.
             option_id (str): The ID of the adaptation option.
 
         Returns:

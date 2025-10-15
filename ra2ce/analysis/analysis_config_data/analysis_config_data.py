@@ -31,6 +31,7 @@ from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
+from ra2ce.analysis.analysis_config_data.base_rootable_paths import BaseRootablePaths
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -112,7 +113,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     def reroot_analysis_config(
         self,
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: AnalysisConfigDataProtocol,
         new_root: Path,
     ) -> AnalysisConfigData:
         """
@@ -134,16 +135,8 @@ class AnalysisConfigData(ConfigDataProtocol):
 
         # Rewrite the paths of the input files in the analysis config
         _analysis = self.get_analysis(analysis_type)
-        if isinstance(_analysis, DamagesConfigData):
-            _analysis.file_name = reroot_path(_analysis.file_name)
-        elif isinstance(_analysis, LossesAnalysisConfigDataProtocol):
-            _analysis.resilience_curves_file = reroot_path(
-                _analysis.resilience_curves_file
-            )
-            _analysis.traffic_intensities_file = reroot_path(
-                _analysis.traffic_intensities_file
-            )
-            _analysis.values_of_time_file = reroot_path(_analysis.values_of_time_file)
+        if isinstance(_analysis, BaseRootablePaths):
+            _analysis.reroot_fields(self.root_path, new_root)
 
         self.root_path = new_root
 

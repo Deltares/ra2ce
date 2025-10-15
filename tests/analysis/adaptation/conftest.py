@@ -11,11 +11,12 @@ from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
     AdaptationOptionConfigData,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    BaseLinkLossesConfigData,
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
@@ -89,14 +90,13 @@ def _get_valid_adaptation_config_fixture(
         Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
-    def get_losses_section(analysis: AnalysisLossesEnum) -> LossesAnalysisConfigDataProtocol:
-        return LossesAnalysisConfigDataProtocol(
+    def get_losses_section(analysis_type: type[BaseLinkLossesConfigData]) -> LossesAnalysisConfigDataProtocol:
+        return analysis_type(
             name="Losses",
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,
-            threshold=0,
             production_loss_per_capita_per_hour=42,
-            hours_per_traffic_period=8,
+            # hours_per_traffic_period=8,
             traffic_period=TrafficPeriodEnum.DAY,
             trip_purposes=[
                 TripPurposeEnum.BUSINESS,
@@ -143,16 +143,15 @@ def _get_valid_adaptation_config_fixture(
     )
     # - losses
     _single_link_losses_section = get_losses_section(
-        AnalysisLossesEnum.SINGLE_LINK_LOSSES
+        SingleLinkLossesConfigData
     )
     _multi_link_losses_section = get_losses_section(
-        AnalysisLossesEnum.MULTI_LINK_LOSSES
+        MultiLinkLossesConfigData
     )
     # - adaptation
     _adaptation_section = AdaptationConfigData(
-        analysis=AnalysisEnum.ADAPTATION,
         name="Adaptation",
-        losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+        losses_analysis=MultiLinkLossesConfigData,
         adaptation_options=AdaptationOptionCases.config_cases,
         time_horizon=20,
         discount_rate=0.025,

@@ -82,7 +82,7 @@ class AdaptationOption:
             )
 
         # Create input for the damages and losses analyses (if present in config)
-        _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
+        _config_analyses = [x for x in analysis_config.config_data.analyses]
         _analyses = [
             AdaptationOptionAnalysis.from_config(
                 analysis_config,

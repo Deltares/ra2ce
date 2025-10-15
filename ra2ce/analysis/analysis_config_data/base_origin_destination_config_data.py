@@ -1,6 +1,7 @@
 import math
 from abc import ABC
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
