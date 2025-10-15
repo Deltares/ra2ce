@@ -12,8 +12,11 @@ class UpdateReference:
 
     def update(self) -> None:
         for _example_data in self.example_data_path.iterdir():
+            _example_reference = _example_data.joinpath("reference")
+            if not _example_reference.is_dir():
+                continue
             for _reference_file in OutputValidator._get_relative_paths(
-                _example_data.joinpath("reference")
+                _example_reference
             ):
                 _from = self.example_data_path.joinpath(_example_data, _reference_file)
                 _to = self.example_data_path.joinpath(
