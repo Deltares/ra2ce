@@ -1,7 +1,0 @@
-,road_types,avg_speed
-0,secondary_link,50.0
-1,tertiary_link,58.3
-2,residential,60.0
-3,secondary,50.0
-4,"['tertiary', 'residential']",60.0
-5,tertiary,58.3
