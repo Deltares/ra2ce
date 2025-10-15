@@ -20,7 +20,7 @@ class PfileValidator(FileValidatorProtocol):
             with open(file_path, "rb") as _file_path:
                 _graph = pickle.load(_file_path)
             assert isinstance(_graph, nx.Graph)
-            return nx.to_numpy_array(_graph, weight="weight")
+            return _graph
 
         _graph_ref = _get_normalized_content(self.reference_file)
         _graph_res = _get_normalized_content(self.result_file)
