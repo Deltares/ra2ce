@@ -4,6 +4,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     LossesAnalysisConfigDataProtocol,
@@ -40,32 +43,43 @@ class BaseOriginDestinationConfigData(LossesAnalysisConfigDataProtocol, ABC):
             )
         return _report
 
-
+@dataclass
 class OptimalRouteOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-destination analysis."""
 
-    pass
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
 
-
+@dataclass
 class OptimalRouteOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-closest destination analysis."""
 
-    pass
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value
 
-
+@dataclass
 class MultiLinkOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-destination analysis."""
 
-    pass
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value
 
-
+@dataclass
 class MultiLinkOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-closest destination analysis."""
 
-    pass
-
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value
 @dataclass
 class MultiLinkIsolatedLocationsConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link isolated locations analysis."""
 
     category_field_name: Optional[str] = None
+
+    @property
+    def config_name(self) -> str:
+        return AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS.config_value

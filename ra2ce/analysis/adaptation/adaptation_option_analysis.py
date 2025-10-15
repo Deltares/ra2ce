@@ -29,12 +29,11 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.damages import Damages
@@ -47,20 +46,20 @@ from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 @dataclass
 class AdaptationOptionAnalysis:
     option_id: str
-    analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
+    analysis_type: type[AnalysisConfigDataProtocol]
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
     result_col: str
 
     @staticmethod
     def get_analysis_info(
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
     ) -> tuple[type[Damages | LossesBase], str]:
         """
         Get the analysis class and the result column for the given analysis.
 
         Args:
-            analysis (AnalysisDamagesEnum | AnalysisLossesEnum): The type of analysis.
+            analysis (type[AnalysisConfigDataProtocol]): The type of analysis.
 
         Raises:
             NotImplementedError: The analysis type is not implemented.
@@ -68,12 +67,12 @@ class AdaptationOptionAnalysis:
         Returns:
             tuple[type[Damages | LossesBase], str]: The analysis class and the regex to find the result column.
         """
-        if analysis_type == AnalysisDamagesEnum.DAMAGES:
+        if analysis_type == DamagesConfigData:
             # Columnname should start with "dam_" and should not end with "_segments"
             return (Damages, "(?!.*_segments$)^dam_.*")
-        elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
+        elif analysis_type == SingleLinkLossesConfigData:
             return (SingleLinkLosses, "^vlh_.*_total$")
-        elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
+        elif analysis_type == MultiLinkLossesConfigData:
             return (MultiLinkLosses, "^vlh_.*_total$")
         raise NotImplementedError(f"Analysis {analysis_type} not supported")
 
@@ -107,7 +106,7 @@ class AdaptationOptionAnalysis:
 
         # Create analysis input
         _analysis = _analysis_config.config_data.get_analysis(analysis_type)
-        if analysis_type == AnalysisDamagesEnum.DAMAGES:
+        if isinstance(analysis_type, DamagesConfigData):
             _graph_file = None
             _graph_file_hazard = analysis_config.graph_files.base_network_hazard
         else:

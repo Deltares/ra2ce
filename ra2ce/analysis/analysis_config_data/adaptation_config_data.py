@@ -30,6 +30,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
 from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     LossesAnalysisConfigDataProtocol,
 )
@@ -57,6 +58,10 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     hazard_fraction_cost: bool = False
     # First option is the no adaptation option
     adaptation_options: list[AdaptationOptionConfigData] = field(default_factory=list)
+
+    @property
+    def config_name(self) -> str:
+        return AnalysisEnum.ADAPTATION.config_value
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()

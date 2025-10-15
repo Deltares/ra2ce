@@ -123,18 +123,19 @@ class AnalysisConfigData(ConfigDataProtocol):
             AnalysisConfigData: The rerooted config data.
         """
 
+        _analysis = self.get_analysis(analysis_type)
+        
         def reroot_path(orig_path: Optional[Path]) -> Optional[Path]:
             # Rewrite the path to the new root
             if not orig_path or not self.root_path:
                 return None
             _orig_parts = orig_path.parts
             _rel_path = Path(*_orig_parts[len(self.root_path.parts) :])
-            return new_root.joinpath(analysis_type.config_value, _rel_path)
+            return new_root.joinpath(_analysis.config_name, _rel_path)
 
         self.input_path = reroot_path(self.input_path)
 
         # Rewrite the paths of the input files in the analysis config
-        _analysis = self.get_analysis(analysis_type)
         if isinstance(_analysis, BaseRootablePaths):
             _analysis.reroot_fields(self.root_path, new_root)
 

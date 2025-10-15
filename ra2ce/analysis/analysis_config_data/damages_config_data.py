@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from dataclasses import dataclass, field
-from logging import config
 from pathlib import Path
 from typing import Optional
 

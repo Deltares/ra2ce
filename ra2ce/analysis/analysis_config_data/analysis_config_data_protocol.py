@@ -34,6 +34,10 @@ class AnalysisConfigDataProtocol(Protocol):
     save_gpkg: bool
     save_csv: bool
 
+    @property
+    def config_name(self) -> str:
+        pass
+
     def validate_integrity(self) -> ValidationReport:
         """
         Validates the integrity of the config data instance. This includes checking for required fields,
