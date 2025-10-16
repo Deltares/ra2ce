@@ -24,13 +24,13 @@ from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class MultiLinkRedundancyConfigData(LossesAnalysisConfigDataProtocol):
+class MultiLinkRedundancyConfigData(BaseLossesAnalysisConfigData):
     # Common properties
     name: str
     save_gpkg: bool = False

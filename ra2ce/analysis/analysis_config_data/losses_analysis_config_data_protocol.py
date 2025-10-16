@@ -19,13 +19,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol
+from abc import ABC
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
 
 
-class LossesAnalysisConfigDataProtocol(AnalysisConfigDataProtocol, Protocol):
-    """Protocol for losses analysis configuration data."""
+class BaseLossesAnalysisConfigData(AnalysisConfigDataProtocol, ABC):
+    """
+    Base class for losses analysis configuration data.
+    It is mostly used as a marker interface to distinguish between damages and losses analysis config data.
+    """
     pass

@@ -5,7 +5,7 @@ import pytest
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
@@ -33,7 +33,7 @@ class TestAnalysisFactory:
 
     def test_get_losses_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = LossesAnalysisConfigDataProtocol()
+        _analysis = BaseLossesAnalysisConfigData()
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
@@ -62,7 +62,7 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_losses(self):
         # 1. Define test data.
-        _analysis = LossesAnalysisConfigDataProtocol()
+        _analysis = BaseLossesAnalysisConfigData()
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 

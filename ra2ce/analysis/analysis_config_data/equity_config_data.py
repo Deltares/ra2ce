@@ -34,7 +34,8 @@ class EquityConfigData(OptimalRouteOriginDestinationConfigData):
     equity_weight: Path = None
 
     @property
-    def config_name(self) -> str:
+    @staticmethod
+    def config_name() -> str:
         return "equity"
 
     def validate_integrity(self) -> ValidationReport:

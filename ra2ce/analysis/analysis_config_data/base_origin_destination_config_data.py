@@ -9,13 +9,13 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class BaseOriginDestinationConfigData(LossesAnalysisConfigDataProtocol, ABC):
+class BaseOriginDestinationConfigData(BaseLossesAnalysisConfigData, ABC):
     """Base class for origin-destination configuration data."""
 
     name: str
@@ -47,39 +47,29 @@ class BaseOriginDestinationConfigData(LossesAnalysisConfigDataProtocol, ABC):
 class OptimalRouteOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-destination analysis."""
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
+    config_name: str = AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value
 
 @dataclass
 class OptimalRouteOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for optimal route origin-closest destination analysis."""
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value
+    config_name: str = AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value
 
 @dataclass
 class MultiLinkOriginDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-destination analysis."""
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value
+    config_name: str = AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION.config_value
 
 @dataclass
 class MultiLinkOriginClosestDestinationConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link origin-closest destination analysis."""
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value
+    config_name: str = AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION.config_value
 @dataclass
 class MultiLinkIsolatedLocationsConfigData(BaseOriginDestinationConfigData):
     """Configuration data for multi-link isolated locations analysis."""
 
     category_field_name: Optional[str] = None
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS.config_value
+    config_name: str = AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS.config_value

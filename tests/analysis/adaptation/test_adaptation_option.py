@@ -27,6 +27,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     MultiLinkLossesConfigData,
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -72,6 +73,14 @@ class TestAdaptationOption:
         assert len(_result.analyses) == 2
         assert Damages in [x.analysis_class for x in _result.analyses]
         assert losses_analysis in [x.analysis_class for x in _result.analyses]
+
+    def test_when_losses_list_no_damages_included(self, valid_adaptation_config: AnalysisConfigWrapper):
+        # 1. Define test data.
+        assert any(isinstance(x, DamagesConfigData) for x in valid_adaptation_config.config_data.analyses)
+        assert not any(
+            isinstance(x, DamagesConfigData)
+            for x in valid_adaptation_config.config_data.losses_list
+        )
 
     @pytest.mark.parametrize(
         "keep_analyses",

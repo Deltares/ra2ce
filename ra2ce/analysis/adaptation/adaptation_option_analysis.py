@@ -106,7 +106,7 @@ class AdaptationOptionAnalysis:
 
         # Create analysis input
         _analysis = _analysis_config.config_data.get_analysis(analysis_type)
-        if isinstance(analysis_type, DamagesConfigData):
+        if isinstance(_analysis, DamagesConfigData):
             _graph_file = None
             _graph_file_hazard = analysis_config.graph_files.base_network_hazard
         else:

@@ -12,7 +12,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
@@ -22,7 +22,7 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 class TestAnalysisCollection:
 
     @dataclass
-    class MockAnalysisSectionLosses(LossesAnalysisConfigDataProtocol):
+    class MockAnalysisSectionLosses(BaseLossesAnalysisConfigData):
         name: str = "Any name"
 
     def test_initialize(self):

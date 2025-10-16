@@ -9,7 +9,7 @@ from pyproj import CRS
 
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -20,7 +20,7 @@ from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf
 
 
 class MultiLinkIsolatedLocations(AnalysisBase, AnalysisLossesProtocol):
-    analysis: LossesAnalysisConfigDataProtocol
+    analysis: BaseLossesAnalysisConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
@@ -136,7 +136,7 @@ class MultiLinkIsolatedLocations(AnalysisBase, AnalysisLossesProtocol):
         return df_aggregation
 
     def multi_link_isolated_locations(
-        self, graph: nx.Graph, analysis: LossesAnalysisConfigDataProtocol, crs=4326
+        self, graph: nx.Graph, analysis: BaseLossesAnalysisConfigData, crs=4326
     ) -> tuple[GeoDataFrame, pd.DataFrame]:
         """
         This function identifies locations that are flooded or isolated due to the disruption of the network caused by a hazard.

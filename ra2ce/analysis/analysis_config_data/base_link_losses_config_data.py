@@ -39,13 +39,13 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
 @dataclass
-class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, BaseRootablePaths, ABC):
+class BaseLinkLossesConfigData(BaseLossesAnalysisConfigData, BaseRootablePaths, ABC):
     """
     Reflects all possible settings that a base link losses config might contain.
     """
@@ -66,6 +66,8 @@ class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, BaseRootablePat
     trip_purposes: Optional[list[TripPurposeEnum]] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
+    hours_per_traffic_period: Optional[float] = math.nan
+
     resilience_curves_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
@@ -76,11 +78,6 @@ class BaseLinkLossesConfigData(LossesAnalysisConfigDataProtocol, BaseRootablePat
     )
     # Risk calculation year is required if 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'
     risk_calculation_year: Optional[int] = None
-
-    @property
-    @abstractmethod
-    def config_name(self) -> str:
-        pass
 
     def reroot_fields(self, old_root: Path, new_root: Path):
         _new_root = self._get_new_root(old_root, new_root.joinpath(self.config_name))
@@ -176,16 +173,12 @@ class MultiLinkLossesConfigData(BaseLinkLossesConfigData):
     Configuration data for multi-link losses analysis.
     """
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value
+    config_name: str = AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value
     
 @dataclass
 class SingleLinkLossesConfigData(BaseLinkLossesConfigData):
     """
     Configuration data for single-link losses analysis.
     """
-    @property
-    def config_name(self) -> str:
-        return AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value
+    config_name: str = AnalysisLossesEnum.SINGLE_LINK_LOSSES.config_value
 

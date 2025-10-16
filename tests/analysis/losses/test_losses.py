@@ -17,7 +17,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -57,7 +57,7 @@ class TestLosses:
         )
 
         _config.config_data.input_path = Path("sth")
-        _analysis = LossesAnalysisConfigDataProtocol(traffic_period=None)
+        _analysis = BaseLossesAnalysisConfigData(traffic_period=None)
 
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
@@ -96,7 +96,7 @@ class TestLosses:
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
-        _analysis = LossesAnalysisConfigDataProtocol(
+        _analysis = BaseLossesAnalysisConfigData(
             traffic_period=TrafficPeriodEnum.DAY,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,

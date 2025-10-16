@@ -37,7 +37,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -64,12 +64,16 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
     Based on the analysis type a different criticality analysis is executed.
     """
 
-    analysis: LossesAnalysisConfigDataProtocol
+    analysis: BaseLossesAnalysisConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
+
+    @property
+    def analysis_type(self) -> type[BaseLossesAnalysisConfigData]:
+        return type(self.analysis)
 
     def __init__(
         self,
@@ -87,7 +91,6 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
 
-        self.analysis_type = self.analysis.analysis
         self.traffic_period: TrafficPeriodEnum = self.analysis.traffic_period
         self.hours_per_traffic_period: float = self.analysis.hours_per_traffic_period
         if not self.hours_per_traffic_period:

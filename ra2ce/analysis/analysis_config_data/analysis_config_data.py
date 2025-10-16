@@ -40,7 +40,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -156,7 +156,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def losses_list(self) -> list[LossesAnalysisConfigDataProtocol]:
+    def losses_list(self) -> list[BaseLossesAnalysisConfigData]:
         """
         Get all losses analyses from config.
 
@@ -164,7 +164,7 @@ class AnalysisConfigData(ConfigDataProtocol):
             list[LossesAnalysisConfigDataProtocol]: List of all losses analyses.
         """
         return list(
-            filter(lambda x: isinstance(x, LossesAnalysisConfigDataProtocol), self.analyses)
+            filter(lambda x: isinstance(x, BaseLossesAnalysisConfigData), self.analyses)
         )
 
     @property

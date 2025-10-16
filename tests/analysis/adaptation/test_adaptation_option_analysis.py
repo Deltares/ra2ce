@@ -134,7 +134,7 @@ class TestAnalysisOptionAnalysis:
 
         # 1. Define test data.
         _option_id = "Option1"
-        _analysis_type = AnalysisDamagesEnum.DAMAGES
+        _analysis_type = DamagesConfigData
         _analysis = AdaptationOptionAnalysis(
             option_id=_option_id,
             analysis_type=_analysis_type,
@@ -149,5 +149,5 @@ class TestAnalysisOptionAnalysis:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
-            f"{_option_id}_{_analysis_type.config_value}"
+            f"{_option_id}_{_analysis_type.config_name}"
         ].sum() == pytest.approx(55)

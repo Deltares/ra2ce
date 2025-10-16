@@ -66,9 +66,7 @@ class DamagesConfigData(BaseRootablePaths, AnalysisConfigDataProtocol):
     file_name: Optional[Path] = None
     representative_damage_percentage: float = 100
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisDamagesEnum.DAMAGES.config_value
+    config_name: str = field(default=AnalysisDamagesEnum.DAMAGES.config_value, repr=False)
 
     def reroot_fields(self, old_root: Path, new_root: Path):
         _new_root = self._get_new_root(old_root, new_root.joinpath(self.config_name))

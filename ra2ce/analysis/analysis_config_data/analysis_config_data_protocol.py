@@ -33,10 +33,7 @@ class AnalysisConfigDataProtocol(Protocol):
     name: str
     save_gpkg: bool
     save_csv: bool
-
-    @property
-    def config_name(self) -> str:
-        pass
+    config_name: str
 
     def validate_integrity(self) -> ValidationReport:
         """

@@ -10,12 +10,13 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
     AdaptationOptionPartialResult,
 )
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 
 
 class TestAdaptationOptionPartialResult:
@@ -67,22 +68,22 @@ class TestAdaptationOptionPartialResult:
         "analysis_type, col_name, match",
         [
             pytest.param(
-                AnalysisDamagesEnum.DAMAGES, "dam_EV1_al", True, id="valid damages"
+                DamagesConfigData, "dam_EV1_al", True, id="valid damages"
             ),
             pytest.param(
-                AnalysisDamagesEnum.DAMAGES,
+                DamagesConfigData,
                 "dam_EV1_al_segments",
                 False,
                 id="invalid damages",
             ),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 "vlh_EV1_me_total",
                 True,
                 id="valid losses",
             ),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 "vlh_business_EV1_me",
                 False,
                 id="invalid losses",
@@ -91,7 +92,7 @@ class TestAdaptationOptionPartialResult:
     )
     def test_from_gdf_with_matched_col_returns_object(
         self,
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
         col_name: str,
         match: bool,
     ):
@@ -109,7 +110,7 @@ class TestAdaptationOptionPartialResult:
         )
 
         # 3. Verify expectations.
-        _result_col = f"{_option_id}_{analysis_type.config_value}"
+        _result_col = f"{_option_id}_{analysis_type.config_name}"
         assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result_col in _result.data_frame.columns
         assert (_result.data_frame[_result_col].sum() == pytest.approx(45)) == match

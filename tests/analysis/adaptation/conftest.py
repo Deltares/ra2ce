@@ -25,7 +25,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -90,7 +90,7 @@ def _get_valid_adaptation_config_fixture(
         Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
-    def get_losses_section(analysis_type: type[BaseLinkLossesConfigData]) -> LossesAnalysisConfigDataProtocol:
+    def get_losses_section(analysis_type: type[BaseLinkLossesConfigData]) -> BaseLossesAnalysisConfigData:
         return analysis_type(
             name="Losses",
             event_type=EventTypeEnum.EVENT,

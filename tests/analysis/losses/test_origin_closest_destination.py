@@ -4,7 +4,7 @@ from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data imp
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -32,7 +32,7 @@ class TestOriginClosestDestination:
             ),
             network=NetworkSection(file_id=""),
         )
-        _analysis = LossesAnalysisConfigDataProtocol(threshold="", weighing=WeighingEnum.INVALID)
+        _analysis = BaseLossesAnalysisConfigData(threshold="", weighing=WeighingEnum.INVALID)
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
             analysis_config=_config,

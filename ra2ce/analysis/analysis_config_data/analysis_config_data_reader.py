@@ -68,7 +68,7 @@ from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurp
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
     MultiLinkRedundancyConfigData,
@@ -316,7 +316,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
-    def _get_losses_analysis_type_from_string(self, analysis_type_name: str) -> LossesAnalysisConfigDataProtocol:
+    def _get_losses_analysis_type_from_string(self, analysis_type_name: str) -> BaseLossesAnalysisConfigData:
         _mappers = {
             AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value: SingleLinkRedundancyConfigData,
             AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value: MultiLinkRedundancyConfigData,

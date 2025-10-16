@@ -32,7 +32,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.common.validation.validation_report import ValidationReport
 
@@ -47,7 +47,7 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     save_csv: bool = False  # Save results as CSV
     save_gpkg: bool = False  # Save results as GPKG
 
-    losses_analysis: type[LossesAnalysisConfigDataProtocol] = SingleLinkLossesConfigData
+    losses_analysis: type[BaseLossesAnalysisConfigData] = SingleLinkLossesConfigData
 
     # Economical settings
     time_horizon: float = 0.0
@@ -59,9 +59,7 @@ class AdaptationConfigData(AnalysisConfigDataProtocol):
     # First option is the no adaptation option
     adaptation_options: list[AdaptationOptionConfigData] = field(default_factory=list)
 
-    @property
-    def config_name(self) -> str:
-        return AnalysisEnum.ADAPTATION.config_value
+    config_name: str = AnalysisEnum.ADAPTATION.config_value
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()

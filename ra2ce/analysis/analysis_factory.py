@@ -42,7 +42,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
-    LossesAnalysisConfigDataProtocol,
+    BaseLossesAnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
     MultiLinkRedundancyConfigData,
@@ -114,7 +114,7 @@ class AnalysisFactory:
 
     @staticmethod
     def get_losses_analysis(
-        analysis: LossesAnalysisConfigDataProtocol,
+        analysis: BaseLossesAnalysisConfigData,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisLossesProtocol:
         """

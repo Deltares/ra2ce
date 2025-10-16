@@ -16,7 +16,7 @@ from .base_origin_destination_config_data import (
 )
 from .damages_config_data import DamagesConfigData
 from .equity_config_data import EquityConfigData
-from .losses_analysis_config_data_protocol import LossesAnalysisConfigDataProtocol
+from .losses_analysis_config_data_protocol import BaseLossesAnalysisConfigData
 from .multi_link_redundancy_config_data import MultiLinkRedundancyConfigData
 
 AdaptationConfigTypes: list[type[AdaptationConfigData]] = [
@@ -27,7 +27,7 @@ DamagesConfigTypes: list[type[DamagesConfigData]] = [
     DamagesConfigData,
 ]
 
-LossesConfigDataTypes: list[type[LossesAnalysisConfigDataProtocol]] = [
+LossesConfigDataTypes: list[type[BaseLossesAnalysisConfigData]] = [
     SingleLinkLossesConfigData,
     MultiLinkLossesConfigData,
     SingleLinkRedundancyConfigData,
