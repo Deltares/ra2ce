@@ -66,11 +66,12 @@ class BaseLinkLossesConfigData(BaseLossesAnalysisConfigData, BaseRootablePaths, 
     trip_purposes: Optional[list[TripPurposeEnum]] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
-    hours_per_traffic_period: Optional[float] = math.nan
 
     resilience_curves_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
+
+    hours_per_traffic_period: Optional[float] = math.nan
 
     # Optional properties
     risk_calculation_mode: RiskCalculationModeEnum = field(

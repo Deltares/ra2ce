@@ -68,7 +68,7 @@ class AnalysisResult:
             Path: base path without extension for exporting results.
         """
         return self.output_path.joinpath(
-            self.analysis_config.analysis.config_value, self.analysis_name
+            self.analysis_config.config_name, self.analysis_name
         )
 
     def is_valid_result(self) -> bool:
