@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from ra2ce.analysis.analysis_base import AnalysisBase
+from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     BaseLossesAnalysisConfigData,
@@ -60,9 +61,10 @@ class TestAnalysisFactory:
         assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
-    def test_get_analysis_with_losses(self):
+    @pytest.mark.parametrize("analysis_type", [pytest.param(_analysis_type) for _analysis_type in LossesConfigDataTypes])
+    def test_get_analysis_with_losses(self, analysis_type: type[BaseLossesAnalysisConfigData]):
         # 1. Define test data.
-        _analysis = BaseLossesAnalysisConfigData()
+        _analysis = analysis_type(name= "sth")
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
@@ -73,4 +75,5 @@ class TestAnalysisFactory:
         assert isinstance(_result, AnalysisLossesProtocol)
         assert isinstance(_result, AnalysisBase)
         assert _result.graph_file == _config.graph_files.base_graph
-        assert _result.analysis == _analysis
+        assert isinstance(_result.analysis, BaseLossesAnalysisConfigData)
+        assert isinstance(_result.analysis, BaseLossesAnalysisConfigData)

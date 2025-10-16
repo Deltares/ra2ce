@@ -32,11 +32,7 @@ from ra2ce.common.validation.validation_report import ValidationReport
 class EquityConfigData(OptimalRouteOriginDestinationConfigData):
     """Configuration data for equity analysis."""
     equity_weight: Path = None
-
-    @property
-    @staticmethod
-    def config_name() -> str:
-        return "equity"
+    config_name: str = "equity"
 
     def validate_integrity(self) -> ValidationReport:
         _report = super().validate_integrity()

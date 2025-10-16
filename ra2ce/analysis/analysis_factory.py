@@ -28,6 +28,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     SingleLinkLossesConfigData,
 )
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkIsolatedLocationsConfigData,
     MultiLinkOriginClosestDestinationConfigData,
     MultiLinkOriginDestinationConfigData,
     OptimalRouteOriginClosestDestinationConfigData,
@@ -38,9 +39,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     BaseLossesAnalysisConfigData,
 )
@@ -104,13 +102,13 @@ class AnalysisFactory:
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
-        if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
+        if isinstance(analysis, DamagesConfigData):
             return Damages(
                 _analysis_input,
                 analysis_config.graph_files.base_graph_hazard.get_graph(),
             )
 
-        raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
+        raise NotImplementedError(f"Analysis {analysis} not implemented")
 
     @staticmethod
     def get_losses_analysis(
@@ -203,15 +201,15 @@ class AnalysisFactory:
             )
             return MultiLinkLosses(_analysis_input, analysis_config)
 
-        # if isinstance(analysis, MultiLinkIsolatedLocationsConfigData):
-        #     _analysis_input = AnalysisInputWrapper.from_input(
-        #         analysis=analysis,
-        #         analysis_config=analysis_config,
-        #         graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
-        #     )
-        #     return MultiLinkIsolatedLocations(_analysis_input)
+        if isinstance(analysis, MultiLinkIsolatedLocationsConfigData):
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
+            )
+            return MultiLinkIsolatedLocations(_analysis_input)
 
-        raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
+        raise NotImplementedError(f"Analysis {analysis} not implemented")
 
     @staticmethod
     def get_adaptation_analysis(
@@ -240,7 +238,7 @@ class AnalysisFactory:
             graph_file_hazard=analysis_config.graph_files.base_graph_hazard_edges,
         )
 
-        if analysis.analysis == AnalysisEnum.ADAPTATION:
+        if isinstance(analysis, AdaptationConfigData):
             return Adaptation(_analysis_input, analysis_config)
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
