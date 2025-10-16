@@ -22,6 +22,12 @@
 from configparser import ConfigParser
 from pathlib import Path
 
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
+)
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptation,
@@ -65,6 +71,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_config_data.multi_link_redundancy_config_data import (
     MultiLinkRedundancyConfigData,
 )
@@ -207,7 +214,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
     def _get_base_link_losses_config_data(
         self, section_name: str, config_data_type: type[BaseLinkLossesConfigData]
-    ) -> AnalysisConfigDataProtocol:
+    ) -> BaseLinkLossesConfigData:
         _section = config_data_type.from_ini_file(**self._parser[section_name])
         self._set_section_common_properties(_section, section_name)
 
@@ -256,9 +263,26 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_equity_or_optimal_route_config_data(
+        self, section_name: str
+    ) -> EquityConfigData | OptimalRouteOriginDestinationConfigData:
+        if "save_traffic" not in self._parser[section_name]:
+            return self._get_origin_destination_config_data(
+                section_name, OptimalRouteOriginDestinationConfigData
+            )
+
+        _section = EquityConfigData.from_ini_file(**self._parser[section_name])
+        self._set_section_common_properties(_section, section_name)
+        _section.equity_weight = self._parser.get(
+            section_name,
+            "equity_weight",
+            fallback=_section.equity_weight,
+        )
+        return _section
+
     def _get_origin_destination_config_data(
         self, section_name: str, config_data_type: type[BaseOriginDestinationConfigData]
-    ) -> AnalysisConfigDataProtocol:
+    ) -> BaseOriginDestinationConfigData:
         _section = config_data_type.from_ini_file(**self._parser[section_name])
         self._set_section_common_properties(_section, section_name)
         _section.weighing = WeighingEnum.get_enum(
@@ -286,6 +310,43 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_adaptation_config_data(self, section_name: str) -> AdaptationConfigData:
+        def _get_adaptation_option(
+            section_name: str,
+        ) -> AdaptationOptionConfigData:
+            return AdaptationOptionConfigData(**self._parser[section_name])
+
+        _section = AdaptationConfigData.from_ini_file(**self._parser[section_name])
+        _section.analysis = AnalysisEnum.get_enum(
+            self._parser.get(section_name, "analysis", fallback=None)
+        )
+        _section.losses_analysis = AnalysisLossesEnum.get_enum(
+            self._parser.get(section_name, "losses_analysis", fallback=None)
+        )
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        _section.hazard_fraction_cost = self._parser.getboolean(
+            section_name,
+            "hazard_fraction_costs",
+            fallback=_section.hazard_fraction_cost,
+        )
+
+        _adaptation_options = list(
+            _adaptation_option
+            for _adaptation_option in self._parser.sections()
+            if "adaptationoption" in _adaptation_option
+        )
+        for _adaptation_option in _adaptation_options:
+            _section.adaptation_options.append(
+                _get_adaptation_option(_adaptation_option)
+            )
+
+        return _section
+
     def _get_analysis_sections_with_new_dataclasses(
         self,
     ) -> list[AnalysisConfigDataProtocol]:
@@ -304,9 +365,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             AnalysisLossesEnum.MULTI_LINK_LOSSES.config_value: lambda x: self._get_base_link_losses_config_data(
                 x, MultiLinkLossesConfigData
             ),
-            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
-                x, OptimalRouteOriginDestinationConfigData
-            ),
+            AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION.config_value: self._get_equity_or_optimal_route_config_data,
             AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION.config_value: lambda x: self._get_origin_destination_config_data(
                 x, OptimalRouteOriginClosestDestinationConfigData
             ),
@@ -317,7 +376,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 x, MultiLinkOriginClosestDestinationConfigData
             ),
             AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
+            AnalysisEnum.ADAPTATION.config_value: self._get_adaptation_config_data,
         }
+        # Equity was not supported before, it was being dected whenever 'save_traffic' was true.
 
         def raise_not_supported(analysis_type_name: str):
             raise ValueError(f"Analysis {analysis_type_name} not supported.")

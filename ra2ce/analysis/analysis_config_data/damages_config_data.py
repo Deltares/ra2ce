@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataWithIntegrityValidationProtocol,
+    AnalysisConfigDataProtocol,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -37,7 +37,7 @@ from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 @with_legacy_mappers
 @dataclass
-class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
+class DamagesConfigData(AnalysisConfigDataProtocol):
     """
     Configuration data for damages analysis.
     """
@@ -66,6 +66,26 @@ class DamagesConfigData(AnalysisConfigDataWithIntegrityValidationProtocol):
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
+
+        if not self.name:
+            _report.error("An analysis 'name' must be provided.")
+
+        if (
+            not isinstance(self.event_type, EventTypeEnum)
+            or self.event_type == EventTypeEnum.INVALID
+            or self.event_type == EventTypeEnum.NONE
+        ):
+            _report.error(
+                f"For damage analysis '{self.name}': 'event_type' must be a valid EventTypeEnum value."
+            )
+        if (
+            not isinstance(self.damage_curve, DamageCurveEnum)
+            or self.damage_curve == DamageCurveEnum.INVALID
+        ):
+            _report.error(
+                f"For damage analysis '{self.name}': 'damage_curve' must be a valid DamageCurveEnum value."
+            )
+
         if self.risk_calculation_mode == RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR:
             if self.risk_calculation_year is None or self.risk_calculation_year <= 0:
                 _report.error(

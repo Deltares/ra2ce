@@ -18,3 +18,6 @@ Please refer to our [Ra2ce documentation](https://deltares.github.io/ra2ce/) for
 
 ## Binder requirements.
 Binder requires the `apt.txt` and the `environment.yml` files to be present. Do not remove them from this repository.
+
+## Configuration
+Examples that focus on the analysis stage have the network predefined in `static\output_graph` to ensure a stable network.

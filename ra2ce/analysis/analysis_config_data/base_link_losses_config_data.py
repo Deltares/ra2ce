@@ -77,11 +77,81 @@ class BaseLinkLossesConfigData(AnalysisConfigDataProtocol, ABC):
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
+
+        if not self.name:
+            _report.error("An analysis 'name' must be provided.")
+
+        if (
+            not isinstance(self.weighing, WeighingEnum)
+            or self.weighing == WeighingEnum.INVALID
+            or self.weighing == WeighingEnum.NONE
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."
+            )
+
+        if (
+            not isinstance(self.event_type, EventTypeEnum)
+            or self.event_type == EventTypeEnum.INVALID
+            or self.event_type == EventTypeEnum.NONE
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'event_type' must be a valid EventTypeEnum value."
+            )
+
+        if (
+            self.production_loss_per_capita_per_hour is None
+            or self.production_loss_per_capita_per_hour < 0
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'production_loss_per_capita_per_hour' must be a non-negative number."
+            )
+
+        if (
+            not isinstance(self.traffic_period, TrafficPeriodEnum)
+            or self.traffic_period == TrafficPeriodEnum.INVALID
+            or self.traffic_period == TrafficPeriodEnum.NONE
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'traffic_period' must be a valid TrafficPeriodEnum value."
+            )
+
+        if (
+            self.trip_purposes is None
+            or not isinstance(self.trip_purposes, list)
+            or len(self.trip_purposes) == 0
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'trip_purposes' must be a non-empty list of TripPurposeEnum values."
+            )
+
+        if (
+            self.resilience_curves_file is None
+            or not self.resilience_curves_file.exists()
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'resilience_curves_file' must be a valid file path."
+            )
+
+        if (
+            self.traffic_intensities_file is None
+            or not self.traffic_intensities_file.exists()
+        ):
+            _report.error(
+                f"For link losses analysis '{self.name}': 'traffic_intensities_file' must be a valid file path."
+            )
+
+        if self.values_of_time_file is None or not self.values_of_time_file.exists():
+            _report.error(
+                f"For link losses analysis '{self.name}': 'values_of_time_file' must be a valid file path."
+            )
+
         if self.risk_calculation_mode == RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR:
             if self.risk_calculation_year is None or self.risk_calculation_year <= 0:
                 _report.error(
-                    f"For damage analysis '{self.name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
+                    f"For link losses analysis '{self.name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
                 )
+
         return _report
 
 

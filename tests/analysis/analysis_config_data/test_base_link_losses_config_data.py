@@ -1,5 +1,6 @@
 import math
 from dataclasses import is_dataclass
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +12,7 @@ from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     MultiLinkLossesConfigData,
     SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.enums import weighing_enum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -59,6 +61,23 @@ class TestLinkLossesConfigData:
         assert link_losses_config.risk_calculation_mode == RiskCalculationModeEnum.NONE
         assert link_losses_config.risk_calculation_year is None
 
+    @pytest.fixture(name="valid_link_losses_config")
+    def fixture_valid_link_losses_config(
+        self, link_losses_class: type[BaseLinkLossesConfigData]
+    ):
+        return link_losses_class(
+            name="Valid Link Losses Analysis",
+            weighing=WeighingEnum.LENGTH,
+            event_type=EventTypeEnum.EVENT,
+            production_loss_per_capita_per_hour=10.0,
+            traffic_period=TrafficPeriodEnum.DAY,
+            trip_purposes=[TripPurposeEnum.BUSINESS],
+            resilience_curves_file=Path(__file__),
+            traffic_intensities_file=Path(__file__),
+            values_of_time_file=Path(__file__),
+            risk_calculation_mode=RiskCalculationModeEnum.NONE,
+        )
+
     @pytest.mark.parametrize(
         "risk_calculation_year",
         [
@@ -70,20 +89,22 @@ class TestLinkLossesConfigData:
     def test_given_risk_calculation_triangle_and_invalid_year_when_validate_integrity_then_fails(
         self,
         risk_calculation_year: int | None,
-        link_losses_class: type[BaseLinkLossesConfigData],
+        valid_link_losses_config: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Invalid Damages Analysis"
-        _damages_config = link_losses_class(
-            name=_data_name,
-            risk_calculation_mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
-            risk_calculation_year=risk_calculation_year,
+        _data_name = "Invalid Base Link Losses Analysis"
+        # Set risk calculation mode to TRIANGLE_TO_NULL_YEAR to trigger the year validation.
+        _link_losses_config = valid_link_losses_config
+        _link_losses_config.name = _data_name
+        _link_losses_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
         )
+        _link_losses_config.risk_calculation_year = risk_calculation_year
 
-        _expected_error = f"For damage analysis '{_data_name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
+        _expected_error = f"For link losses analysis '{_data_name}': 'risk_calculation_year' should be a positive integer when 'risk_calculation_mode' is set to 'RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR'."
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
@@ -94,18 +115,20 @@ class TestLinkLossesConfigData:
         assert _report._errors[0] == _expected_error
 
     def test_given_risk_calculation_triangle_and_valid_year_when_validate_integrity_then_succeeds(
-        self, link_losses_class: type[BaseLinkLossesConfigData]
+        self,
+        valid_link_losses_config: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Invalid Damages Analysis"
-        _damages_config = link_losses_class(
-            name=_data_name,
-            risk_calculation_mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
-            risk_calculation_year=1,
+        _data_name = "Invalid Base Link Losses Analysis"
+        _link_losses_config = valid_link_losses_config
+        _link_losses_config.name = _data_name
+        _link_losses_config.risk_calculation_mode = (
+            RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR
         )
+        _link_losses_config.risk_calculation_year = 10
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
@@ -129,15 +152,23 @@ class TestLinkLossesConfigData:
         link_losses_class: type[BaseLinkLossesConfigData],
     ):
         # 1. Define test data.
-        _data_name = "Valid Damages Analysis"
-        _damages_config = link_losses_class(
+        _data_name = "Valid Link Losses Analysis"
+        _link_losses_config = link_losses_class(
             name=_data_name,
             risk_calculation_mode=risk_calculation_mode,
             risk_calculation_year=risk_calculation_year,
+            weighing=WeighingEnum.LENGTH,
+            event_type=EventTypeEnum.EVENT,
+            production_loss_per_capita_per_hour=10.0,
+            traffic_period=TrafficPeriodEnum.DAY,
+            trip_purposes=[TripPurposeEnum.BUSINESS],
+            resilience_curves_file=Path(__file__),
+            traffic_intensities_file=Path(__file__),
+            values_of_time_file=Path(__file__),
         )
 
         # 2. Run test.
-        _report = _damages_config.validate_integrity()
+        _report = _link_losses_config.validate_integrity()
 
         # 3. Verify expectations for invalid data.
         assert isinstance(_report, ValidationReport)
