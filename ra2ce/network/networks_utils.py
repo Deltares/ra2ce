@@ -38,15 +38,12 @@ import rtree
 from geopy import distance
 from numpy.ma import MaskedArray
 from osmnx import graph_to_gdfs
-from pyproj import CRS
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
-
-from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -690,7 +687,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_: str):
             to_remove.append(idx)
 
     lines_gdf.drop(to_remove, inplace=True)
-    lines_gdf = lines_gdf.append(to_add, ignore_index=True)
+    lines_gdf = pd.concat([lines_gdf] + to_add, ignore_index=True)
     return lines_gdf
 
 
@@ -772,7 +769,7 @@ def join_nodes_edges(
     incorrect_edges = []
 
     # add node attributes to edges
-    gdf = gpd.sjoin(gdf_edges, gdf_nodes, how="left", op="intersects")
+    gdf = gpd.sjoin(gdf_edges, gdf_nodes, how="left", predicate="intersects")
 
     tuples_df = pd.DataFrame({"node_A": [], "node_B": []})
 
@@ -849,27 +846,29 @@ def join_nodes_edges(
             node_a = [
                 i
                 for i, xy in zip(gdf_nodes.node_fid, gdf_nodes.geometry)
-                if xy.almost_equals(
+                if xy.equals_exact(
                     Point(
                         list(
                             gdf_edges.loc[gdf_edges[id_name] == edge]
                             .iloc[0]
                             .geometry.coords
                         )[0]
-                    )
+                    ),
+                    tolerance=1e-6,
                 )
             ]
             node_b = [
                 i
                 for i, xy in zip(gdf_nodes.node_fid, gdf_nodes.geometry)
-                if xy.almost_equals(
+                if xy.equals_exact(
                     Point(
                         list(
                             gdf_edges.loc[gdf_edges[id_name] == edge]
                             .iloc[0]
                             .geometry.coords
                         )[-1]
-                    )
+                    ),
+                    tolerance=1e-6,
                 )
             ]
             tuples_df = pd.concat(
@@ -992,9 +991,9 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
         list[Point]: list with unique points.
     """
     points = [point for point in all_points]
-    uniquepoints = []
+    uniquepoints: list[Point] = []
     for point in points:
-        if not any(p.almost_equals(point) for p in uniquepoints):
+        if not any(p.equals_exact(point, tolerance=1e-6) for p in uniquepoints):
             uniquepoints.append(point)
     return uniquepoints
 
@@ -1110,7 +1109,12 @@ def graph_from_gdf(
 
     # create nodes on the Graph
     for _, row in gdf_nodes.iterrows():
-        c = {node_id: row[node_id], "geometry": row.geometry}
+        c = {
+            node_id: row[node_id],
+            "geometry": row.geometry,
+            "x": row.geometry.x,
+            "y": row.geometry.y,
+        }
         _created_graph.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
@@ -1131,7 +1135,8 @@ def graph_to_gdf(
     save_nodes: bool = False,
     save_edges: bool = True,
     to_save: bool = False,
-):
+    node_geometry: bool = False,
+) -> tuple[gpd.GeoDataFrame | None, gpd.GeoDataFrame | None]:
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
 
     Arguments:
@@ -1144,11 +1149,16 @@ def graph_to_gdf(
         edges (GeoDataFrame): contains the edges
         nodes (GeoDataFrame): contains the nodes
     """
+    # Add x and y to nodes if not present
+    graph_to_convert = add_x_y_to_nodes(graph_to_convert)
 
     nodes, edges = None, None
     if save_nodes and save_edges:
         nodes, edges = graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
+            graph_to_convert,
+            nodes=save_nodes,
+            edges=save_edges,
+            node_geometry=node_geometry,
         )
         if to_save:
             for df in [edges, nodes]:
@@ -1183,7 +1193,7 @@ def get_nodes_and_edges_from_origin_graph(
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    _nodes, _edges = graph_to_gdfs(origin_graph, node_geometry=False)
+    _edges, _nodes = graph_to_gdf(origin_graph, save_nodes=True)
 
     dfs = [_edges, _nodes]
     for df in dfs:
