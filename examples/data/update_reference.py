@@ -27,4 +27,5 @@ class UpdateReference:
                     copy(_from, _to)
 
 
-UpdateReference().update()
+def run() -> None:
+    UpdateReference().update()

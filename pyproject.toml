@@ -27,6 +27,7 @@ packages = [{include = "ra2ce"}]
 [tool.poetry.scripts]
 run_ra2ce = "ra2ce.run:main"
 build-cli = "scripts.make_exe:build_cli"
+update-example-references = "examples.data.update_reference:run"
 
 [tool.poetry.dependencies]
 python = "^3.11, <3.12"
