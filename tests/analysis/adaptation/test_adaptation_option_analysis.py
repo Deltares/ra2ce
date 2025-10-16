@@ -37,14 +37,14 @@ class TestAnalysisOptionAnalysis:
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
         [
-            pytest.param(AnalysisDamagesEnum.DAMAGES, Damages, id="damages"),
+            pytest.param(DamagesConfigData, Damages, id="damages"),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 SingleLinkLosses,
                 id="single_link_losses",
             ),
             pytest.param(
-                AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLossesConfigData,
                 MultiLinkLosses,
                 id="multi_link_losses",
             ),
@@ -52,7 +52,7 @@ class TestAnalysisOptionAnalysis:
     )
     def test_get_analysis_info_returns_tuple(
         self,
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1./2. Define test data./Run test.
