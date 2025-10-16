@@ -102,7 +102,7 @@ nan,tertiary,nan,True,False,61.961,"[10096, 1100, 1094, 3935]",766,59.0,0.001,na
 nan,residential,nan,False,False,177.01,5205,2946,60.0,0.003,nan,0.14768719673156738,0.01989996923198834,0.0,nan,nan,,,nan,nan,478350184
 Rua Pedro Álvares Cabral,residential,nan,False,False,49.091,381,269,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,589213616
 nan,residential,nan,False,True,143.0,"[3948, 5349]",2973,60.0,0.003,nan,0.13575444221496583,0.14459828088174811,0.0,nan,nan,567933757.0,13037735191.0,567933757_13037735191,nan,60944889
-Rua 1 Dezembro,residential,nan,False,False,341.0,"[3939, 3941, 3943, 1288, 3945, 1270, 1272, 5273]",916,60.0,0.009,nan,0.18312324059976115,0.44788421767467196,0.0,nan,nan,567933757.0,13037735198.0,567933757_13037735198,nan,183065772
+Rua 1 Dezembro,residential,nan,False,False,341.0,"[3939, 3941, 3943, 1288, 3945, 1270, 1272, 5273]",916,60.0,0.009,nan,0.18312324059976115,0.4478842176746077,0.0,nan,nan,567933757.0,13037735198.0,567933757_13037735198,nan,183065772
 nan,residential,nan,False,True,66.83,405,291,60.0,0.001,nan,,0.0,2546.6416368500004,nan,nan,,,nan,nan,60944885
 nan,tertiary,nan,False,False,137.741,207,132,59.0,0.002,nan,,0.0,2546.6416368500004,nan,nan,,,nan,nan,473658934
 Rua Pedro Álvares Cabral,residential,nan,False,True,67.052,382,270,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,589213616
@@ -114,7 +114,7 @@ Praça da Juventude,tertiary,nan,True,False,38.17,"[3673, 185, 3674, 187]",117,5
 Rua 1.361,tertiary,nan,True,False,230.11100000000005,"[8236, 3697, 3698, 3731, 9683, 3699, 5110, 5111, 3701, 3702, 186]",118,59.0,0.004,yes,0.21066813468933104,0.07997588093200789,1013.78449821,nan,nan,,,nan,nan,"[44785553, 389966870, 589011895]"
 Praça da Juventude,tertiary,nan,True,False,43.085,"[1258, 1259, 3672, 3671, 184, 183]",900,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,roundabout,44785548
 Praça da Juventude,tertiary,nan,True,False,13.228,"[3675, 188]",119,59.0,0.0,nan,,0.0,6263.76312541,nan,nan,,,nan,roundabout,44785548
-Rua 1.361,tertiary,30,True,False,239.849,"[3703, 8237, 8238, 8239, 9682, 3896, 3700, 117, 3897, 3895, 3704, 3705, 3706, 3707]",2320,30.0,0.008,yes,0.3411173423131307,0.1008080717265549,5249.9786272,nan,nan,,,nan,nan,"[389966871, 389966869, 44785551]"
+Rua 1.361,tertiary,30,True,False,239.849,"[3703, 8237, 8238, 8239, 9682, 3896, 3700, 117, 3897, 3895, 3704, 3705, 3706, 3707]",2320,30.0,0.008,yes,0.3411173423131307,0.10080807172655926,5249.9786272,nan,nan,,,nan,nan,"[389966871, 389966869, 44785551]"
 nan,tertiary,nan,True,False,47.165,190,120,59.0,0.001,nan,,0.0,6263.76312541,nan,nan,,,nan,nan,359898619
 Praça da Juventude,tertiary,nan,True,False,28.842999999999996,"[3677, 3676, 189, 191]",121,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,roundabout,44785548
 Praça da Juventude,tertiary,nan,True,False,40.985,"[192, 194, 181, 182, 3678]",122,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,roundabout,44785548
@@ -207,7 +207,7 @@ nan,residential,nan,False,True,11.812,4007,2446,60.0,0.0,nan,0.20866191387176514
 Rua Renato Baptista,residential,nan,False,True,58.77,1016,709,60.0,0.001,nan,,0.0,949.35508919,nan,nan,,,nan,nan,52014440
 Rua Renato Baptista,residential,nan,False,False,54.174,3979,2432,60.0,0.001,nan,,0.0,949.35508919,nan,nan,,,nan,nan,52014440
 nan,residential,nan,False,True,116.57,1023,714,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,478348667
-nan,residential,nan,False,False,102.195,4006,2445,60.0,0.002,nan,0.2335174764905657,0.9595089754388563,0.0,nan,nan,,,nan,nan,478348667
+nan,residential,nan,False,False,102.195,4006,2445,60.0,0.002,nan,0.2335174764905657,0.9595089754390574,0.0,nan,nan,,,nan,nan,478348667
 Rua Mouzinho de Albuquerque,residential,nan,False,True,114.936,1285,912,60.0,0.002,nan,,0.0,0.0,2,nan,,,nan,nan,44785547
 Rua Mouzinho de Albuquerque,residential,nan,False,False,112.424,1112,780,60.0,0.002,nan,,0.0,0.0,2,nan,,,nan,nan,44785547
 Rua Don Gonçalo Silveira,residential,nan,False,False,60.81,"[5153, 4707]",2749,60.0,0.001,nan,,0.0,949.35508919,nan,nan,,,nan,nan,54172958
@@ -275,7 +275,7 @@ nan,residential,nan,True,False,37.032,"[4712, 4713, 4714, 4715, 4717]",2751,60.0
 nan,residential,nan,True,False,19.058,"[433, 9206]",317,60.0,0.0,nan,,0.0,2546.6416368500004,nan,nan,,,nan,nan,183067165
 nan,residential,nan,True,False,40.179,"[1310, 9214]",937,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183067165
 nan,residential,nan,False,False,165.642,468,346,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,60944890
-nan,residential,nan,False,False,106.90799999999999,"[4001, 3989, 3991, 9272, 3993, 3995, 3997, 3999]",3909,60.0,0.002,nan,0.06432962417602539,0.05721046375551309,0.0,nan,nan,,,nan,nan,478350085
+nan,residential,nan,False,False,106.90799999999999,"[4001, 3989, 3991, 9272, 3993, 3995, 3997, 3999]",3909,60.0,0.002,nan,0.06432962417602539,0.05721046375551941,0.0,nan,nan,,,nan,nan,478350085
 nan,residential,nan,False,False,26.493,3921,2420,60.0,0.0,nan,,0.0,4127.86200237,nan,nan,,,nan,nan,54172959
 Rua Capitão Curado,residential,nan,False,True,67.381,3719,2325,60.0,0.001,nan,,0.0,4127.86200237,nan,nan,,,nan,nan,172428913
 nan,residential,nan,True,False,40.902,439,323,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,478348057
@@ -298,7 +298,7 @@ nan,residential,nan,True,False,40.068000000000005,"[5160, 465, 5158, 5159]",343,
 nan,tertiary,nan,True,False,55.15,"[472, 1084]",348,59.0,0.001,nan,,0.0,17616.00158501,nan,nan,,,nan,nan,60944887
 Rua do Comandante Gaivão,residential,nan,False,True,55.023,962,663,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,60944886
 Rua do Comandante Gaivão,residential,nan,False,False,115.884,1096,767,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,60944886
-nan,residential,nan,False,False,128.853,"[9530, 966]",667,60.0,0.002,nan,0.13005833327770233,0.4331534596701523,0.0,nan,nan,,,nan,nan,60944890
+nan,residential,nan,False,False,128.853,"[9530, 966]",667,60.0,0.002,nan,0.13005833327770233,0.43315345967122326,0.0,nan,nan,,,nan,nan,60944890
 nan,tertiary,nan,True,False,39.489000000000004,"[1080, 289]",757,59.0,0.001,nan,,0.0,17616.00158501,nan,nan,,,nan,nan,60944887
 nan,residential,nan,True,False,51.608000000000004,"[3929, 3930, 3931, 3932, 3933]",2427,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,478348663
 Rua Sancho de Toar,residential,nan,False,True,121.174,1287,914,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,60945106
@@ -332,7 +332,7 @@ nan,residential,nan,False,True,48.093,2108,1527,60.0,0.001,nan,,0.0,1570.9185218
 nan,residential,nan,False,False,58.467999999999996,"[489, 524, 6182]",385,60.0,0.001,nan,,0.0,1570.91852188,nan,nan,,,nan,nan,62224148
 Rua 1.802,residential,nan,False,False,25.316,566,416,60.0,0.0,nan,,0.0,1678.15233612,nan,nan,,,nan,nan,685461115
 nan,residential,nan,False,True,47.35,"[3465, 3451]",2276,60.0,0.001,nan,0.6913273334503174,0.7894764262269744,0.0,nan,nan,,,nan,nan,385433384
-nan,residential,nan,False,False,128.339,"[3444, 3442, 3452, 3446]",2271,60.0,0.002,nan,0.236893892288208,0.13986599248077813,0.0,nan,nan,,,nan,nan,385433391
+nan,residential,nan,False,False,128.339,"[3444, 3442, 3452, 3446]",2271,60.0,0.002,nan,0.236893892288208,0.1398659924815304,0.0,nan,nan,,,nan,nan,385433391
 nan,residential,nan,False,True,72.815,"[505, 6014, 6004, 5990]",3117,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,590517850
 Rua 1.800,residential,nan,False,True,39.528,9111,3858,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224149
 Rua 1.800,residential,nan,False,False,70.256,6241,3199,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224149
@@ -364,7 +364,7 @@ Rua Alfredo Lawley,secondary,nan,False,True,40.061,1865,1308,50.0,0.001,nan,,0.0
 Rua Alfredo Lawley,secondary,nan,True,False,22.556,1871,1312,50.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,684869597
 Rua Alfredo Lawley,tertiary,nan,False,True,49.003,8301,3728,59.0,0.001,nan,,0.0,1715.69475746,nan,nan,,,nan,nan,204096428
 Rua Alfredo Lawley,tertiary,nan,False,False,36.775,7896,3653,59.0,0.001,nan,,0.0,1715.69475746,nan,nan,,,nan,nan,204096428
-nan,residential,nan,False,"[False, True]",1397.3300000000004,"[6402, 6406, 6410, 6414, 8082, 8477, 6315, 6318, 6320, 6322, 6324, 6326, 6328, 6330, 6331, 6333, 9150, 6335, 4159, 6337, 4162, 6339, 4164, 6341, 4166, 6343, 4168, 6345, 4170, 6347, 4172, 6349, 4174, 6351, 4176, 6353, 4178, 6355, 4180, 6357, 4182, 6359, 4184, 6361, 4186, 6363, 4188, 6365, 4190, 6367, 4192, 6369, 6371, 6373, 6375, 6377, 6379, 6383]",3247,60.0,0.023,nan,0.9126301012541118,0.7496623387313377,0.0,nan,nan,,,nan,nan,"[590777077, 479164814]"
+nan,residential,nan,False,"[False, True]",1397.3300000000004,"[6402, 6406, 6410, 6414, 8082, 8477, 6315, 6318, 6320, 6322, 6324, 6326, 6328, 6330, 6331, 6333, 9150, 6335, 4159, 6337, 4162, 6339, 4164, 6341, 4166, 6343, 4168, 6345, 4170, 6347, 4172, 6349, 4174, 6351, 4176, 6353, 4178, 6355, 4180, 6357, 4182, 6359, 4184, 6361, 4186, 6363, 4188, 6365, 4190, 6367, 4192, 6369, 6371, 6373, 6375, 6377, 6379, 6383]",3247,60.0,0.023,nan,0.9126301012541118,0.7496623387313892,0.0,nan,nan,,,nan,nan,"[590777077, 479164814]"
 Rua de Cabo Verde,residential,nan,False,True,168.434,675,465,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,62226545
 Rua de Cabo Verde,residential,nan,False,False,28.56,688,476,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,62226545
 nan,residential,nan,True,False,35.087999999999994,"[585, 580, 4119]",428,60.0,0.001,nan,,0.0,3751.31243706,nan,nan,,,nan,nan,479157499
@@ -468,7 +468,7 @@ nan,residential,nan,False,False,16.617,4032,2466,60.0,0.0,nan,,0.0,0.0,nan,nan,,
 Avenida 24 de Julho,tertiary,nan,True,False,194.348,"[5699, 9252, 822, 2713, 827]",559,59.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,62229137
 nan,residential,nan,False,True,137.285,"[5608, 5610, 9828, 9830]",3046,60.0,0.002,nan,0.3641930307660784,0.8461658986023642,0.0,nan,nan,,,nan,nan,589901999
 Avenida 24 de Julho,tertiary,nan,True,False,18.597,5562,3027,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,62229137
-Avenida 24 De Julho,residential,nan,False,True,258.98,"[832, 801, 804, 806, 8039, 808, 8041, 8042, 5358, 5360, 5362, 818, 5364, 826]",3684,60.0,0.004,nan,0.23562128403607538,0.26689286386090555,0.0,nan,nan,,,nan,nan,183118891
+Avenida 24 De Julho,residential,nan,False,True,258.98,"[832, 801, 804, 806, 8039, 808, 8041, 8042, 5358, 5360, 5362, 818, 5364, 826]",3684,60.0,0.004,nan,0.23562128403607538,0.26689286386091693,0.0,nan,nan,,,nan,nan,183118891
 Avenida 24 De Julho,residential,nan,False,False,129.96800000000002,"[9064, 810, 1798]",1256,60.0,0.002,nan,4.014751688639323,1.0,0.0,nan,nan,,,nan,nan,183118891
 V5/V14,residential,nan,True,False,363.902,"[9320, 9326, 9061, 830]",563,60.0,0.006,nan,2.064963635103202,1.0,0.0,nan,nan,,,nan,nan,887629127
 nan,residential,nan,False,True,108.621,1253,895,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183065770
@@ -492,7 +492,7 @@ Rua do Banco Nacional Ultramarino (1.049),residential,nan,False,False,83.319,873
 "['Rua Teixeira Pinto (1.051)', 'Rua Governador Sousa Pinto (1.040)']",residential,nan,False,True,241.702,"[856, 5794, 5795, 871]",596,60.0,0.004,nan,,0.0,0.0,2,nan,,,nan,nan,"[172425137, 930970107]"
 Rua Marques Do Soveral (1.038),residential,nan,False,True,158.661,4248,2542,60.0,0.003,nan,,0.0,0.0,2,nan,,,nan,nan,172425132
 Rua Tenente Alves (1.053),residential,nan,False,True,71.99,5800,3082,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,479165744
-Rua Tenente Alves (1.053),residential,nan,False,False,136.191,9726,4107,60.0,0.002,nan,0.14554254213968912,0.16041025852766025,0.0,2,nan,,,nan,nan,479165744
+Rua Tenente Alves (1.053),residential,nan,False,False,136.191,9726,4107,60.0,0.002,nan,0.14554254213968912,0.16041025852752827,0.0,2,nan,,,nan,nan,479165744
 Rua Marques Do Soveral (1.038),residential,nan,False,False,162.615,"[5760, 5762, 5764, 868, 5766, 5768, 5770]",595,60.0,0.003,nan,,0.0,0.0,2,nan,,,nan,nan,172425132
 Rua Diogo de Couto (1.047),residential,nan,False,False,79.368,9714,4103,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,172425149
 Rua Governador Sousa Pinto (1.040),residential,nan,False,True,150.71900000000002,"[4642, 4644, 4646, 4648, 4650, 4637]",2729,60.0,0.003,nan,,0.0,0.0,2,nan,,,nan,nan,479184835
@@ -759,12 +759,12 @@ nan,residential,nan,False,False,26.195,3550,2303,60.0,0.0,nan,,0.0,0.0,nan,nan,,
 nan,residential,nan,False,False,41.808,"[8240, 3555]",2308,60.0,0.001,nan,0.16077164503244254,1.0,0.0,nan,nan,,,nan,nan,678686026
 nan,residential,nan,False,True,200.0,"[3557, 1432, 3559, 5736, 5738, 3563, 5740, 5742, 3567, 3569, 1430, 3608, 1434, 3579, 3549, 5758]",2313,60.0,0.005,nan,0.15300146138892984,1.0,0.0,nan,nan,1934753552.0,13037735201.0,1934753552_13037735201,nan,183112046
 nan,residential,nan,False,True,24.996,5622,3047,60.0,0.0,nan,0.0733339786529541,0.17967623851198516,0.0,nan,nan,,,nan,nan,183112047
-nan,residential,nan,False,False,125.16799999999999,"[5632, 1419, 3855, 1424, 5624, 1435, 1437, 1439]",3050,60.0,0.002,nan,0.09189918637275696,0.2505203862999853,0.0,nan,nan,,,nan,nan,183112047
+nan,residential,nan,False,False,125.16799999999999,"[5632, 1419, 3855, 1424, 5624, 1435, 1437, 1439]",3050,60.0,0.002,nan,0.09189918637275696,0.25052038629520956,0.0,nan,nan,,,nan,nan,183112047
 nan,residential,nan,False,False,139.891,"[1415, 9243, 1394, 9240, 9242, 1403]",3897,60.0,0.002,nan,0.060256242752075195,0.03588805988494074,0.0,nan,nan,,,nan,nan,183112051
 nan,residential,nan,False,True,100.753,"[1466, 1461]",991,60.0,0.002,nan,0.4241430348363416,1.0,0.0,nan,nan,,,nan,nan,183112059
-nan,residential,nan,False,False,304.11500000000007,"[8591, 5668, 5670, 5672, 5674, 5676, 5678, 5680, 5682, 1458, 5684, 5686, 5565, 9958, 9960, 9962, 9964, 9966, 9968, 9970]",3030,60.0,0.005,nan,0.13344509026099896,0.3524127785163604,0.0,nan,nan,,,nan,nan,"[183112059, 589902004]"
+nan,residential,nan,False,False,304.11500000000007,"[8591, 5668, 5670, 5672, 5674, 5676, 5678, 5680, 5682, 1458, 5684, 5686, 5565, 9958, 9960, 9962, 9964, 9966, 9968, 9970]",3030,60.0,0.005,nan,0.13344509026099896,0.3524127785164389,0.0,nan,nan,,,nan,nan,"[183112059, 589902004]"
 nan,residential,nan,False,False,45.667,"[5688, 5690]",3056,60.0,0.001,nan,0.34154844284057617,1.0,0.0,nan,nan,,,nan,nan,589902005
-nan,residential,nan,False,True,282.89900000000006,"[3648, 3650, 3618, 3652, 1477, 3646, 5578, 5580, 5582, 3631, 5584, 3630, 5586, 5588, 3638, 5590, 5592, 5694]",1000,60.0,0.005,nan,0.572257273905986,0.9590431802719319,0.0,nan,nan,,,nan,nan,"[385524613, 385524559]"
+nan,residential,nan,False,True,282.89900000000006,"[3648, 3650, 3618, 3652, 1477, 3646, 5578, 5580, 5582, 3631, 5584, 3630, 5586, 5588, 3638, 5590, 5592, 5694]",1000,60.0,0.005,nan,0.572257273905986,0.9590431802719288,0.0,nan,nan,,,nan,nan,"[385524613, 385524559]"
 nan,residential,nan,False,False,237.48199999999997,"[3553, 3560, 5611, 5613, 5615, 8242, 3572, 3576, 5596]",2307,60.0,0.004,nan,0.2144639675433819,0.7979980228860932,0.0,nan,nan,,,nan,nan,385524559
 nan,residential,nan,False,False,104.561,1478,1001,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183112049
 Rua Roberto Ivens,residential,nan,False,True,103.87899999999999,"[937, 1492]",1013,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,479166607
@@ -780,7 +780,7 @@ Rua Roberto Ivens,residential,nan,False,True,53.429,"[939, 1511]",1026,60.0,0.00
 nan,residential,nan,False,True,99.388,2925,1975,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,172428925
 nan,residential,nan,False,False,59.641,1502,1021,60.0,0.001,nan,,0.0,1504.05272293,nan,nan,,,nan,nan,172428925
 nan,residential,nan,False,True,60.244,1514,1029,60.0,0.001,nan,,0.0,1504.05272293,nan,nan,,,nan,nan,255563371
-nan,residential,nan,False,False,120.92100000000002,"[5701, 2954, 5593, 9818, 2716]",4126,60.0,0.002,nan,0.48064487321036203,0.8122316593253354,0.0,nan,nan,,,nan,nan,685721201
+nan,residential,nan,False,False,120.92100000000002,"[5701, 2954, 5593, 9818, 2716]",4126,60.0,0.002,nan,0.48064487321036203,0.8122316593253515,0.0,nan,nan,,,nan,nan,685721201
 nan,residential,nan,False,False,44.192,1517,1032,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183112061
 nan,residential,nan,False,False,110.639,"[1521, 9482]",1035,60.0,0.002,nan,,0.0,1504.05272293,nan,nan,,,nan,nan,172428925
 nan,residential,nan,False,False,98.327,"[1505, 1538, 1519]",1047,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183112057
@@ -809,7 +809,7 @@ nan,tertiary,nan,True,False,118.883,1574,1075,59.0,0.002,nan,,0.0,0.0,nan,nan,,,
 Rua Pinheiro Chagas,residential,nan,False,False,123.086,1584,1081,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183114366
 Rua dos Descobrimentos,residential,nan,False,True,105.339,"[3827, 1588, 1583]",1086,60.0,0.002,nan,,0.0,1239.84428596,nan,nan,,,nan,nan,44785088
 Rua dos Descobrimentos,residential,nan,False,False,370.759,"[3840, 1576, 9302, 3830, 3832, 3834, 3836, 6621, 3838]",2378,60.0,0.006,nan,,0.0,1239.84428596,nan,nan,,,nan,nan,44785088
-"['Rua Pinheiro Chagas', 'Rua Viriato']",residential,nan,False,True,625.484,"[3854, 9927, 9929, 9931, 7633, 7636, 7638, 7640, 7642, 7644, 7646, 7648, 7650, 7652, 7654, 7656, 7658, 7660, 7661]",3570,60.0,0.01,nan,0.14808778984602108,0.5853969910788013,0.0,nan,nan,,,nan,nan,"[591841712, 591841708, 183114366]"
+"['Rua Viriato', 'Rua Pinheiro Chagas']",residential,nan,False,True,625.484,"[3854, 9927, 9929, 9931, 7633, 7636, 7638, 7640, 7642, 7644, 7646, 7648, 7650, 7652, 7654, 7656, 7658, 7660, 7661]",3570,60.0,0.01,nan,0.14808778984602108,0.5853969910787635,0.0,nan,nan,,,nan,nan,"[591841712, 591841708, 183114366]"
 Rua Pinheiro Chagas,residential,nan,False,False,115.377,1594,1087,60.0,0.002,nan,,0.0,869.3315668099999,nan,nan,,,nan,nan,183114366
 Rua do Centro Comercial,residential,nan,False,False,165.512,"[6715, 6713, 1595, 6717, 1599]",1093,60.0,0.003,nan,,0.0,869.3315668099999,nan,nan,,,nan,nan,820923408
 Imp. 1003,residential,nan,False,False,161.577,6712,3304,60.0,0.003,nan,,0.0,1363.85136414,nan,nan,,,nan,nan,590811910
@@ -832,7 +832,7 @@ Rua de Paiva Raposo,residential,nan,False,False,137.032,1644,1129,60.0,0.002,nan
 Rua do Centro Comercial,residential,nan,False,False,181.469,"[8432, 1634]",1120,60.0,0.003,nan,,0.0,3473.02721691,nan,nan,,,nan,nan,183114353
 nan,residential,nan,False,True,55.851,4487,2686,60.0,0.001,nan,,0.0,1846.9139595,nan,nan,,,nan,nan,172428910
 nan,residential,nan,False,True,69.282,4441,2664,60.0,0.001,nan,,0.0,1846.9139595,nan,nan,,,nan,nan,183114356
-nan,residential,nan,False,False,264.19399999999996,"[9130, 6506, 6508, 4470, 1628]",2673,60.0,0.004,nan,0.11341639927455358,0.12322825719028031,0.0,nan,nan,,,nan,nan,"[479183173, 172428910]"
+nan,residential,nan,False,False,264.19399999999996,"[9130, 6506, 6508, 4470, 1628]",2673,60.0,0.004,nan,0.11341639927455358,0.12322825719033179,0.0,nan,nan,,,nan,nan,"[479183173, 172428910]"
 Rua do Centro Comercial,residential,nan,False,False,152.885,1640,1125,60.0,0.003,nan,,0.0,3473.02721691,nan,nan,,,nan,nan,183114353
 Rua dos Pioneiros de Manica,residential,nan,False,False,172.713,1670,1148,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,183114361
 Ava Mártires da Revolução,tertiary,60,False,True,141.422,1646,1130,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,820923407
@@ -861,7 +861,7 @@ nan,residential,nan,False,False,153.256,1697,1176,60.0,0.003,nan,,0.0,17555.4445
 nan,residential,nan,False,False,77.301,1707,1186,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183114364
 nan,residential,nan,False,False,201.769,1700,1178,60.0,0.003,nan,0.20787945815495082,0.30068385187266916,0.0,nan,nan,,,nan,nan,183114360
 nan,residential,nan,False,True,88.447,"[5947, 5949, 5951]",3106,60.0,0.001,nan,0.44912290573120117,0.2299133780391357,0.0,nan,nan,,,nan,nan,590494926
-Rua Dom Gonçalo da Silveira (1.057),residential,nan,False,True,83.604,1711,1190,60.0,0.001,nan,0.1863421599070231,0.13360629875018284,0.0,nan,nan,,,nan,nan,172425118
+Rua Dom Gonçalo da Silveira (1.057),residential,nan,False,True,83.604,1711,1190,60.0,0.001,nan,0.1863421599070231,0.13360629874993513,0.0,nan,nan,,,nan,nan,172425118
 Rua Marques Do Soveral (1.038),residential,nan,False,False,156.816,"[5791, 4247]",2544,60.0,0.003,nan,,0.0,0.0,2,nan,,,nan,nan,172425132
 Rua Dom Gonçalo da Silveira (1.057),residential,nan,False,"[False, True]",250.0,"[8684, 837, 8686]",3776,60.0,0.004,nan,0.23471517562866212,0.28592996962600997,0.0,nan,nan,1934771022.0,13037735221.0,1934771022_13037735221,nan,"[590190921, 172425118]"
 nan,residential,nan,False,False,127.723,1705,1183,60.0,0.002,nan,,0.0,17555.444571490003,nan,nan,,,nan,nan,479185274
@@ -907,7 +907,7 @@ nan,residential,nan,False,False,205.935,"[4368, 9023]",2633,60.0,0.003,nan,,0.0,
 nan,residential,nan,False,True,91.281,1781,1252,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,52019767
 nan,residential,nan,False,True,64.437,3762,2351,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,52019767
 nan,residential,nan,False,False,22.204,4437,2662,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,183116579
-nan,tertiary,nan,False,"[False, True]",273.313,"[1793, 1795, 740, 1797, 4391, 783, 9080, 1785, 1787, 1789, 1791]",2644,59.0,0.005,nan,0.27959022521972654,0.49112139965361,0.0,nan,nan,,,nan,nan,"[183118911, 62226807]"
+nan,tertiary,nan,False,"[False, True]",273.313,"[1793, 1795, 740, 1797, 4391, 783, 9080, 1785, 1787, 1789, 1791]",2644,59.0,0.005,nan,0.27959022521972654,0.49112139965318813,0.0,nan,nan,,,nan,nan,"[183118911, 62226807]"
 nan,residential,nan,False,True,49.254000000000005,"[5881, 3036]",2032,60.0,0.001,nan,0.11078064782278878,0.5529689718769907,0.0,nan,nan,,,nan,nan,183217116
 nan,residential,nan,False,False,95.835,1830,1275,60.0,0.002,nan,,0.0,1983.5795536,nan,nan,,,nan,nan,685123274
 nan,residential,nan,False,True,104.868,1839,1284,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183217116
@@ -928,7 +928,7 @@ nan,residential,nan,False,True,107.203,1863,1306,60.0,0.002,nan,,0.0,0.0,nan,nan
 nan,residential,nan,False,True,58.27,1845,1288,60.0,0.001,nan,,0.0,3427.1867647199997,nan,nan,,,nan,nan,183217120
 nan,residential,nan,False,True,96.042,1868,1311,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,684289513
 Rua Alfredo Lawley,secondary,nan,False,False,57.388,1849,1292,50.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,684867497
-nan,residential,nan,False,True,237.961,"[4324, 9076, 1844, 5848, 8029, 8031]",2594,60.0,0.004,nan,0.12089252471923828,0.007982280344992175,0.0,nan,nan,,,nan,nan,183217122
+nan,residential,nan,False,True,237.961,"[4324, 9076, 1844, 5848, 8029, 8031]",2594,60.0,0.004,nan,0.12089252471923828,0.007982280338018576,0.0,nan,nan,,,nan,nan,183217122
 nan,residential,nan,False,False,93.31,"[9010, 9014]",3844,60.0,0.002,nan,,0.0,3427.1867647199997,nan,nan,,,nan,nan,183217122
 Rua Alfredo Lawley,secondary,nan,False,False,55.368,1858,1301,50.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,684867497
 nan,residential,nan,False,True,24.969,1855,1298,60.0,0.0,nan,,0.0,2258.97821045,nan,nan,,,nan,nan,183217104
@@ -1001,18 +1001,18 @@ nan,residential,nan,False,True,30.347,4252,2547,60.0,0.001,nan,,0.0,0.0,nan,nan,
 nan,residential,nan,False,True,71.554,"[4328, 5833, 3402, 5835]",2598,60.0,0.001,nan,0.05714114507039388,0.2020732878923583,0.0,nan,nan,,,nan,nan,"[385433458, 479170165]"
 Rua 1.777,residential,nan,False,False,32.467,6856,3346,60.0,0.001,nan,0.11314654350280762,0.2600672768008131,0.0,nan,nan,,,nan,nan,183218165
 Rua 45,residential,nan,False,False,131.984,6855,3344,60.0,0.002,nan,0.1733805682208087,0.977848985266667,0.0,nan,nan,,,nan,nan,183218185
-Rua 45,residential,nan,False,True,146.285,"[8560, 1977]",1405,60.0,0.002,nan,0.3189231554667155,0.8998037928117352,0.0,nan,nan,,,nan,nan,183218185
+Rua 45,residential,nan,False,True,146.285,"[8560, 1977]",1405,60.0,0.002,nan,0.3189231554667155,0.8998037928116681,0.0,nan,nan,,,nan,nan,183218185
 R. 1779,residential,nan,False,True,37.465,"[3227, 8558]",2117,60.0,0.001,nan,0.5018324418501421,1.0,0.0,nan,nan,,,nan,nan,385433646
 Rua 1.777,residential,nan,False,True,48.134,6857,3347,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218165
 Rua 1.777,residential,nan,False,False,50.252,1984,1409,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218165
 Rua 43,residential,nan,False,True,131.185,"[6266, 7322]",3214,60.0,0.002,nan,0.1281651020050049,0.5514505822403458,0.0,nan,nan,,,nan,nan,183218183
-Rua 43,residential,nan,False,False,146.04399999999998,"[1979, 1988, 1991]",1415,60.0,0.002,nan,0.19819475256878397,0.5674573998911282,0.0,nan,nan,,,nan,nan,183218183
+Rua 43,residential,nan,False,False,146.04399999999998,"[1979, 1988, 1991]",1415,60.0,0.002,nan,0.19819475256878397,0.5674573998908397,0.0,nan,nan,,,nan,nan,183218183
 Rua 45,residential,nan,False,True,56.846,1982,1407,60.0,0.001,nan,0.43210433511173024,1.0,0.0,nan,nan,,,nan,nan,183218185
 nan,residential,nan,False,True,41.223,3492,2283,60.0,0.001,nan,0.2503257164588341,1.0,0.0,nan,nan,,,nan,nan,183218192
 Rua 45,residential,nan,False,True,52.191,3495,2286,60.0,0.001,nan,0.5085947513580322,1.0,0.0,nan,nan,,,nan,nan,183218185
 nan,residential,nan,False,True,31.807,6852,3340,60.0,0.001,nan,0.5756708780924479,1.0,0.0,nan,nan,,,nan,nan,590976362
 Rua 1.777,residential,nan,False,False,47.896,1995,1418,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218165
-Rua 42,residential,nan,False,True,129.15,6287,3226,60.0,0.002,nan,0.120278000831604,0.1491306936591564,0.0,nan,nan,,,nan,nan,590768968
+Rua 42,residential,nan,False,True,129.15,6287,3226,60.0,0.002,nan,0.120278000831604,0.14913069364714146,0.0,nan,nan,,,nan,nan,590768968
 Rua 42,residential,nan,False,False,147.961,2013,1431,60.0,0.002,nan,0.2070256471633911,0.5864415407762543,0.0,nan,nan,,,nan,nan,590768968
 Rua 1.782 (18),residential,nan,False,False,103.388,2007,1428,60.0,0.002,nan,0.18648838996887207,0.03448533985898071,0.0,nan,nan,,,nan,nan,183218190
 nan,residential,nan,False,False,47.323,3491,2282,60.0,0.001,nan,0.168744581086295,1.0,0.0,nan,nan,,,nan,nan,183218192
@@ -1023,7 +1023,7 @@ Eua 41,residential,nan,False,True,150.612,2026,1445,60.0,0.003,nan,0.38064528956
 Eua 41,residential,nan,False,False,128.545,3246,2132,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,385433546
 Rua 1.757 (21),residential,nan,False,False,97.868,6747,3315,60.0,0.002,nan,0.12131704886754353,0.5257428083342277,0.0,nan,nan,,,nan,nan,183218166
 nan,residential,nan,False,False,53.037,3497,2287,60.0,0.001,nan,0.3336857159932454,1.0,0.0,nan,nan,,,nan,nan,686758038
-nan,residential,nan,False,False,356.81100000000004,"[3520, 6881, 3522, 3526, 3501, 3503, 3506, 3508, 6741, 3510, 3512, 3514, 3516, 3518]",2293,60.0,0.006,nan,0.22320416394401998,0.6837399428064168,0.0,nan,nan,,,nan,nan,385524566
+nan,residential,nan,False,False,356.81100000000004,"[3520, 6881, 3522, 3526, 3501, 3503, 3506, 3508, 6741, 3510, 3512, 3514, 3516, 3518]",2293,60.0,0.006,nan,0.22320416394401998,0.6837399428061415,0.0,nan,nan,,,nan,nan,385524566
 Rua 1.780 (17),residential,nan,False,True,100.288,2016,1435,60.0,0.002,nan,0.10990420977274577,0.105245104222507,0.0,nan,nan,,,nan,nan,183218177
 nan,residential,nan,False,True,43.158,2018,1437,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218187
 nan,residential,nan,False,False,47.662,3259,2144,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218187
@@ -1122,7 +1122,7 @@ nan,residential,nan,False,True,53.007,2200,1597,60.0,0.001,nan,,0.0,0.0,nan,nan,
 nan,residential,nan,False,True,57.901,2210,1607,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218180
 nan,residential,nan,False,True,26.702,2209,1606,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,183218176
 Rua 1.757 (1),residential,nan,False,False,34.881,2207,1603,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,1221684698
-"['Rua 1.757 (1)', 'Rua 1.757 (21)']",residential,nan,False,True,25.115000000000002,"[9196, 4630]",3887,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,"[1221684698, 183218166]"
+"['Rua 1.757 (21)', 'Rua 1.757 (1)']",residential,nan,False,True,25.115000000000002,"[9196, 4630]",3887,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,"[1221684698, 183218166]"
 Rua 1.757 (1),residential,nan,False,False,2.938,9510,3983,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,1221684698
 nan,residential,nan,False,False,52.95,6129,3157,60.0,0.001,nan,0.3002322803844105,0.7910083080765725,0.0,nan,nan,,,nan,nan,590522953
 Rua 1.757 (1),residential,nan,False,True,51.137,9511,3984,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,1221684698
@@ -1145,7 +1145,7 @@ Rua 1790 (32),residential,nan,False,False,130.98,2253,1636,60.0,0.002,nan,,0.0,0
 Rua 1792 (31),residential,nan,False,True,110.168,2256,1638,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183218497
 nan,residential,nan,False,True,49.209,2252,1635,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218502
 nan,residential,nan,False,False,55.004,3325,2190,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218502
-"['Rua 1792 (31)', 'Eua 41']",residential,nan,False,False,131.81099999999998,"[9690, 2230]",4094,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,"[183218497, 385433546]"
+"['Eua 41', 'Rua 1792 (31)']",residential,nan,False,False,131.81099999999998,"[9690, 2230]",4094,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,"[183218497, 385433546]"
 Ava de Portugal / Rua 1751,residential,60,False,False,90.822,"[2240, 3351]",2206,60.0,0.002,nan,,0.0,0.0,2,nan,,,nan,nan,183218499
 Rua 1794 (30),residential,nan,False,True,113.81899999999999,"[3355, 6795, 3327]",2192,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,385433594
 nan,residential,nan,False,True,43.385999999999996,"[2250, 2258]",1641,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479184827
@@ -1157,7 +1157,7 @@ Rua 1.757 (21),residential,nan,False,True,53.755,9685,4088,60.0,0.001,nan,,0.0,0
 Rua 1.786 (34),residential,nan,False,True,128.76,2277,1652,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183218498
 nan,residential,nan,False,True,52.686,2279,1654,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218502
 Rua 1788 (33),residential,nan,False,True,130.498,9687,4090,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,592352458
-Rua 1788 (33),residential,nan,False,False,111.362,4618,2715,60.0,0.002,nan,0.3472603998686138,0.6293276103607867,0.0,nan,nan,,,nan,nan,592352458
+Rua 1788 (33),residential,nan,False,False,111.362,4618,2715,60.0,0.002,nan,0.3472603998686138,0.6293276103604627,0.0,nan,nan,,,nan,nan,592352458
 Rua 1.764 (35),residential,nan,False,False,126.753,2287,1660,60.0,0.002,nan,,0.0,1821.23622513,nan,nan,,,nan,nan,590972021
 nan,residential,nan,False,True,59.207,2286,1659,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183218502
 nan,residential,nan,False,True,49.013,2289,1662,60.0,0.001,nan,0.38731156076703754,1.0,0.0,nan,nan,,,nan,nan,479184824
@@ -1177,15 +1177,15 @@ nan,residential,nan,False,False,41.408,"[3971, 5151]",2925,60.0,0.001,nan,,0.0,0
 Rua Vasco Fernandes Homem,residential,nan,False,True,38.763,5150,2923,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,52014436
 nan,tertiary,nan,True,False,121.29,"[2344, 4705, 5715]",1675,59.0,0.002,nan,,0.0,83.02479362,nan,nan,,,nan,nan,204092456
 nan,tertiary,nan,True,False,121.13499999999999,"[2346, 5787, 5716, 9293]",3078,59.0,0.002,nan,,0.0,1154.41796875,nan,nan,,,nan,nan,52014467
-Armando Tivane,tertiary,nan,True,False,133.03,"[583, 2351]",1677,59.0,0.002,nan,0.0602569580078125,0.004518435441536203,0.0,nan,nan,,,nan,nan,62226382
-nan,residential,nan,False,True,214.073,"[3850, 5516, 5518, 5520, 5522, 5524, 8670, 8255]",3722,60.0,0.004,nan,0.11521950635043057,0.7543339720048869,0.0,nan,nan,,,nan,nan,250455087
+Armando Tivane,tertiary,nan,True,False,133.03,"[583, 2351]",1677,59.0,0.002,nan,0.0602569580078125,0.004518435441539525,0.0,nan,nan,,,nan,nan,62226382
+nan,residential,nan,False,True,214.073,"[3850, 5516, 5518, 5520, 5522, 5524, 8670, 8255]",3722,60.0,0.004,nan,0.11521950635043057,0.7543339719997056,0.0,nan,nan,,,nan,nan,250455087
 Armando Tivane,tertiary,nan,True,False,68.801,5475,2997,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62226382
 Avenida 24 de Julho,tertiary,60,True,False,147.00799999999998,"[4093, 306, 2365, 4094]",1679,60.0,0.002,nan,,0.0,15354.061733249999,2,praca da independencia e dos professores,,,nan,nan,62226384
 Avenida 24 de Julho,tertiary,60,True,False,110.418,2396,1686,60.0,0.002,nan,,0.0,15354.061733249999,2,praca da independencia e dos professores,,,nan,nan,62226384
-nan,residential,nan,False,True,176.0,"[2368, 2370, 2372, 2374, 2376, 9033, 2378, 2380, 2381, 2384, 2386, 5490, 2388, 5492, 2390, 2392]",1682,60.0,0.004,nan,0.08471719423929851,0.06137857797616594,0.0,nan,nan,2568927648.0,13037735192.0,2568927648_13037735192,nan,"[250455569, 250455092]"
+nan,residential,nan,False,True,176.0,"[2368, 2370, 2372, 2374, 2376, 9033, 2378, 2380, 2381, 2384, 2386, 5490, 2388, 5492, 2390, 2392]",1682,60.0,0.004,nan,0.08471719423929851,0.061378577976166394,0.0,nan,nan,2568927648.0,13037735192.0,2568927648_13037735192,nan,"[250455569, 250455092]"
 nan,residential,nan,False,True,56.613,2395,1685,60.0,0.001,nan,0.21645607948303222,1.0,0.0,nan,nan,,,nan,nan,250455569
-nan,residential,nan,False,False,254.404,"[9056, 2400, 2402, 2404, 5493, 2488, 5497, 2490, 2397, 9053, 2398]",1687,60.0,0.004,nan,0.1801159323715582,0.5966526342180763,0.0,nan,nan,,,nan,nan,250455571
-nan,residential,nan,False,True,315.2389999999999,"[8257, 2433, 8259, 2435, 2407, 2409, 2411, 2413, 2415, 2417, 2419, 2421, 2423, 5496, 2425, 2427, 2429, 2431]",3723,60.0,0.005,nan,0.2627395951604269,0.9430963840908794,0.0,nan,nan,,,nan,nan,250456766
+nan,residential,nan,False,False,254.404,"[9056, 2400, 2402, 2404, 5493, 2488, 5497, 2490, 2397, 9053, 2398]",1687,60.0,0.004,nan,0.1801159323715582,0.5966526342181312,0.0,nan,nan,,,nan,nan,250455571
+nan,residential,nan,False,True,315.2389999999999,"[8257, 2433, 8259, 2435, 2407, 2409, 2411, 2413, 2415, 2417, 2419, 2421, 2423, 5496, 2425, 2427, 2429, 2431]",3723,60.0,0.005,nan,0.2627395951604269,0.9430963840908719,0.0,nan,nan,,,nan,nan,250456766
 nan,residential,nan,False,True,67.0,"[2368, 2370, 2372, 2374, 2376, 9033, 2378, 2380, 2381, 2384, 2386, 5490, 2388, 5492, 2390, 2392]",1682,60.0,0.004,nan,0.3092253835577714,1.0,0.0,nan,nan,13037735192.0,2568934960.0,13037735192_2568934960,nan,"[250455569, 250455092]"
 Avenida 24 de Julho,tertiary,60,True,False,194.57899999999998,"[9055, 5567]",3031,60.0,0.003,nan,,0.0,15354.061733249999,2,praca da independencia e dos professores,,,nan,nan,62226384
 nan,residential,nan,False,True,97.19300000000001,"[2450, 2453, 2447]",1691,60.0,0.002,nan,0.14944374561309814,0.1386546473875554,0.0,nan,nan,,,nan,nan,"[685107633, 250457117]"
@@ -1219,9 +1219,9 @@ Rua Don Estevão de Ataíde,residential,nan,False,True,232.64299999999997,"[2528
 nan,residential,nan,False,True,89.129,2537,1737,60.0,0.001,nan,0.0683363676071167,0.06617415192661671,0.0,nan,nan,,,nan,nan,253459884
 nan,residential,nan,False,True,6.0,"[2548, 9709]",1748,60.0,0.001,nan,,0.0,2461.33372116,nan,nan,2593840216.0,13037735186.0,2593840216_13037735186,nan,479162191
 nan,residential,nan,False,True,162.93,2541,1741,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,253460145
-nan,residential,nan,False,False,55.565,2545,1744,60.0,0.001,nan,0.29288697242736816,0.0572695811947381,0.0,nan,nan,,,nan,nan,253460146
-nan,residential,nan,False,True,106.81700000000001,"[9072, 5460, 5462]",3855,60.0,0.002,nan,0.11957219067741842,0.5995858139248523,0.0,nan,nan,,,nan,nan,253460146
-Avenida 24 De Julho,tertiary,nan,True,False,327.259,"[9068, 9070, 2544, 2998, 4120, 5465]",1745,59.0,0.006,nan,2.418366376091452,0.9272362703681208,0.0,nan,nan,,,nan,nan,183217110
+nan,residential,nan,False,False,55.565,2545,1744,60.0,0.001,nan,0.29288697242736816,0.0572695811948569,0.0,nan,nan,,,nan,nan,253460146
+nan,residential,nan,False,True,106.81700000000001,"[9072, 5460, 5462]",3855,60.0,0.002,nan,0.11957219067741842,0.5995858139242979,0.0,nan,nan,,,nan,nan,253460146
+Avenida 24 De Julho,tertiary,nan,True,False,327.259,"[9068, 9070, 2544, 2998, 4120, 5465]",1745,59.0,0.006,nan,2.418366376091452,0.9272362703681262,0.0,nan,nan,,,nan,nan,183217110
 Avenida 24 De Julho,tertiary,nan,True,False,172.91,"[9066, 4100]",2498,59.0,0.003,nan,1.9503873189290364,0.9309067638965901,0.0,nan,nan,,,nan,nan,183217110
 nan,residential,nan,False,True,78.578,"[8210, 2549]",1749,60.0,0.001,nan,0.08509469032287598,0.09907552334514687,0.0,nan,nan,,,nan,nan,253460181
 nan,residential,nan,False,True,63.0,"[2548, 9709]",1748,60.0,0.001,nan,,0.0,0.0,nan,nan,13037735186.0,2593844812.0,13037735186_2593844812,nan,479162191
@@ -1229,7 +1229,7 @@ Rua Camilo Castelo Branco,residential,nan,False,True,174.656,2553,1753,60.0,0.00
 Avenida 24 De Julho,tertiary,nan,True,False,70.851,"[9067, 2556]",1757,59.0,0.001,nan,2.5503385066986084,1.0,0.0,nan,nan,,,nan,nan,62226379
 Rua Guerra Junqueiro,residential,nan,False,False,37.363,2988,2016,60.0,0.001,nan,,0.0,1892.20948792,nan,nan,,,nan,nan,253460333
 Rua Guerra Junqueiro,residential,nan,False,True,70.27900000000001,"[2560, 9656]",1760,60.0,0.001,nan,,0.0,1892.20948792,nan,nan,,,nan,nan,253460333
-Rua A. Queiroz,residential,nan,False,True,167.454,2558,1758,60.0,0.003,nan,2.3162174224853516,0.030772827638101113,0.0,nan,nan,,,nan,nan,253460238
+Rua A. Queiroz,residential,nan,False,True,167.454,2558,1758,60.0,0.003,nan,2.3162174224853516,0.030772827638079904,0.0,nan,nan,,,nan,nan,253460238
 Avenida 24 De Julho,tertiary,nan,True,False,67.218,2561,1761,59.0,0.001,nan,2.927718162536621,1.0,0.0,nan,nan,,,nan,nan,62226379
 Rua Guerra Junqueiro,residential,nan,False,True,69.494,"[2992, 2565, 5528]",1765,60.0,0.001,nan,,0.0,1892.20948792,nan,nan,,,nan,nan,253460333
 Rua Alexandre Herculano,residential,nan,False,True,166.896,2563,1763,60.0,0.003,nan,2.2122862339019775,0.04901997689655033,0.0,nan,nan,,,nan,nan,253460252
@@ -1303,7 +1303,7 @@ nan,residential,nan,False,False,30.07,2782,1888,60.0,0.001,nan,0.594438135623931
 nan,residential,nan,False,True,110.56,7846,3614,60.0,0.002,nan,0.39005809360080296,1.0,0.0,nan,nan,,,nan,nan,255563361
 nan,residential,nan,False,False,204.213,"[2963, 2839]",2004,60.0,0.003,nan,0.2804383933544159,0.1569823955148268,0.0,nan,nan,,,nan,nan,255563361
 nan,residential,nan,False,False,88.543,9820,4125,60.0,0.001,nan,0.9590413020207331,1.0,0.0,nan,nan,,,nan,nan,1257530155
-Rua P-R001,residential,nan,False,True,158.52900000000002,"[5696, 5698, 2760, 2926, 2832, 2708]",1976,60.0,0.003,nan,0.6056471737948331,0.969679683950456,0.0,nan,nan,,,nan,nan,255563327
+Rua P-R001,residential,nan,False,True,158.52900000000002,"[5696, 5698, 2760, 2926, 2832, 2708]",1976,60.0,0.003,nan,0.6056471737948331,0.9696796839504549,0.0,nan,nan,,,nan,nan,255563327
 Rua P-R001,residential,nan,False,False,240.41600000000003,"[9825, 5700, 9821, 9823]",3057,60.0,0.004,nan,0.5165837860107422,0.9390158956108537,0.0,nan,nan,,,nan,nan,255563327
 nan,residential,nan,False,True,72.874,2753,1870,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563348
 nan,residential,nan,False,False,59.316,2857,1929,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563335
@@ -1315,7 +1315,7 @@ nan,residential,nan,False,False,61.482,"[8698, 2916]",1969,60.0,0.001,nan,0.1041
 nan,residential,nan,False,False,161.377,"[6416, 2874, 2910]",3256,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,685461114
 Rua 1.812,residential,nan,False,False,141.213,3133,2070,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,255563373
 Rua 1795,residential,nan,False,True,49.891,2934,1982,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,590546535
-Rua 1795,residential,nan,False,False,37.48,5985,3114,60.0,0.001,nan,0.08721884091695149,0.41714100357755574,0.0,nan,nan,,,nan,nan,590546535
+Rua 1795,residential,nan,False,False,37.48,5985,3114,60.0,0.001,nan,0.08721884091695149,0.4171410035780989,0.0,nan,nan,,,nan,nan,590546535
 Rua 1.797,residential,nan,False,True,52.105,3132,2069,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563365
 Rua 1.810,residential,nan,False,True,138.045,"[6016, 9190, 2762, 6001, 2873, 2909]",3122,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,255563360
 Rua 1.810,residential,nan,False,False,62.219,"[2804, 2766]",1900,60.0,0.001,nan,0.16291749477386475,0.39576295636122416,0.0,nan,nan,,,nan,nan,255563360
@@ -1324,7 +1324,7 @@ Rua 1.830,residential,nan,False,False,50.725,2935,1983,60.0,0.001,nan,0.40684713
 nan,residential,nan,False,False,12.387,2880,1943,60.0,0.0,yes,0.5806801915168762,1.0,0.0,nan,nan,,,nan,nan,685123322
 Rua 1.830,residential,nan,False,True,93.374,"[6260, 2844]",1920,60.0,0.002,nan,0.6247943380604619,1.0,0.0,nan,nan,,,nan,nan,546413228
 nan,residential,nan,False,False,48.534,"[9245, 9247]",3898,60.0,0.001,nan,0.6424036026000977,1.0,0.0,nan,nan,,,nan,nan,255563339
-nan,residential,nan,False,False,210.38199999999998,"[10212, 10189, 10191, 10193, 10195, 10197, 10199]",4225,60.0,0.004,nan,0.1521524715423584,0.4957400422841665,0.0,nan,nan,,,nan,nan,1416955873
+nan,residential,nan,False,False,210.38199999999998,"[10212, 10189, 10191, 10193, 10195, 10197, 10199]",4225,60.0,0.004,nan,0.1521524715423584,0.4957400422838979,0.0,nan,nan,,,nan,nan,1416955873
 nan,residential,nan,False,False,24.516,4333,2602,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,255563339
 nan,residential,nan,False,True,145.692,"[2882, 10127]",1947,60.0,0.002,nan,,0.0,2003.88581848,nan,nan,,,nan,nan,183217121
 nan,residential,nan,False,False,28.675,6144,3164,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,255563362
@@ -1338,7 +1338,7 @@ nan,residential,nan,False,False,60.44200000000001,"[7890, 2902]",1960,60.0,0.001
 nan,residential,nan,False,False,86.273,2943,1989,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563326
 Ava Mártires da Revolução,tertiary,60,False,True,119.28399999999999,"[9664, 2899]",1957,60.0,0.002,nan,,0.0,1782.0776615099999,nan,nan,,,nan,nan,820923407
 Rua 1.832,residential,nan,False,False,45.251,"[2776, 2878]",1944,60.0,0.001,nan,0.3966570695241292,1.0,0.0,nan,nan,,,nan,nan,255563333
-Rua 1.814,residential,nan,False,False,204.78199999999998,"[2785, 9185, 2787, 2852, 2921, 6025, 2705, 2805, 2774]",1972,60.0,0.003,nan,0.14869970083236694,0.0758994625983557,0.0,nan,nan,,,nan,nan,255563354
+Rua 1.814,residential,nan,False,False,204.78199999999998,"[2785, 9185, 2787, 2852, 2921, 6025, 2705, 2805, 2774]",1972,60.0,0.003,nan,0.14869970083236694,0.07589946259786617,0.0,nan,nan,,,nan,nan,255563354
 Rua 1.832,residential,nan,False,True,79.0,"[4897, 6018, 6020, 9188, 6022, 3463, 6024, 4883, 4885, 4887, 4889, 4891, 4893, 4895]",2274,60.0,0.007,nan,0.577430906749907,1.0,0.0,nan,nan,2612440824.0,13037735203.0,2612440824_13037735203,nan,255563333
 Rua Alfredo Lawley,tertiary,nan,False,True,109.796,6200,3174,59.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,204096428
 Rua Alfredo Lawley,tertiary,nan,False,False,60.459,2905,1961,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,204096428
@@ -1348,7 +1348,7 @@ nan,residential,nan,False,False,108.0,"[3786, 70]",2365,60.0,0.003,nan,,0.0,428.
 nan,residential,nan,False,True,203.636,"[2731, 2891, 6418, 2970, 2715]",2010,60.0,0.003,nan,0.30709547996520997,0.0880841888738633,0.0,nan,nan,,,nan,nan,255563352
 nan,residential,nan,False,True,135.028,2870,1940,60.0,0.002,nan,0.24333448667783994,1.0,0.0,nan,nan,,,nan,nan,255563363
 Rua 1818,residential,nan,False,True,110.812,"[3433, 8597]",2263,60.0,0.002,nan,0.17030107975006104,0.022213586450321534,0.0,nan,nan,,,nan,nan,255563350
-Rua 1.830,residential,nan,False,True,50.247,"[9094, 4879]",2834,60.0,0.001,nan,0.5960429264948919,0.9229050505824752,0.0,nan,nan,,,nan,nan,546413228
+Rua 1.830,residential,nan,False,True,50.247,"[9094, 4879]",2834,60.0,0.001,nan,0.5960429264948919,0.9229050505824753,0.0,nan,nan,,,nan,nan,546413228
 Rua Francisco Matange,residential,nan,False,False,24.312,4668,2739,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,172428912
 nan,residential,nan,False,True,36.321,2944,1990,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563326
 nan,residential,nan,False,False,117.59,2938,1986,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,255563326
@@ -1378,8 +1378,8 @@ nan,residential,nan,False,False,44.126999999999995,"[2968, 2724]",2008,60.0,0.00
 nan,residential,nan,False,True,165.974,"[8968, 4353, 1959]",2620,60.0,0.003,nan,0.2881874740123749,0.18091286761871003,0.0,nan,nan,,,nan,nan,183217121
 nan,residential,nan,False,False,104.234,2973,2011,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,255563345
 Rua 1.836,residential,nan,False,False,12.525,4872,2826,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,546413222
-Rua 1.814,residential,nan,False,"[False, True]",258.13500000000005,"[4193, 4195, 4197, 4199, 4201, 4202, 4204, 4206, 4208, 9104, 4210]",2532,60.0,0.004,nan,0.08750605583190918,0.15311508986383404,0.0,nan,nan,,,nan,nan,"[255563354, 479166605]"
-Rua 1.826,residential,nan,False,False,166.855,3529,2294,60.0,0.003,nan,0.3052700360616048,0.05026166210627266,0.0,nan,nan,,,nan,nan,255563328
+Rua 1.814,residential,nan,False,"[False, True]",258.13500000000005,"[4193, 4195, 4197, 4199, 4201, 4202, 4204, 4206, 4208, 9104, 4210]",2532,60.0,0.004,nan,0.08750605583190918,0.1531150898637626,0.0,nan,nan,,,nan,nan,"[255563354, 479166605]"
+Rua 1.826,residential,nan,False,False,166.855,3529,2294,60.0,0.003,nan,0.3052700360616048,0.050261662105605905,0.0,nan,nan,,,nan,nan,255563328
 Rua 1.832,residential,nan,False,True,52.403,"[9096, 3535]",2298,60.0,0.001,nan,0.4081226076398577,1.0,0.0,nan,nan,,,nan,nan,255563333
 Rua 1.832,residential,nan,False,True,56.018,"[8595, 6166]",3765,60.0,0.001,nan,0.5601374944051106,1.0,0.0,nan,nan,,,nan,nan,590546537
 Rua 1795,residential,nan,False,True,52.338,6119,3150,60.0,0.001,nan,0.05100536346435547,0.10244018064748246,0.0,nan,nan,,,nan,nan,590546535
@@ -1392,19 +1392,19 @@ nan,residential,nan,False,True,43.016,"[2893, 2975]",2013,60.0,0.001,nan,,0.0,0.
 nan,residential,nan,False,True,111.69299999999998,"[8928, 8930, 8932, 8934, 4359, 8936, 8938, 8944]",3825,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,479170459
 Rua 1818,residential,nan,False,False,186.48,"[2919, 3432, 2860, 6161, 6163]",2262,60.0,0.003,nan,0.19522619247436523,0.0006884851275801939,0.0,nan,nan,,,nan,nan,255563350
 Rua 1795,residential,nan,False,True,43.074,"[6250, 9090]",3209,60.0,0.001,nan,0.2653466860453288,0.8080884384063495,0.0,nan,nan,,,nan,nan,590546535
-Rua 1795,residential,nan,False,False,97.23400000000001,"[6118, 6255]",3152,60.0,0.002,nan,0.13352233171463013,0.14847834179465694,0.0,nan,nan,,,nan,nan,590546535
+Rua 1795,residential,nan,False,False,97.23400000000001,"[6118, 6255]",3152,60.0,0.002,nan,0.13352233171463013,0.14847834178502597,0.0,nan,nan,,,nan,nan,590546535
 nan,residential,nan,False,False,92.714,6309,3239,60.0,0.002,nan,0.34972819575557,1.0,0.0,nan,nan,,,nan,nan,590777074
 nan,residential,nan,False,True,95.153,"[6227, 6220, 9877]",4155,60.0,0.002,nan,0.5129621028900146,1.0,0.0,nan,nan,,,nan,nan,255563330
 nan,residential,nan,False,False,79.388,"[9152, 2728]",3873,60.0,0.001,nan,0.3770848979120669,1.0,0.0,nan,nan,,,nan,nan,255563330
 nan,residential,nan,False,True,46.5,3421,2252,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563355
-nan,residential,nan,False,False,32.781,10210,4223,60.0,0.001,nan,0.05238199234008789,0.0523790796275285,0.0,nan,nan,,,nan,nan,255563355
+nan,residential,nan,False,False,32.781,10210,4223,60.0,0.001,nan,0.05238199234008789,0.052379079627571504,0.0,nan,nan,,,nan,nan,255563355
 nan,residential,nan,False,False,34.39,10186,4219,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563361
 nan,residential,nan,False,False,39.984,"[6184, 6151]",3171,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563335
 nan,residential,nan,False,True,55.783,10187,4220,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563361
 nan,residential,nan,False,True,87.0,"[2818, 8956]",3829,60.0,0.002,nan,,0.0,0.0,nan,nan,2612441065.0,13037735194.0,2612441065_13037735194,nan,255563370
 Rua 1.826,residential,nan,False,True,168.888,3530,2295,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,255563328
 Impasse 1.511,residential,nan,False,False,202.466,"[4106, 4110]",2501,60.0,0.003,nan,,0.0,1892.20948792,nan,nan,,,nan,nan,479157496
-Avenida Samora Machel,tertiary,nan,True,False,341.463,"[3713, 3714, 3715, 10184, 5106, 2997, 10142, 10143]",2019,59.0,0.006,nan,0.08673644065856934,0.0016347856643108563,0.0,nan,nan,,,nan,nan,389844219
+Avenida Samora Machel,tertiary,nan,True,False,341.463,"[3713, 3714, 3715, 10184, 5106, 2997, 10142, 10143]",2019,59.0,0.006,nan,0.08673644065856934,0.0016347856643108237,0.0,nan,nan,,,nan,nan,389844219
 nan,tertiary,nan,True,False,24.262,"[3001, 591]",2020,59.0,0.0,nan,6.534649985177176,1.0,0.0,nan,nan,,,nan,roundabout,62226383
 nan,tertiary,nan,True,False,34.317,"[5464, 605, 2999]",2990,59.0,0.001,nan,6.441682603624132,0.9635546026080276,0.0,nan,nan,,,nan,roundabout,62226383
 V1,residential,nan,False,False,78.737,9363,3929,60.0,0.001,nan,4.371784410978618,1.0,0.0,nan,nan,,,nan,nan,887623914
@@ -1431,7 +1431,7 @@ nan,residential,nan,False,True,113.534,5879,3090,60.0,0.002,nan,,0.0,0.0,nan,nan
 nan,residential,nan,False,True,74.535,"[8913, 3046]",3820,60.0,0.001,nan,,0.0,1711.49200726,nan,nan,,,nan,nan,326191764
 nan,residential,nan,False,False,157.422,"[7864, 7859, 7860, 7862]",3626,60.0,0.003,nan,,0.0,1711.49200726,nan,nan,,,nan,nan,592390949
 V5/V14,residential,nan,True,False,627.0160000000001,"[3104, 9321, 9322, 9323, 9324, 9325, 9327, 9085]",2054,60.0,0.01,nan,4.1446041850923745,1.0,0.0,nan,nan,,,nan,nan,887629127
-nan,residential,nan,False,True,381.0,"[5376, 3074, 5378, 3076, 3078, 3080, 3082, 3086, 9233, 5372, 3092, 9236, 3094, 3100, 3102, 3103, 8991, 3106, 3110, 3112, 3044, 3048, 3052, 3054, 3056, 5366, 5368, 5370, 9084, 5374]",2053,60.0,0.01,nan,0.3353746732076009,0.04061743111641287,0.0,nan,nan,13037735166.0,3328127446.0,13037735166_3328127446,nan,685149812
+nan,residential,nan,False,True,381.0,"[5376, 3074, 5378, 3076, 3078, 3080, 3082, 3086, 9233, 5372, 3092, 9236, 3094, 3100, 3102, 3103, 8991, 3106, 3110, 3112, 3044, 3048, 3052, 3054, 3056, 5366, 5368, 5370, 9084, 5374]",2053,60.0,0.01,nan,0.3353746732076009,0.0406174311164138,0.0,nan,nan,13037735166.0,3328127446.0,13037735166_3328127446,nan,685149812
 nan,tertiary,nan,False,True,105.092,3126,2061,59.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,588685776
 nan,tertiary,nan,False,False,69.866,3766,2353,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,588685776
 PG-R003,residential,nan,False,True,116.269,9597,4030,60.0,0.002,nan,0.5115089416503906,1.0,0.0,nan,nan,,,nan,nan,346592661
@@ -1458,16 +1458,16 @@ R. 1779,residential,nan,False,True,68.685,"[3187, 8795]",3798,60.0,0.001,nan,0.0
 nan,residential,nan,False,False,112.275,7315,3548,60.0,0.002,nan,0.1674387093746301,1.0,0.0,nan,nan,,,nan,nan,1199342416
 nan,residential,nan,False,False,56.087,"[10092, 8565]",3762,60.0,0.001,nan,0.36659634908040367,1.0,0.0,nan,nan,,,nan,nan,385433667
 Rua 44,residential,nan,False,True,111.936,"[6304, 8540, 6302, 3199]",3238,60.0,0.002,nan,0.10839201155162993,0.6621353087012956,0.0,nan,nan,,,nan,nan,385433576
-Rua 44,residential,nan,False,False,147.45999999999998,"[3225, 3210, 8899]",2114,60.0,0.002,nan,0.08375333036695208,0.328025541236669,0.0,nan,nan,,,nan,nan,385433576
+Rua 44,residential,nan,False,False,147.45999999999998,"[3225, 3210, 8899]",2114,60.0,0.002,nan,0.08375333036695208,0.3280255412358422,0.0,nan,nan,,,nan,nan,385433576
 nan,residential,nan,False,False,45.584999999999994,"[3216, 6273, 6172]",3217,60.0,0.001,nan,0.08656454086303711,0.5478084207507478,0.0,nan,nan,,,nan,nan,1263826229
 nan,residential,nan,False,False,37.436,6853,3343,60.0,0.001,nan,0.2847054654901678,1.0,0.0,nan,nan,,,nan,nan,62224148
 R. 1779,residential,nan,False,False,79.735,3221,2109,60.0,0.001,nan,0.2341783979664678,1.0,0.0,nan,nan,,,nan,nan,686758039
 R. 1779,residential,nan,False,True,105.332,6390,3250,60.0,0.002,nan,0.09105967592310023,0.8883962110685524,0.0,nan,nan,,,nan,nan,686758040
 R. 1779,residential,nan,False,False,56.847,3229,2116,60.0,0.001,nan,0.28330862522125244,1.0,0.0,nan,nan,,,nan,nan,686758039
 nan,residential,nan,False,False,51.297,"[3208, 3212, 6916, 6765]",3390,60.0,0.001,nan,0.23935697759900773,1.0,0.0,nan,nan,,,nan,nan,385433663
-nan,residential,nan,False,False,51.169,6263,3211,60.0,0.001,nan,0.10139346122741699,0.13083572312717273,0.0,nan,nan,,,nan,nan,62224148
-nan,residential,nan,False,True,28.490000000000002,"[3219, 6854]",3345,60.0,0.0,nan,0.07172783215840657,0.31123659263647924,0.0,nan,nan,,,nan,nan,62224148
-Rua 44,residential,nan,False,False,132.205,"[6858, 7317, 7319]",3349,60.0,0.002,nan,0.15659894262041366,0.3679754755722163,0.0,nan,nan,,,nan,nan,385433576
+nan,residential,nan,False,False,51.169,6263,3211,60.0,0.001,nan,0.10139346122741699,0.13083572313176514,0.0,nan,nan,,,nan,nan,62224148
+nan,residential,nan,False,True,28.490000000000002,"[3219, 6854]",3345,60.0,0.0,nan,0.07172783215840657,0.31123659262720443,0.0,nan,nan,,,nan,nan,62224148
+Rua 44,residential,nan,False,False,132.205,"[6858, 7317, 7319]",3349,60.0,0.002,nan,0.15659894262041366,0.36797547557333005,0.0,nan,nan,,,nan,nan,385433576
 nan,residential,nan,False,True,196.248,"[6851, 6980, 6982]",3342,60.0,0.003,nan,0.19653693267277308,1.0,0.0,nan,nan,,,nan,nan,590815371
 nan,residential,nan,False,True,21.947,6171,3169,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,385433580
 nan,residential,nan,False,False,51.801,3236,2125,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,385433580
@@ -1510,19 +1510,19 @@ Rua 1794 (30),residential,nan,False,False,132.92,3326,2191,60.0,0.002,nan,0.0555
 nan,residential,nan,False,True,159.249,3331,2193,60.0,0.003,nan,0.27297312714332755,1.0,0.0,nan,nan,,,nan,nan,385433668
 nan,residential,nan,False,True,51.399,6935,3403,60.0,0.001,nan,0.26856740315755206,0.9927234199945816,0.0,nan,nan,,,nan,nan,1173665683
 Ava de Portugal / Rua 1751,residential,60,False,False,50.717,6943,3411,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,183218499
-nan,residential,nan,False,True,194.821,6937,3404,60.0,0.003,nan,0.19860108044682717,0.9218875647530672,0.0,nan,nan,,,nan,nan,385433426
+nan,residential,nan,False,True,194.821,6937,3404,60.0,0.003,nan,0.19860108044682717,0.921887564753025,0.0,nan,nan,,,nan,nan,385433426
 Ava de Portugal / Rua 1751,residential,60,False,True,45.742000000000004,"[9570, 2229]",4016,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,183218499
 nan,residential,nan,False,True,37.742000000000004,"[8729, 2733]",3787,60.0,0.001,nan,0.22927472988764444,1.0,0.0,nan,nan,,,nan,nan,183217121
 nan,residential,nan,False,False,163.096,"[4352, 2824, 2826, 2807, 5820]",2619,60.0,0.003,nan,0.38133985731336806,1.0,0.0,nan,nan,,,nan,nan,183217121
-nan,residential,nan,False,True,236.996,"[8769, 3297, 8771, 8773, 3311, 5809, 5811, 5817, 5813, 3286, 5815, 8761, 5819, 8765, 8767]",3793,60.0,0.004,nan,0.21028646608678306,0.7317472956214259,0.0,nan,nan,,,nan,nan,385433590
+nan,residential,nan,False,True,236.996,"[8769, 3297, 8771, 8773, 3311, 5809, 5811, 5817, 5813, 3286, 5815, 8761, 5819, 8765, 8767]",3793,60.0,0.004,nan,0.21028646608678306,0.731747295621326,0.0,nan,nan,,,nan,nan,385433590
 nan,residential,nan,False,True,5.288,7855,3621,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,385433574
 nan,residential,nan,False,False,30.664,10130,4204,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,385433574
 nan,residential,nan,False,True,49.923,6942,3410,60.0,0.001,nan,0.2533277364877554,1.0,0.0,nan,nan,,,nan,nan,1173665681
 nan,residential,nan,False,True,318.422,"[4833, 7212]",3515,60.0,0.005,nan,0.2492243229657754,1.0,0.0,nan,nan,,,nan,nan,385433668
 Rua 55,residential,nan,False,False,199.57000000000002,"[9546, 9551]",3999,60.0,0.003,nan,0.2432627244429155,1.0,0.0,nan,nan,,,nan,nan,"[1173665681, 1173665682]"
-nan,residential,nan,False,False,54.63,7280,3541,60.0,0.001,nan,0.1685804526011149,0.3418960596575155,0.0,nan,nan,,,nan,nan,591024414
-Rua 57,residential,nan,False,False,195.75400000000002,"[9955, 9556]",4002,60.0,0.003,nan,0.14639883774977464,0.7360395722685361,0.0,nan,nan,,,nan,nan,385433485
-nan,residential,nan,False,True,50.204,"[7272, 7275, 9907]",3538,60.0,0.001,nan,0.11773675680160522,0.21914832362355138,0.0,nan,nan,,,nan,nan,591024414
+nan,residential,nan,False,False,54.63,7280,3541,60.0,0.001,nan,0.1685804526011149,0.3418960596082961,0.0,nan,nan,,,nan,nan,591024414
+Rua 57,residential,nan,False,False,195.75400000000002,"[9955, 9556]",4002,60.0,0.003,nan,0.14639883774977464,0.7360395722702004,0.0,nan,nan,,,nan,nan,385433485
+nan,residential,nan,False,True,50.204,"[7272, 7275, 9907]",3538,60.0,0.001,nan,0.11773675680160522,0.2191483236174927,0.0,nan,nan,,,nan,nan,591024414
 nan,residential,nan,False,True,5.185,4273,2560,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,183217105
 nan,residential,nan,False,False,49.789,"[8972, 7854]",3623,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,385433574
 nan,residential,nan,False,True,21.57,4257,2549,60.0,0.0,nan,0.1363779604434967,1.0,0.0,nan,nan,,,nan,nan,385433528
@@ -1546,7 +1546,7 @@ nan,residential,nan,False,True,257.219,"[5538, 5540, 5542, 3654, 5544, 3656, 554
 Rua 1.789,residential,nan,False,False,46.098,3409,2244,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224267
 Rua 1.806,residential,nan,False,True,187.956,"[3424, 6160, 3408, 6158]",2257,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,385433522
 nan,residential,nan,False,True,43.273,8602,3766,60.0,0.001,nan,0.4888725280761719,1.0,0.0,nan,nan,,,nan,nan,681245002
-Rua 1.791,residential,nan,False,True,94.25200000000001,"[8601, 9092, 3431]",2260,60.0,0.002,nan,0.25353656496320454,0.8764423200626772,0.0,nan,nan,,,nan,nan,590522951
+Rua 1.791,residential,nan,False,True,94.25200000000001,"[8601, 9092, 3431]",2260,60.0,0.002,nan,0.25353656496320454,0.8764423200629458,0.0,nan,nan,,,nan,nan,590522951
 nan,residential,nan,False,False,59.830999999999996,"[3669, 7845]",3615,60.0,0.001,nan,0.4870873769124349,1.0,0.0,nan,nan,,,nan,nan,255563361
 nan,residential,nan,False,False,40.747,3420,2251,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563355
 nan,residential,nan,False,True,35.885,"[4337, 2820]",2607,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563355
@@ -1560,8 +1560,8 @@ nan,residential,nan,False,False,202.25900000000001,"[3400, 6954, 6834, 6836, 341
 Rua 1.804,residential,nan,False,True,39.144,3429,2258,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,385433540
 Rua 1.799,residential,nan,False,False,96.779,"[6257, 3438]",2267,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,385433550
 nan,tertiary,nan,False,False,30.857,"[6131, 364]",3160,59.0,0.001,nan,,0.0,6800.10864258,nan,nan,,,nan,nan,54172956
-nan,residential,nan,False,True,340.95899999999995,"[3456, 3458, 3460, 3462, 8689, 6136, 3449, 6138, 6140, 3453, 6142]",2272,60.0,0.006,nan,0.13437767028808595,0.06642860193315624,0.0,nan,nan,,,nan,nan,385433391
-nan,residential,nan,False,False,152.091,"[6051, 6053, 6055, 9193, 6057, 6059, 6125, 6062, 6063, 6065, 6067, 6069, 6071, 6073]",3155,60.0,0.003,nan,0.47719007922757056,0.7093316129600774,0.0,nan,nan,,,nan,nan,"[685127979, 590522942]"
+nan,residential,nan,False,True,340.95899999999995,"[3456, 3458, 3460, 3462, 8689, 6136, 3449, 6138, 6140, 3453, 6142]",2272,60.0,0.006,nan,0.13437767028808595,0.066428601932505,0.0,nan,nan,,,nan,nan,385433391
+nan,residential,nan,False,False,152.091,"[6051, 6053, 6055, 9193, 6057, 6059, 6125, 6062, 6063, 6065, 6067, 6069, 6071, 6073]",3155,60.0,0.003,nan,0.47719007922757056,0.7093316129601929,0.0,nan,nan,,,nan,nan,"[685127979, 590522942]"
 nan,residential,nan,False,True,59.869,"[4899, 3467, 6124, 6127, 8344]",3154,60.0,0.001,nan,0.4534318182203505,0.7208209167181093,0.0,nan,nan,,,nan,nan,385433384
 Rua 1.832,residential,nan,False,True,316.0,"[4897, 6018, 6020, 9188, 6022, 3463, 6024, 4883, 4885, 4887, 4889, 4891, 4893, 4895]",2274,60.0,0.007,nan,0.8745866072805304,1.0,0.0,nan,nan,13037735203.0,3887805451.0,13037735203_3887805451,nan,255563333
 nan,residential,nan,True,False,59.573,3480,2277,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,253460750
@@ -1579,7 +1579,7 @@ Rua 1.824,residential,nan,False,True,17.554,4869,2823,60.0,0.0,nan,,0.0,0.0,nan,
 nan,residential,nan,False,True,23.994,3554,2306,60.0,0.0,nan,0.12009723981221516,0.8301008081624586,0.0,nan,nan,,,nan,nan,385524559
 nan,residential,nan,False,False,162.0,"[1444, 1446, 1448, 1450, 1452, 1454, 1456, 5619, 5621]",3049,60.0,0.003,nan,0.13243502378463745,0.3097006933145628,0.0,nan,nan,3888725418.0,13037735200.0,3888725418_13037735200,nan,183112047
 nan,residential,nan,False,True,237.918,"[3590, 3594, 3596, 3600, 3602, 5746, 3604, 5748, 3610, 3612, 3614]",2315,60.0,0.004,nan,0.11227786540985107,0.0799129293122305,0.0,nan,nan,,,nan,nan,385524568
-nan,residential,nan,False,True,160.424,"[9251, 3588, 3598, 8244, 3606, 3581, 3583]",3718,60.0,0.003,nan,0.396069155799018,0.8385734255229231,0.0,nan,nan,,,nan,nan,385524568
+nan,residential,nan,False,True,160.424,"[9251, 3588, 3598, 8244, 3606, 3581, 3583]",3718,60.0,0.003,nan,0.396069155799018,0.8385734255229234,0.0,nan,nan,,,nan,nan,385524568
 nan,residential,nan,False,True,114.0,"[3557, 1432, 3559, 5736, 5738, 3563, 5740, 5742, 3567, 3569, 1430, 3608, 1434, 3579, 3549, 5758]",2313,60.0,0.005,nan,0.2630560874938965,0.8107433943017993,0.0,nan,nan,13037735201.0,3888725454.0,13037735201_3888725454,nan,183112046
 nan,tertiary,nan,True,False,26.162,"[3688, 3686, 3687]",2316,59.0,0.0,nan,,0.0,4127.86200237,nan,nan,,,nan,roundabout,389844218
 Avenida Samora Machel,tertiary,nan,True,False,73.03299999999999,"[3712, 5107, 3726]",2333,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,389844219
@@ -1643,10 +1643,10 @@ Armando Tivane,tertiary,nan,True,False,13.384,5097,2902,59.0,0.0,nan,,0.0,1691.7
 Armando Tivane,tertiary,nan,True,False,13.242,3900,2407,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,62226382
 Armando Tivane,tertiary,nan,True,False,146.439,3909,2412,59.0,0.002,nan,0.061795949935913086,0.023001107037777448,0.0,nan,nan,,,nan,nan,62226382
 Armando Tivane,tertiary,nan,True,False,17.46,3905,2409,59.0,0.0,nan,,0.0,1691.79252434,nan,nan,,,nan,nan,104498606
-nan,tertiary_link,nan,True,False,28.325,"[3906, 3908]",2411,59.0,0.0,nan,0.12477755546569824,0.027864503927723803,0.0,nan,nan,,,nan,nan,478347701
+nan,tertiary_link,nan,True,False,28.325,"[3906, 3908]",2411,59.0,0.0,nan,0.12477755546569824,0.027864503927788716,0.0,nan,nan,,,nan,nan,478347701
 Armando Tivane,tertiary,nan,True,False,14.238,3911,2413,59.0,0.0,nan,,0.0,1691.79252434,nan,nan,,,nan,nan,104498606
 Armando Tivane,tertiary,nan,True,False,14.094,3907,2410,59.0,0.0,nan,0.1248171329498291,0.27948040221037324,0.0,nan,nan,,,nan,nan,62226382
-Armando Tivane,tertiary,nan,True,False,244.776,5134,2919,59.0,0.004,nan,0.10170900821685791,0.04370781909557187,0.0,nan,nan,,,nan,nan,62226382
+Armando Tivane,tertiary,nan,True,False,244.776,5134,2919,59.0,0.004,nan,0.10170900821685791,0.04370781909555442,0.0,nan,nan,,,nan,nan,62226382
 nan,tertiary_link,nan,True,False,27.872,"[3912, 3910]",2414,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,478347702
 nan,residential,nan,True,False,21.185,3918,2417,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,478349368
 nan,residential,nan,True,False,31.662,"[3914, 3915]",2415,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,478349366
@@ -1664,7 +1664,7 @@ nan,tertiary,nan,False,True,24.195,"[1137, 9533]",3987,59.0,0.0,nan,,0.0,15354.0
 nan,tertiary_link,nan,True,False,20.293,"[4024, 4020, 4021, 4022]",2460,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,479147375
 Avenida 24 de Julho,tertiary,nan,True,False,21.26,4023,2459,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,62229137
 Avenida 24 de Julho,tertiary,60,True,False,54.742,"[4025, 9484]",2461,60.0,0.001,nan,,0.0,15354.061733249999,2,praca da independencia e dos professores,,,nan,nan,62226384
-nan,residential,nan,False,True,142.8,"[10137, 10139, 10141, 10135]",4207,60.0,0.002,nan,0.5172130039760044,0.8672145012548929,0.0,nan,nan,,,nan,nan,1352847231
+nan,residential,nan,False,True,142.8,"[10137, 10139, 10141, 10135]",4207,60.0,0.002,nan,0.5172130039760044,0.8672145012549056,0.0,nan,nan,,,nan,nan,1352847231
 Avenida 24 de Julho,tertiary,60,True,False,19.849,4031,2465,60.0,0.0,nan,,0.0,15354.061733249999,2,praca da independencia e dos professores,,,nan,nan,62226384
 nan,residential,nan,False,True,31.831999999999997,"[4081, 4083, 4077, 4079]",2491,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479152736
 nan,residential,nan,True,False,48.157,"[5706, 4035]",3061,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479149591
@@ -1697,7 +1697,7 @@ nan,tertiary,nan,False,True,63.416,"[4392, 745]",2645,59.0,0.001,nan,,0.0,0.0,na
 nan,residential,nan,False,True,134.099,"[4385, 5380, 5382, 4379, 4381, 4383]",2640,60.0,0.002,nan,,0.0,2311.43289948,nan,nan,,,nan,nan,685123256
 nan,residential,nan,False,False,176.2,"[4154, 5389, 4150, 5391]",2531,60.0,0.003,nan,0.16225242614746094,0.08550246745912238,0.0,nan,nan,,,nan,nan,479164063
 Rua Alfredo Lawley,secondary,nan,False,True,67.484,"[5406, 9447]",3959,50.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224547
-Rua Alfredo Lawley,secondary,nan,False,False,196.70100000000002,"[9376, 4147, 671]",3936,50.0,0.004,nan,0.21797680854797363,0.011560485692636624,0.0,nan,nan,,,nan,nan,62224547
+Rua Alfredo Lawley,secondary,nan,False,False,196.70100000000002,"[9376, 4147, 671]",3936,50.0,0.004,nan,0.21797680854797363,0.011560485692642878,0.0,nan,nan,,,nan,nan,62224547
 nan,tertiary_link,nan,True,False,32.113,"[4225, 4218, 4219, 4220, 4221, 4222, 4223]",2535,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479166608
 nan,tertiary,nan,True,False,26.01,4232,2537,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,204092456
 nan,tertiary,nan,True,False,29.877,4224,2534,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,52014467
@@ -1710,7 +1710,7 @@ nan,residential,nan,False,False,50.132,4326,2595,60.0,0.001,nan,0.06125617027282
 nan,residential,nan,False,True,123.233,"[4265, 4255]",2557,60.0,0.002,nan,0.2277646906235639,1.0,0.0,nan,nan,,,nan,nan,479169834
 nan,residential,nan,False,False,58.735,"[4264, 4262]",2556,60.0,0.001,nan,0.12893134355545044,1.0,0.0,nan,nan,,,nan,nan,479169834
 nan,residential,nan,False,False,56.567,10148,4208,60.0,0.001,nan,0.21908419926961262,1.0,0.0,nan,nan,,,nan,nan,1374792928
-nan,residential,nan,False,False,57.905,"[4274, 4268, 4270]",2561,60.0,0.001,nan,0.13289049693516322,0.46703543374626,0.0,nan,nan,,,nan,nan,479169835
+nan,residential,nan,False,False,57.905,"[4274, 4268, 4270]",2561,60.0,0.001,nan,0.13289049693516322,0.4670354337462409,0.0,nan,nan,,,nan,nan,479169835
 nan,residential,nan,False,True,47.75,7851,3617,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183217119
 nan,residential,nan,False,False,64.404,4280,2567,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479169836
 nan,residential,nan,False,True,10.865,10131,4205,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,385433574
@@ -1724,7 +1724,7 @@ nan,residential,nan,False,False,81.111,4320,2589,60.0,0.001,nan,,0.0,0.0,nan,nan
 nan,residential,nan,False,False,46.448,5877,3089,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479169839
 nan,residential,nan,False,True,127.751,"[8033, 8035, 4316, 5878]",3091,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,479169839
 nan,residential,nan,False,"[False, True]",52.571999999999996,"[8019, 8027, 8022, 8023]",3681,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,"[677692016, 326191755]"
-nan,residential,nan,False,True,408.0,"[8001, 3042, 8003, 8005, 5926, 8007, 5928, 8009, 3114, 8011, 8013, 8206, 8015, 8017, 8018, 3058, 3060]",3678,60.0,0.007,nan,0.15087811763469988,0.47931542100212954,0.0,nan,nan,4723168160.0,13037735174.0,4723168160_13037735174,nan,677692016
+nan,residential,nan,False,True,408.0,"[8001, 3042, 8003, 8005, 5926, 8007, 5928, 8009, 3114, 8011, 8013, 8206, 8015, 8017, 8018, 3058, 3060]",3678,60.0,0.007,nan,0.15087811763469988,0.4793154210020745,0.0,nan,nan,4723168160.0,13037735174.0,4723168160_13037735174,nan,677692016
 nan,residential,nan,False,False,46.345,8026,3679,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,326191755
 nan,residential,nan,False,False,56.151,4325,2592,60.0,0.001,nan,0.23041529655456544,0.38995612466978646,0.0,nan,nan,,,nan,nan,479169840
 nan,residential,nan,False,True,35.299,"[8025, 1812]",3680,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183217122
@@ -1734,7 +1734,7 @@ nan,residential,nan,False,True,14.612,7870,3631,60.0,0.0,nan,,0.0,0.0,nan,nan,,,
 nan,residential,nan,False,False,166.183,4341,2610,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,479170169
 nan,residential,nan,False,True,31.049,7867,3628,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,255563339
 nan,residential,nan,False,False,100.644,4343,2612,60.0,0.002,nan,0.19764971733093262,0.3262437852370838,0.0,nan,nan,,,nan,nan,479170456
-Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,False,113.874,8102,3697,50.0,0.002,nan,0.0973961353302002,0.012237056255550525,0.0,nan,nan,,,nan,nan,887795677
+Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,False,113.874,8102,3697,50.0,0.002,nan,0.0973961353302002,0.012237056263279972,0.0,nan,nan,,,nan,nan,887795677
 nan,residential,nan,False,False,60.153,"[4347, 4351]",2618,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479170457
 nan,residential,nan,False,False,227.858,"[4354, 2946, 2884, 8526, 8528, 2837, 2941]",2621,60.0,0.004,nan,0.3434627000675645,0.7712547841636456,0.0,nan,nan,,,nan,nan,255563335
 nan,residential,nan,False,False,62.987,4363,2626,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479173010
@@ -1748,7 +1748,7 @@ nan,residential,nan,False,False,205.616,"[4393, 5395, 4389, 5393]",2646,60.0,0.0
 nan,residential,nan,False,False,70.356,8231,3715,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,253461093
 nan,residential,nan,False,False,82.268,"[4399, 4401, 4403, 4405, 5433, 5435]",2651,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479173791
 nan,residential,nan,False,True,140.731,4412,2654,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,479173793
-nan,residential,nan,False,False,416.82899999999995,"[4417, 4419, 4421, 4423, 4425, 4427, 4431, 5431, 4413, 4415]",2658,60.0,0.007,nan,0.2510879740995519,0.4617747240967168,0.0,nan,nan,,,nan,nan,479173793
+nan,residential,nan,False,False,416.82899999999995,"[4417, 4419, 4421, 4423, 4425, 4427, 4431, 5431, 4413, 4415]",2658,60.0,0.007,nan,0.2510879740995519,0.46177472408993453,0.0,nan,nan,,,nan,nan,479173793
 nan,residential,nan,False,True,62.96,5457,2987,60.0,0.001,nan,,0.0,5410.76631832,nan,nan,,,nan,nan,183217120
 nan,residential,nan,False,False,83.914,"[4408, 5422]",2979,60.0,0.001,nan,,0.0,5410.76631832,nan,nan,,,nan,nan,183217120
 nan,tertiary,nan,False,False,219.008,5450,2982,59.0,0.004,nan,2.243562089635971,0.9563826850319087,0.0,nan,nan,,,nan,nan,318655603
@@ -1758,7 +1758,7 @@ nan,residential,nan,False,False,44.03,4482,2679,60.0,0.001,nan,,0.0,1846.9139595
 nan,residential,nan,False,True,129.41,"[4483, 4458, 4460, 4462, 6511, 6513, 8252]",2684,60.0,0.002,nan,,0.0,1846.9139595,nan,nan,,,nan,nan,479183154
 nan,residential,nan,False,True,74.0,"[8048, 8052, 4476]",2676,60.0,0.002,nan,,0.0,1942.03381729,nan,nan,4723291238.0,13037735214.0,4723291238_13037735214,nan,479183155
 nan,residential,nan,False,False,75.934,"[4472, 4474, 6523, 4477]",2677,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479183157
-nan,residential,nan,False,False,135.179,"[8049, 4588, 8053, 8045]",3686,60.0,0.002,nan,0.1344669818878174,0.3115802517177056,0.0,nan,nan,,,nan,nan,479183173
+nan,residential,nan,False,False,135.179,"[8049, 4588, 8053, 8045]",3686,60.0,0.002,nan,0.1344669818878174,0.3115802517174494,0.0,nan,nan,,,nan,nan,479183173
 nan,residential,nan,False,True,53.0,"[8048, 8052, 4476]",2676,60.0,0.002,nan,,0.0,0.0,nan,nan,13037735214.0,4723291242.0,13037735214_4723291242,nan,479183155
 nan,residential,nan,False,False,124.067,4488,2687,60.0,0.002,nan,,0.0,1846.9139595,nan,nan,,,nan,nan,479183161
 nan,residential,nan,False,True,101.32,5034,2882,60.0,0.002,nan,0.6437862836397611,1.0,0.0,nan,nan,,,nan,nan,546413243
@@ -1766,12 +1766,12 @@ nan,residential,nan,False,False,119.291,"[6101, 4493, 4495]",3140,60.0,0.002,nan
 nan,residential,nan,False,"[False, True]",56.592,"[4796, 5973, 4564, 4797]",2705,60.0,0.001,yes,0.9479504903157552,1.0,0.0,nan,nan,,,nan,nan,"[590494929, 489364460, 546413245]"
 nan,residential,nan,False,True,442.0,"[5004, 6028, 6030, 5007, 6032, 5009, 6034, 5011, 6036, 5013, 6038, 5015, 6040, 5017, 6042, 5019, 6044, 5021, 6046, 5023, 6048]",2878,60.0,0.008,nan,0.6531251568660558,1.0,0.0,nan,nan,4723291246.0,13037735212.0,4723291246_13037735212,nan,546413242
 nan,tertiary,nan,False,True,27.716,6576,3282,59.0,0.0,nan,,0.0,8689.02090454,nan,nan,,,nan,nan,54172956
-nan,tertiary,nan,False,False,31.512999999999998,"[4522, 6084, 6086]",2702,59.0,0.001,yes,0.7780036926269531,0.5935665476714682,8689.02090454,nan,nan,,,nan,nan,"[590522944, 590522945, 54172956]"
-nan,residential,nan,False,True,422.294,"[4512, 6050, 6099, 4500, 4502, 4504, 4506, 4508, 4510]",3138,60.0,0.007,nan,0.7045078822544643,0.9818265824098051,0.0,nan,nan,,,nan,nan,479183163
-nan,residential,nan,False,False,348.389,"[4802, 4804, 4806, 4808, 8092, 4810, 4812, 4814, 4816, 4818, 4820, 4822, 4824, 4826, 4828, 4830]",2794,60.0,0.006,nan,1.1500347800876782,0.9924115071393526,0.0,nan,nan,,,nan,nan,685127983
+nan,tertiary,nan,False,False,31.512999999999998,"[4522, 6084, 6086]",2702,59.0,0.001,yes,0.7780036926269531,0.5935665476883596,8689.02090454,nan,nan,,,nan,nan,"[590522944, 590522945, 54172956]"
+nan,residential,nan,False,True,422.294,"[4512, 6050, 6099, 4500, 4502, 4504, 4506, 4508, 4510]",3138,60.0,0.007,nan,0.7045078822544643,0.9818265824103762,0.0,nan,nan,,,nan,nan,479183163
+nan,residential,nan,False,False,348.389,"[4802, 4804, 4806, 4808, 8092, 4810, 4812, 4814, 4816, 4818, 4820, 4822, 4824, 4826, 4828, 4830]",2794,60.0,0.006,nan,1.1500347800876782,0.99241150713936,0.0,nan,nan,,,nan,nan,685127983
 nan,residential,nan,False,False,50.049,9767,4114,60.0,0.001,nan,0.7139547788179837,1.0,0.0,nan,nan,,,nan,nan,1255312927
 nan,residential,nan,False,True,324.858,"[4801, 4585, 4583]",2793,60.0,0.005,nan,0.6423819271134742,1.0,0.0,nan,nan,,,nan,nan,685107625
-nan,residential,nan,False,False,207.0,"[4524, 4526, 4528, 4530, 4532, 4534, 4536, 4538, 4540, 4542, 4544, 4546, 4548, 4550, 4552, 4554, 4556, 4558, 4560, 5968, 4562, 5970]",2703,60.0,0.01,nan,0.30509356963328826,0.7311015229538332,0.0,nan,nan,4723291259.0,13037735213.0,4723291259_13037735213,nan,479183167
+nan,residential,nan,False,False,207.0,"[4524, 4526, 4528, 4530, 4532, 4534, 4536, 4538, 4540, 4542, 4544, 4546, 4548, 4550, 4552, 4554, 4556, 4558, 4560, 5968, 4562, 5970]",2703,60.0,0.01,nan,0.30509356963328826,0.731101522925239,0.0,nan,nan,4723291259.0,13037735213.0,4723291259_13037735213,nan,479183167
 nan,residential,nan,False,False,44.449,"[4565, 4567, 4569, 4571, 4799]",2792,60.0,0.001,nan,0.5064258942237267,1.0,0.0,nan,nan,,,nan,nan,479183167
 nan,residential,nan,False,False,416.0,"[4524, 4526, 4528, 4530, 4532, 4534, 4536, 4538, 4540, 4542, 4544, 4546, 4548, 4550, 4552, 4554, 4556, 4558, 4560, 5968, 4562, 5970]",2703,60.0,0.01,nan,0.4966590382228388,1.0,0.0,nan,nan,13037735213.0,4723291279.0,13037735213_4723291279,nan,479183167
 nan,residential,nan,False,True,21.435,4800,2791,60.0,0.0,nan,0.5895973046620687,1.0,0.0,nan,nan,,,nan,nan,479183167
@@ -1786,10 +1786,10 @@ nan,residential,nan,False,True,17.765,9737,4111,60.0,0.0,nan,,0.0,0.0,nan,nan,,,
 nan,residential,nan,False,False,147.688,4667,2737,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,479184839
 nan,residential,nan,False,False,32.082,4676,2747,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,479184841
 nan,residential,nan,False,True,102.11,9445,3957,60.0,0.002,nan,1.0007816314697267,1.0,0.0,nan,nan,,,nan,nan,1050475837
-"['Rua Arq. Domingos', 'Rua Dom Francisco de Almeida (1.272)']",residential,nan,False,True,193.442,"[5208, 5207]",2948,60.0,0.003,nan,0.6076093633124169,0.8731492256774782,0.0,nan,nan,,,nan,nan,"[489093044, 589208652]"
+"['Rua Dom Francisco de Almeida (1.272)', 'Rua Arq. Domingos']",residential,nan,False,True,193.442,"[5208, 5207]",2948,60.0,0.003,nan,0.6076093633124169,0.8731492256774782,0.0,nan,nan,,,nan,nan,"[489093044, 589208652]"
 nan,residential,nan,False,False,32.499,4744,2759,60.0,0.001,nan,,0.0,1474.05879116,nan,nan,,,nan,nan,589213613
 nan,residential,nan,False,True,135.593,"[4736, 8450, 9443, 4738, 8464, 8466, 4722, 8468, 4724, 8470, 4726, 4728, 4730, 4732, 4734]",3748,60.0,0.002,nan,,0.0,1474.05879116,nan,nan,,,nan,nan,489099132
-nan,residential,nan,False,True,202.539,"[5249, 5251, 5231, 5234, 5236, 8533, 5238, 5240, 5242, 5243, 7932, 7934, 5247]",2952,60.0,0.003,nan,0.09718342260880904,0.23876234746706085,0.0,nan,nan,,,nan,nan,"[589213614, 589213615]"
+nan,residential,nan,False,True,202.539,"[5249, 5251, 5231, 5234, 5236, 8533, 5238, 5240, 5242, 5243, 7932, 7934, 5247]",2952,60.0,0.003,nan,0.09718342260880904,0.2387623474670736,0.0,nan,nan,,,nan,nan,"[589213614, 589213615]"
 nan,residential,nan,False,False,8.817,5291,2960,60.0,0.0,nan,,0.0,1474.05879116,nan,nan,,,nan,nan,183067163
 nan,residential,nan,False,True,65.101,"[3024, 4758]",2762,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,183067163
 nan,residential,nan,False,True,91.451,"[5258, 3019, 3013, 3015]",2955,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183067163
@@ -1807,7 +1807,7 @@ Rua 58,residential,nan,False,True,171.434,9542,3992,60.0,0.003,nan,0.18360663569
 Rua 58,residential,nan,False,True,188.787,"[8891, 7167]",3486,60.0,0.003,nan,0.1714747685652513,0.5027249306990218,0.0,nan,nan,,,nan,nan,489364457
 Rua 1.755 (38),residential,nan,False,True,50.063,6868,3357,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,489364458
 Rua 1.760 (37),residential,nan,False,True,193.762,"[6784, 4632]",3330,60.0,0.003,nan,0.5241121859163851,0.6970186960106427,0.0,nan,nan,,,nan,nan,685127982
-Rua 1.762 (36),residential,nan,False,True,241.31399999999996,"[6793, 4789, 6790]",3332,60.0,0.004,nan,0.5095201730728149,0.4668817873677463,0.0,nan,nan,,,nan,nan,489364459
+Rua 1.762 (36),residential,nan,False,True,241.31399999999996,"[6793, 4789, 6790]",3332,60.0,0.004,nan,0.5095201730728149,0.4668817873698428,0.0,nan,nan,,,nan,nan,489364459
 Rua 1.760 (37),residential,nan,False,False,140.525,"[8518, 6783]",3329,60.0,0.002,nan,0.549427916363972,1.0,0.0,nan,nan,,,nan,nan,685127982
 nan,residential,nan,True,False,27.069000000000003,"[4849, 4845, 4846]",2803,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,489414622
 nan,residential,nan,True,False,17.925,"[3809, 3810, 892, 4839]",2798,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,roundabout,407458653
@@ -1823,7 +1823,7 @@ Rua Tenente Alves (1.053),residential,nan,True,False,63.332,4862,2816,60.0,0.001
 Rua Tenente Alves (1.053),residential,nan,True,False,17.828,5799,3081,60.0,0.0,nan,,0.0,0.0,2,nan,,,nan,nan,172425140
 Rua 1.824,residential,nan,False,True,68.739,4871,2825,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,385524622
 Rua 1.836,residential,nan,False,True,50.262,4873,2827,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,546413222
-Rua 1.822,residential,nan,False,False,187.169,4877,2831,60.0,0.003,nan,0.2720680236816406,0.04781487120925592,0.0,nan,nan,,,nan,nan,546413227
+Rua 1.822,residential,nan,False,False,187.169,4877,2831,60.0,0.003,nan,0.2720680236816406,0.04781487120868505,0.0,nan,nan,,,nan,nan,546413227
 Rua 1.830,residential,nan,False,True,44.262,4881,2835,60.0,0.001,nan,0.8219482898712158,1.0,0.0,nan,nan,,,nan,nan,681245000
 nan,residential,nan,False,False,185.213,"[4901, 4903, 4905, 4907, 4909, 4921]",2842,60.0,0.003,nan,0.8399584244708626,1.0,0.0,nan,nan,,,nan,nan,546413232
 nan,residential,nan,False,False,58.251999999999995,"[4912, 4914, 4918]",2839,60.0,0.001,nan,0.707295298576355,1.0,0.0,nan,nan,,,nan,nan,546413233
@@ -1831,7 +1831,7 @@ nan,residential,nan,False,False,54.965,4922,2841,60.0,0.001,nan,0.77135378973824
 nan,residential,nan,False,False,104.966,"[4961, 4916]",2854,60.0,0.002,nan,0.7480570475260416,1.0,0.0,nan,nan,,,nan,nan,546413233
 nan,residential,nan,False,False,62.379999999999995,"[6088, 4924, 4926]",3130,60.0,0.001,nan,0.8011370340983073,1.0,0.0,nan,nan,,,nan,nan,546413234
 nan,tertiary,nan,False,False,84.192,4939,2847,59.0,0.001,nan,,0.0,8689.02090454,nan,nan,,,nan,nan,54172956
-nan,residential,nan,False,True,290.071,"[8608, 4929, 4931, 8612, 4933, 4935, 6089, 8606]",3131,60.0,0.005,nan,0.819822606906085,0.9838140108613334,0.0,nan,nan,,,nan,nan,546413234
+nan,residential,nan,False,True,290.071,"[8608, 4929, 4931, 8612, 4933, 4935, 6089, 8606]",3131,60.0,0.005,nan,0.819822606906085,0.9838140108613271,0.0,nan,nan,,,nan,nan,546413234
 nan,tertiary,nan,False,True,140.0,"[9192, 9107, 6132, 357]",3161,59.0,0.005,nan,,0.0,8689.02090454,nan,nan,5280400478.0,13037735205.0,5280400478_13037735205,nan,54172956
 nan,tertiary,nan,False,False,73.835,6575,3281,59.0,0.001,nan,,0.0,8689.02090454,nan,nan,,,nan,nan,54172956
 nan,residential,nan,False,False,290.63300000000004,"[8609, 4942, 4944, 4946, 5976, 4948, 4950, 4952, 4954, 5978]",2850,60.0,0.005,nan,0.8531458142777564,0.9690441405652204,0.0,nan,nan,,,nan,nan,546413235
@@ -1891,7 +1891,7 @@ nan,residential,nan,False,True,210.444,"[5344, 5282, 5346, 5284, 5286, 5288]",29
 nan,residential,nan,False,False,185.099,"[5252, 5259, 5261, 1360, 1362, 1364, 5311]",2964,60.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,183067163
 nan,residential,nan,False,False,45.0,"[5294, 5296, 5298, 9396, 5300, 5302, 5304, 5306, 5308, 5310]",2963,60.0,0.002,nan,,0.0,1474.05879116,nan,nan,5626576859.0,13037735190.0,5626576859_13037735190,nan,589222036
 nan,residential,nan,False,False,70.0,"[5294, 5296, 5298, 9396, 5300, 5302, 5304, 5306, 5308, 5310]",2963,60.0,0.002,nan,,0.0,0.0,nan,nan,13037735190.0,5626576868.0,13037735190_5626576868,nan,589222036
-nan,residential,nan,False,False,67.614,"[5263, 1358, 8183]",3708,60.0,0.001,nan,0.08067736625671387,0.20700435362199543,0.0,nan,nan,,,nan,nan,183067163
+nan,residential,nan,False,False,67.614,"[5263, 1358, 8183]",3708,60.0,0.001,nan,0.08067736625671387,0.20700435362062644,0.0,nan,nan,,,nan,nan,183067163
 nan,residential,nan,False,False,276.863,"[8098, 8099, 8536, 5316, 5318, 5314, 5320, 5322, 5324, 5326, 5328, 5330, 5332, 5334, 8534, 5336, 5338]",3696,60.0,0.005,nan,,0.0,0.0,nan,nan,,,nan,nan,589222040
 nan,residential,nan,False,False,47.244,5350,2971,60.0,0.001,nan,,0.0,1531.52594566,nan,nan,,,nan,nan,589238912
 nan,residential,nan,False,True,14.0,"[3948, 5349]",2973,60.0,0.003,nan,,0.0,1531.52594566,nan,nan,13037735191.0,5626710680.0,13037735191_5626710680,nan,60944889
@@ -1901,7 +1901,7 @@ nan,residential,nan,False,False,33.0,"[5424, 5416, 5418, 5420]",2981,60.0,0.002,
 nan,residential,nan,False,False,127.0,"[5449, 5437, 5425]",2984,60.0,0.003,nan,,0.0,13693.90625095,nan,nan,5632396937.0,13037735220.0,5632396937_13037735220,nan,183217120
 nan,tertiary,nan,True,False,132.543,"[5452, 9365]",2985,59.0,0.002,nan,3.27679926554362,0.9679402277427608,0.0,nan,nan,,,nan,nan,964945085
 nan,residential,nan,False,False,27.0,"[5449, 5437, 5425]",2984,60.0,0.003,nan,3.402624766031901,0.2750630183932817,0.0,nan,nan,13037735220.0,5632424987.0,13037735220_5632424987,nan,183217120
-Avenida 24 De Julho,tertiary,nan,True,False,148.143,"[4095, 812, 2566, 5463]",2989,59.0,0.003,nan,2.587655038544626,0.9709292845689353,0.0,nan,nan,,,nan,nan,62226379
+Avenida 24 De Julho,tertiary,nan,True,False,148.143,"[4095, 812, 2566, 5463]",2989,59.0,0.003,nan,2.587655038544626,0.970929284568935,0.0,nan,nan,,,nan,nan,62226379
 nan,tertiary_link,nan,True,False,29.351,5471,2993,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,589862870
 Armando Tivane,tertiary,nan,True,False,16.524,5473,2995,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,62226382
 Armando Tivane,tertiary,nan,True,False,15.828,5470,2992,59.0,0.0,nan,,0.0,15354.061733249999,nan,nan,,,nan,nan,104498606
@@ -1947,12 +1947,12 @@ PG-R006,residential,nan,False,False,120.923,9599,4032,60.0,0.002,nan,0.604732401
 nan,residential,nan,False,False,66.967,9957,4180,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,1280531913
 nan,residential,nan,False,False,33.0,"[1444, 1446, 1448, 1450, 1452, 1454, 1456, 5619, 5621]",3049,60.0,0.003,nan,0.1064074993133545,0.4270458656885039,0.0,nan,nan,13037735200.0,5632850451.0,13037735200_5632850451,nan,183112047
 nan,residential,nan,False,True,93.044,"[8782, 8784, 8786, 8788, 8789]",3796,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,589902002
-nan,residential,nan,False,False,201.857,"[5664, 5667, 5636, 5638, 5640, 5642, 5644, 5646, 5648, 5650, 5652, 5654, 5656, 5658, 5660, 5662]",3055,60.0,0.003,nan,0.1818012609714415,0.7633534512291137,0.0,nan,nan,,,nan,nan,589902002
+nan,residential,nan,False,False,201.857,"[5664, 5667, 5636, 5638, 5640, 5642, 5644, 5646, 5648, 5650, 5652, 5654, 5656, 5658, 5660, 5662]",3055,60.0,0.003,nan,0.1818012609714415,0.7633534512292917,0.0,nan,nan,,,nan,nan,589902002
 nan,residential,nan,False,False,135.238,5779,3072,60.0,0.002,nan,0.9977177211216518,1.0,0.0,nan,nan,,,nan,nan,590190917
 Rua Tenente Alves (1.053),residential,nan,False,True,39.907,9727,4108,60.0,0.001,nan,0.29099221229553224,1.0,0.0,2,nan,,,nan,nan,479165744
 nan,residential,nan,True,False,45.01,"[5781, 5782, 5783, 5784, 5786, 5759]",3076,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,590190918
 nan,tertiary_link,nan,False,False,22.517,5790,3079,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,590190919
-nan,residential,nan,False,"[False, True]",307.212,"[5857, 5859, 5861, 5863, 5865, 5866, 5868, 5870, 5872, 5874, 8439, 8440, 5851, 5853, 5855]",3087,60.0,0.005,nan,0.46630627595925633,0.9758489267725866,0.0,nan,nan,,,nan,nan,"[590219986, 685123285]"
+nan,residential,nan,False,"[False, True]",307.212,"[5857, 5859, 5861, 5863, 5865, 5866, 5868, 5870, 5872, 5874, 8439, 8440, 5851, 5853, 5855]",3087,60.0,0.005,nan,0.46630627595925633,0.9758489267729327,0.0,nan,nan,,,nan,nan,"[590219986, 685123285]"
 Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,True,4.2,8103,3698,50.0,0.0,nan,0.17318809032440186,1.0,0.0,nan,nan,,,nan,nan,887795677
 Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,False,22.809,"[2216, 2217, 6502]",3273,50.0,0.0,yes,0.2963651816050212,0.9899180450260312,0.0,nan,nan,,,nan,nan,"[887795677, 887795678, 686767326]"
 nan,residential,nan,False,False,8.349,5885,3095,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,590219988
@@ -1987,7 +1987,7 @@ nan,residential,nan,False,False,163.287,"[6209, 8084, 8086, 6203, 6205]",3179,60
 Rua Alfredo Lawley,tertiary,nan,False,True,73.145,6215,3181,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,204096428
 Rua Alfredo Lawley,tertiary,nan,False,False,36.824,6381,3245,59.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,204096428
 Rua Alfredo Lawley,tertiary,nan,False,True,7.024,8067,3689,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,204096428
-nan,residential,nan,False,True,311.552,"[6210, 6213, 8081, 9880, 8538]",3760,60.0,0.005,nan,0.4120332189353116,0.9670120069666798,0.0,nan,nan,,,nan,nan,"[678886768, 590768960]"
+nan,residential,nan,False,True,311.552,"[6210, 6213, 8081, 9880, 8538]",3760,60.0,0.005,nan,0.4120332189353116,0.9670120069666734,0.0,nan,nan,,,nan,nan,"[678886768, 590768960]"
 nan,residential,nan,False,False,7.034,9876,4153,60.0,0.0,nan,0.5399235486984253,1.0,0.0,nan,nan,,,nan,nan,255563330
 nan,residential,nan,False,True,52.792,"[6225, 6311]",3243,60.0,0.001,nan,0.4690561294555664,1.0,0.0,nan,nan,,,nan,nan,255563330
 nan,residential,nan,False,True,60.062,"[6392, 6393]",3251,60.0,0.001,nan,0.541495072214227,1.0,0.0,nan,nan,,,nan,nan,590793476
@@ -1997,7 +1997,7 @@ Impasse 150,residential,nan,False,False,68.607,6243,3201,60.0,0.001,nan,,0.0,0.0
 Rua 1.800,residential,nan,False,False,54.171,6247,3205,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224149
 Impasse 206,residential,nan,False,False,68.267,6249,3207,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,590768965
 Rua 1795,residential,nan,False,True,36.502,8603,3767,60.0,0.001,nan,0.38024632930755614,0.887652982254653,0.0,nan,nan,,,nan,nan,681245003
-Rua 1826,residential,nan,False,False,99.64,"[8604, 6253]",3768,60.0,0.002,nan,0.28663206100463867,0.009799185806004362,0.0,nan,nan,,,nan,nan,590768966
+Rua 1826,residential,nan,False,False,99.64,"[8604, 6253]",3768,60.0,0.002,nan,0.28663206100463867,0.009799185806004473,0.0,nan,nan,,,nan,nan,590768966
 nan,residential,nan,False,False,52.836,6284,3224,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,62224148
 Rua 43,residential,nan,False,True,144.107,"[6272, 6268, 6270]",3216,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,183218183
 Rua 43,residential,nan,False,True,112.164,"[6298, 6300, 6301]",3237,60.0,0.002,nan,0.40510785579681396,0.06267022726249734,0.0,nan,nan,,,nan,nan,183218183
@@ -2023,16 +2023,16 @@ nan,residential,nan,False,False,186.0,"[8128, 8155, 8157, 6487, 6489, 6491, 6493
 Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,False,70.57,9167,3880,50.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,686767326
 nan,residential,nan,False,True,140.798,"[6496, 8129, 6498, 8160, 6500]",3703,60.0,0.002,nan,0.36597464425223214,0.9045759690229392,0.0,nan,nan,,,nan,nan,590793500
 nan,residential,nan,False,False,385.2399999999999,"[6529, 6531, 6533, 6535, 6537, 6539, 6541, 6543, 6545, 6547, 6549, 6551, 6553, 6555, 6557, 6559, 6561, 6563, 6565, 2792]",3278,60.0,0.006,nan,,0.0,0.0,nan,nan,,,nan,nan,255563338
-nan,residential,nan,False,False,77.00399999999999,"[6577, 6571, 6573]",3283,60.0,0.001,nan,0.4277311007181803,0.7064402720157054,0.0,nan,nan,,,nan,nan,685127981
+nan,residential,nan,False,False,77.00399999999999,"[6577, 6571, 6573]",3283,60.0,0.001,nan,0.4277311007181803,0.706440272015828,0.0,nan,nan,,,nan,nan,685127981
 Rua Herois de Marracuene,residential,nan,False,False,134.366,6618,3288,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,590811904
 Ava Mártires da Revolução,tertiary,60,False,False,85.211,6723,3309,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,820923407
 Rua do Centro Comercial,residential,nan,False,True,85.065,6721,3307,60.0,0.001,nan,,0.0,3473.02721691,nan,nan,,,nan,nan,820923408
-nan,residential,nan,False,False,178.19899999999998,"[6628, 6630, 6632, 6634, 6668, 6636, 6638, 6641, 6642, 6644]",3294,60.0,0.003,nan,0.13947799931401791,0.9195463720826296,0.0,nan,nan,,,nan,nan,"[590811905, 590811906]"
-nan,residential,nan,False,"[False, True]",142.036,"[6660, 6662, 6664, 6666, 6669, 6646, 6649, 6651]",3295,60.0,0.002,nan,0.2427798540164263,0.9963338980970354,0.0,nan,nan,,,nan,nan,"[590811907, 590811908]"
-nan,residential,nan,False,False,440.541,"[6656, 6658, 7324, 7326, 7328, 7330, 7332, 7334, 7336, 7338, 7340, 7342, 7344, 7346, 7348, 7350, 7352, 7354, 7356, 7358, 7360, 7362, 9924, 7365, 6623, 6652, 6654]",3552,60.0,0.007,nan,0.25820983250935875,0.5953803048530345,0.0,nan,nan,,,nan,nan,"[590811907, 591632588]"
+nan,residential,nan,False,False,178.19899999999998,"[6628, 6630, 6632, 6634, 6668, 6636, 6638, 6641, 6642, 6644]",3294,60.0,0.003,nan,0.13947799931401791,0.9195463720825975,0.0,nan,nan,,,nan,nan,"[590811905, 590811906]"
+nan,residential,nan,False,"[False, True]",142.036,"[6660, 6662, 6664, 6666, 6669, 6646, 6649, 6651]",3295,60.0,0.002,nan,0.2427798540164263,0.9963338980970351,0.0,nan,nan,,,nan,nan,"[590811907, 590811908]"
+nan,residential,nan,False,False,440.541,"[6656, 6658, 7324, 7326, 7328, 7330, 7332, 7334, 7336, 7338, 7340, 7342, 7344, 7346, 7348, 7350, 7352, 7354, 7356, 7358, 7360, 7362, 9924, 7365, 6623, 6652, 6654]",3552,60.0,0.007,nan,0.25820983250935875,0.5953803048530343,0.0,nan,nan,,,nan,nan,"[590811907, 591632588]"
 nan,residential,nan,False,False,196.0,"[6689, 6691, 6693, 6695, 6697, 6700, 6671, 6673, 6675, 6677, 6679, 6681, 6683, 6685, 6687]",3299,60.0,0.008,nan,0.19450074799206793,0.9380615913643622,0.0,nan,nan,5639948211.0,13037735207.0,5639948211_13037735207,nan,590811908
 nan,residential,nan,False,False,19.932,6775,3321,60.0,0.0,nan,0.2801523208618164,1.0,0.0,nan,nan,,,nan,nan,590811908
-nan,residential,nan,False,True,316.05699999999996,"[6579, 6581, 6583, 6585, 6587, 6589, 6591, 6593, 6595, 7364, 6597, 8517, 6599, 6601, 6603, 6605, 6607, 6609, 6611, 6613, 6772, 6774]",3551,60.0,0.005,nan,0.20185906887054444,0.9327705895952566,0.0,nan,nan,,,nan,nan,385524558
+nan,residential,nan,False,True,316.05699999999996,"[6579, 6581, 6583, 6585, 6587, 6589, 6591, 6593, 6595, 7364, 6597, 8517, 6599, 6601, 6603, 6605, 6607, 6609, 6611, 6613, 6772, 6774]",3551,60.0,0.005,nan,0.20185906887054444,0.9327705895952617,0.0,nan,nan,,,nan,nan,385524558
 nan,residential,nan,False,False,292.0,"[6689, 6691, 6693, 6695, 6697, 6700, 6671, 6673, 6675, 6677, 6679, 6681, 6683, 6685, 6687]",3299,60.0,0.008,nan,0.25647893633161273,0.9869468733319248,0.0,nan,nan,13037735207.0,5639948226.0,13037735207_5639948226,nan,590811908
 Rua da Praia,residential,nan,False,False,249.194,"[6705, 6707, 6703, 6711]",3303,60.0,0.004,nan,,0.0,40.46790886,nan,nan,,,nan,nan,590811909
 Rua Carlos Pereira,tertiary,60,False,False,121.0,"[3, 6735, 6737, 9300, 6709, 4694]",3301,60.0,0.004,nan,,0.0,40.46790886,nan,nan,13037735208.0,5639948231.0,13037735208_5639948231,nan,44794760
@@ -2041,7 +2041,7 @@ Rua 1.766 (28),residential,nan,False,False,94.01,6780,3326,60.0,0.002,nan,0.3391
 Rua 43,residential,nan,False,False,53.352,"[6752, 6749, 6750]",3317,60.0,0.001,nan,0.1323273011616298,0.9588010890573243,0.0,nan,nan,,,nan,nan,183218183
 nan,residential,nan,False,False,57.688,9562,4007,60.0,0.001,nan,0.134880436791314,0.6012934570351015,0.0,nan,nan,,,nan,nan,590991306
 nan,residential,nan,False,True,160.903,"[8845, 3215, 8855, 8889, 6875]",3365,60.0,0.003,nan,0.2650464099386464,1.0,0.0,nan,nan,,,nan,nan,385433667
-nan,residential,nan,False,False,748.549,"[8478, 8480, 8482, 8484, 8486, 8488, 8490, 8492, 8494, 8496, 8498, 9138, 8500, 9140, 8502, 9142, 8504, 9146, 8506, 8508, 8510, 8512, 8514, 7366]",3553,60.0,0.012,nan,0.6367978996404723,0.9401096068482535,0.0,nan,nan,,,nan,nan,"[590811908, 678806749]"
+nan,residential,nan,False,False,748.549,"[8478, 8480, 8482, 8484, 8486, 8488, 8490, 8492, 8494, 8496, 8498, 9138, 8500, 9140, 8502, 9142, 8504, 9146, 8506, 8508, 8510, 8512, 8514, 7366]",3553,60.0,0.012,nan,0.6367978996404723,0.9401096068482542,0.0,nan,nan,,,nan,nan,"[590811908, 678806749]"
 nan,residential,nan,False,False,35.488,"[6769, 9133]",3869,60.0,0.001,nan,0.20445752143859863,1.0,0.0,nan,nan,,,nan,nan,685461124
 Eua 41,residential,nan,False,True,49.997,9691,4093,60.0,0.001,nan,0.0932283878326416,0.28963114883513585,0.0,nan,nan,,,nan,nan,385433546
 Rua 1.766 (28),residential,nan,False,False,47.566,6861,3351,60.0,0.001,nan,0.10937219858169556,0.5636763575289264,0.0,nan,nan,,,nan,nan,1221684699
@@ -2053,8 +2053,8 @@ Rua 1788 (33),residential,nan,False,True,139.927,"[9129, 6965, 9127]",3867,60.0,
 Rua 29,residential,nan,False,True,111.892,6866,3355,60.0,0.002,nan,0.2981541633605957,0.6386876555393884,0.0,nan,nan,,,nan,nan,385433420
 nan,residential,nan,False,False,62.605,6870,3360,60.0,0.001,nan,0.4506501621670193,0.9726066332310868,0.0,nan,nan,,,nan,nan,590976369
 Rua 1.755 (38),residential,nan,False,True,106.923,"[8520, 6569]",3756,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,489364458
-nan,residential,nan,False,True,152.009,6914,3386,60.0,0.003,nan,0.13521022545663933,0.9594633473032862,0.0,nan,nan,,,nan,nan,590982379
-nan,residential,nan,False,True,34.538,7316,3549,60.0,0.001,nan,0.0742520809173584,0.4546126364024824,0.0,nan,nan,,,nan,nan,1199342416
+nan,residential,nan,False,True,152.009,6914,3386,60.0,0.003,nan,0.13521022545663933,0.9594633472997601,0.0,nan,nan,,,nan,nan,590982379
+nan,residential,nan,False,True,34.538,7316,3549,60.0,0.001,nan,0.0742520809173584,0.45461263641496596,0.0,nan,nan,,,nan,nan,1199342416
 nan,residential,nan,False,False,40.354,9675,4084,60.0,0.001,nan,0.13063958974984977,1.0,0.0,nan,nan,,,nan,nan,1199342416
 nan,residential,nan,False,True,91.19999999999999,"[8833, 8835, 8885]",3804,60.0,0.002,nan,0.4057215910691481,1.0,0.0,nan,nan,,,nan,nan,385433667
 nan,residential,nan,False,False,54.809,"[8852, 8886, 9559]",4006,60.0,0.001,nan,0.2257322371006012,1.0,0.0,nan,nan,,,nan,nan,590982380
@@ -2069,7 +2069,7 @@ nan,residential,nan,False,True,72.335,9670,4083,60.0,0.001,nan,0.323383808135986
 nan,residential,nan,False,False,136.95100000000002,"[6883, 9237, 3174]",3896,60.0,0.002,nan,0.17813849449157715,1.0,0.0,nan,nan,,,nan,nan,590982381
 nan,residential,nan,False,True,41.635,"[6912, 3191]",3388,60.0,0.001,nan,0.2931320269902547,1.0,0.0,nan,nan,,,nan,nan,385433663
 nan,residential,nan,False,True,118.64000000000001,"[6905, 6907, 6909, 6910]",3384,60.0,0.002,nan,0.3188239265890682,1.0,0.0,nan,nan,,,nan,nan,685131160
-nan,residential,nan,False,False,150.171,"[8800, 7314, 7312]",3550,60.0,0.003,nan,0.11828386372533338,0.6454351127421375,0.0,nan,nan,,,nan,nan,685131160
+nan,residential,nan,False,False,150.171,"[8800, 7314, 7312]",3550,60.0,0.003,nan,0.11828386372533338,0.6454351127418961,0.0,nan,nan,,,nan,nan,685131160
 nan,residential,nan,False,True,110.586,6915,3389,60.0,0.002,nan,0.34371864434444543,1.0,0.0,nan,nan,,,nan,nan,590982379
 nan,residential,nan,False,True,45.519000000000005,"[3201, 6917]",3391,60.0,0.001,nan,0.25215624059949604,1.0,0.0,nan,nan,,,nan,nan,385433663
 nan,residential,nan,False,False,181.178,"[8897, 6924, 6921, 6919]",3396,60.0,0.003,nan,0.2902471130969478,1.0,0.0,nan,nan,,,nan,nan,590982385
@@ -2082,7 +2082,7 @@ nan,residential,nan,False,True,157.997,"[6928, 6947]",3416,60.0,0.003,nan,0.3965
 nan,residential,nan,False,True,156.934,9941,4178,60.0,0.003,nan,0.2570609544452868,0.8915891896410494,0.0,nan,nan,,,nan,nan,591021445
 nan,residential,nan,False,True,54.346,6948,3414,60.0,0.001,nan,0.3000297546386719,1.0,0.0,nan,nan,,,nan,nan,1173665681
 Ava de Portugal / Rua 1751,residential,60,False,False,23.286,9487,3974,60.0,0.0,nan,0.05887794494628906,0.07457818619650392,0.0,2,nan,,,nan,nan,183218499
-nan,residential,nan,False,True,165.179,"[7208, 9178, 7206]",3511,60.0,0.003,nan,0.24602741148413682,0.8819623903410012,0.0,nan,nan,,,nan,nan,385433426
+nan,residential,nan,False,True,165.179,"[7208, 9178, 7206]",3511,60.0,0.003,nan,0.24602741148413682,0.8819623903409259,0.0,nan,nan,,,nan,nan,385433426
 nan,residential,nan,False,False,115.58000000000001,"[6952, 6956]",3422,60.0,0.002,nan,0.22685032231467112,0.9005282056790342,0.0,nan,nan,,,nan,nan,590982392
 nan,residential,nan,False,True,156.365,"[6961, 6957, 6959]",3423,60.0,0.003,nan,0.2895267123267764,1.0,0.0,nan,nan,,,nan,nan,590982393
 nan,residential,nan,False,True,44.645,6984,3434,60.0,0.001,nan,0.27823616908146787,1.0,0.0,nan,nan,,,nan,nan,590982380
@@ -2095,7 +2095,7 @@ nan,residential,nan,False,True,61.766,9974,4183,60.0,0.001,nan,0.169902876803749
 nan,residential,nan,False,True,4.827,9566,4011,60.0,0.0,nan,0.2880439758300781,1.0,0.0,nan,nan,,,nan,nan,590982380
 nan,residential,nan,False,False,150.94,9587,4024,60.0,0.003,nan,0.2113065038408552,1.0,0.0,nan,nan,,,nan,nan,1173665707
 nan,residential,nan,False,True,17.459,9537,3989,60.0,0.0,nan,0.14869871139526367,1.0,0.0,nan,nan,,,nan,nan,590994747
-nan,residential,nan,False,"[False, True]",116.304,"[8864, 8865, 8868, 6989, 8883]",3815,60.0,0.002,nan,0.14835813641548157,0.9944635760470165,0.0,nan,nan,,,nan,nan,"[684480513, 590994745]"
+nan,residential,nan,False,"[False, True]",116.304,"[8864, 8865, 8868, 6989, 8883]",3815,60.0,0.002,nan,0.14835813641548157,0.9944635760470195,0.0,nan,nan,,,nan,nan,"[684480513, 590994745]"
 nan,residential,nan,False,False,73.17999999999999,"[7025, 7019, 7021]",3444,60.0,0.001,nan,0.14431198019730418,0.8381989913652459,0.0,nan,nan,,,nan,nan,590994747
 nan,residential,nan,False,False,59.056,9842,4131,60.0,0.001,nan,0.08785636284772087,1.0,0.0,nan,nan,,,nan,nan,590994746
 nan,residential,nan,False,True,160.174,"[7008, 7010, 7012, 8805, 9899, 6994, 6996, 6998, 8823, 7000, 7002, 7004, 7006]",4166,60.0,0.003,nan,0.1671412918302748,0.7891263913735735,0.0,nan,nan,,,nan,nan,590994746
@@ -2110,10 +2110,10 @@ Rua 58,residential,nan,False,True,56.957,9891,4160,60.0,0.001,nan,0.141589856147
 nan,residential,nan,False,True,54.801,"[7113, 8843]",3477,60.0,0.001,nan,0.18981395661830902,1.0,0.0,nan,nan,,,nan,nan,684479653
 Ava de Portugal / Rua 1751,residential,60,False,True,52.482,7198,3502,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,183218499
 Ava de Portugal / Rua 1751,residential,60,False,False,54.259,7040,3456,60.0,0.001,nan,,0.0,0.0,2,nan,,,nan,nan,183218499
-Rua 60,residential,nan,False,False,45.818,7179,3493,60.0,0.001,nan,0.08927051226298015,0.22188624896241593,0.0,nan,nan,,,nan,nan,1173379366
+Rua 60,residential,nan,False,False,45.818,7179,3493,60.0,0.001,nan,0.08927051226298015,0.2218862489606217,0.0,nan,nan,,,nan,nan,1173379366
 Rua 60,residential,nan,False,True,225.001,"[9538, 9540]",3991,60.0,0.004,nan,0.09682792663574219,0.4093716110446447,0.0,nan,nan,,,nan,nan,1173379366
 Rua 61,residential,nan,False,True,41.763,7190,3499,60.0,0.001,nan,0.16359665393829345,0.7418011839989151,0.0,nan,nan,,,nan,nan,685127967
-Rua 61,residential,nan,False,False,41.449,"[7043, 7045]",3459,60.0,0.001,nan,0.08910632133483887,0.42657216921059476,0.0,nan,nan,,,nan,nan,590994752
+Rua 61,residential,nan,False,False,41.449,"[7043, 7045]",3459,60.0,0.001,nan,0.08910632133483887,0.42657216921284397,0.0,nan,nan,,,nan,nan,590994752
 nan,residential,nan,False,False,10.601,9893,4162,60.0,0.0,nan,0.10273897647857666,1.0,0.0,nan,nan,,,nan,nan,590994746
 Rua 58,residential,nan,False,False,52.903,9890,4159,60.0,0.001,nan,0.11390050252278645,1.0,0.0,nan,nan,,,nan,nan,1173379368
 nan,residential,nan,False,True,73.904,"[8289, 8290, 7073, 7071, 7067, 7069, 8287]",3726,60.0,0.001,nan,0.14068644387381418,1.0,0.0,nan,nan,,,nan,nan,590994756
@@ -2133,22 +2133,22 @@ nan,residential,nan,False,True,48.053,7173,3487,60.0,0.001,nan,0.257297277450561
 Rua 59,residential,nan,False,False,143.022,7181,3495,60.0,0.002,nan,0.12105024337768555,0.6311620319391247,0.0,nan,nan,,,nan,nan,590994767
 Rua 59,residential,nan,False,True,63.0,"[7264, 9954, 7194, 7241, 7196, 7192, 7258, 7260, 7262]",3528,60.0,0.008,nan,0.33143988777609434,1.0,0.0,nan,nan,5641683645.0,13037735189.0,5641683645_13037735189,nan,590994767
 Rua 58,residential,nan,False,True,480.189,"[7297, 7244, 4780, 7289, 7291, 7293, 7295]",3531,60.0,0.008,nan,0.2904572259812128,1.0,0.0,nan,nan,,,nan,nan,489364457
-Rua 60,residential,nan,False,False,144.975,7176,3490,60.0,0.002,nan,0.17593268690438107,0.6749671957850543,0.0,nan,nan,,,nan,nan,590994762
+Rua 60,residential,nan,False,False,144.975,7176,3490,60.0,0.002,nan,0.17593268690438107,0.6749671957845634,0.0,nan,nan,,,nan,nan,590994762
 Rua 60,residential,nan,False,True,514.243,"[7170, 7172, 7302, 7239, 7304, 8554, 7306, 8556, 7308, 7310]",3526,60.0,0.009,nan,0.2919061731409143,1.0,0.0,nan,nan,,,nan,nan,590994762
-nan,residential,nan,False,True,49.28,7188,3498,60.0,0.001,nan,0.09543962478637695,0.314808792306601,0.0,nan,nan,,,nan,nan,590994763
-nan,residential,nan,False,False,51.445,7180,3494,60.0,0.001,nan,0.07792313893636067,0.2095324848071392,0.0,nan,nan,,,nan,nan,590994763
+nan,residential,nan,False,True,49.28,7188,3498,60.0,0.001,nan,0.09543962478637695,0.31480879230626274,0.0,nan,nan,,,nan,nan,590994763
+nan,residential,nan,False,False,51.445,7180,3494,60.0,0.001,nan,0.07792313893636067,0.2095324848084644,0.0,nan,nan,,,nan,nan,590994763
 Rua 59,residential,nan,False,False,46.876,7200,3503,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,590994767
-Rua 61,residential,nan,False,False,107.01500000000001,"[7184, 7186, 7189]",3500,60.0,0.002,nan,0.3209677476149339,0.9416849671934194,0.0,nan,nan,,,nan,nan,685127967
+Rua 61,residential,nan,False,False,107.01500000000001,"[7184, 7186, 7189]",3500,60.0,0.002,nan,0.3209677476149339,0.9416849672128422,0.0,nan,nan,,,nan,nan,685127967
 Rua 59,residential,nan,False,"[False, True]",217.79700000000003,"[8894, 9543]",3994,60.0,0.004,nan,0.11131906509399414,0.7372862444405041,0.0,nan,nan,,,nan,nan,"[1271190210, 590994751]"
 nan,residential,nan,False,True,112.471,9938,4175,60.0,0.002,nan,0.12855311919902934,0.9214746850090604,0.0,nan,nan,,,nan,nan,1271190207
 nan,residential,nan,False,True,43.644,9939,4176,60.0,0.001,nan,0.2095632553100586,1.0,0.0,nan,nan,,,nan,nan,1271190208
 nan,residential,nan,False,True,75.535,"[7217, 7219]",3519,60.0,0.001,nan,0.2040571485246931,1.0,0.0,nan,nan,,,nan,nan,591021444
 nan,residential,nan,False,False,51.217999999999996,"[7220, 7213]",3516,60.0,0.001,nan,0.2011012520108904,1.0,0.0,nan,nan,,,nan,nan,591021444
 nan,residential,nan,False,True,51.094,9942,4179,60.0,0.001,nan,0.19141071637471516,1.0,0.0,nan,nan,,,nan,nan,1271190209
-nan,residential,nan,False,True,238.88,"[7233, 7234, 7236, 7238, 7227, 7229, 7231]",3524,60.0,0.004,nan,0.15604517889804528,0.9360503510299811,0.0,nan,nan,,,nan,nan,385433426
+nan,residential,nan,False,True,238.88,"[7233, 7234, 7236, 7238, 7227, 7229, 7231]",3524,60.0,0.004,nan,0.15604517889804528,0.9360503510278874,0.0,nan,nan,,,nan,nan,385433426
 nan,residential,nan,False,False,27.0,"[9170, 9171, 9173]",3884,60.0,0.002,nan,0.14926815032958984,1.0,0.0,nan,nan,5641898165.0,13037735196.0,5641898165_13037735196,nan,685197812
 nan,residential,nan,False,False,50.548,7222,3520,60.0,0.001,nan,0.1934733231862386,1.0,0.0,nan,nan,,,nan,nan,591021444
-nan,residential,nan,False,True,189.747,"[9937, 9933, 7270, 9935]",3536,60.0,0.003,nan,0.13454543712527253,0.8601716158513284,0.0,nan,nan,,,nan,nan,385433668
+nan,residential,nan,False,True,189.747,"[9937, 9933, 7270, 9935]",3536,60.0,0.003,nan,0.13454543712527253,0.8601716158514057,0.0,nan,nan,,,nan,nan,385433668
 Rua 56,residential,nan,False,True,228.13,"[9944, 9946, 7271]",3537,60.0,0.004,nan,0.18586633602778116,0.7698126737364618,0.0,nan,nan,,,nan,nan,385433396
 Rua 56,residential,nan,False,False,466.648,"[3328, 9548, 3303]",3997,60.0,0.008,nan,0.2650467167055704,1.0,0.0,nan,nan,,,nan,nan,385433396
 nan,residential,nan,False,True,77.428,7225,3523,60.0,0.001,nan,0.13876943027271943,0.785124706604664,0.0,nan,nan,,,nan,nan,591021445
@@ -2162,7 +2162,7 @@ nan,residential,nan,False,True,53.953,"[7281, 7277]",3543,60.0,0.001,nan,0.26442
 nan,residential,nan,False,True,63.160999999999994,"[7634, 9555, 9589, 9590]",3571,60.0,0.001,yes,0.28538970947265624,0.8839964796018752,0.0,nan,nan,,,nan,nan,"[1173665685, 1173665708, 1173665709, 1173665686]"
 Rua 58,residential,nan,False,False,209.874,"[7298, 7284, 7286, 7282]",3546,60.0,0.003,nan,0.15961992740631104,0.9756219860293623,0.0,nan,nan,,,nan,nan,489364457
 nan,residential,nan,False,True,52.154,9558,4001,60.0,0.001,nan,0.2069441000620524,1.0,0.0,nan,nan,,,nan,nan,1173665687
-nan,residential,nan,False,False,389.68399999999997,"[7680, 7425, 7682, 7427, 7432, 7434, 7436, 7438, 7440, 7442, 7444, 7446, 7448, 7450, 7706, 7452, 7454, 8631, 7415, 7417, 7419, 7676, 7421, 7423]",3579,60.0,0.006,nan,0.6454108743106618,0.9608366997846493,0.0,nan,nan,,,nan,nan,"[591843235, 591843236]"
+nan,residential,nan,False,False,389.68399999999997,"[7680, 7425, 7682, 7427, 7432, 7434, 7436, 7438, 7440, 7442, 7444, 7446, 7448, 7450, 7706, 7452, 7454, 8631, 7415, 7417, 7419, 7676, 7421, 7423]",3579,60.0,0.006,nan,0.6454108743106618,0.9608366997846496,0.0,nan,nan,,,nan,nan,"[591843235, 591843236]"
 Rua Dom Jaime Pedro Gonçalves,secondary,nan,False,True,164.018,"[7805, 8630]",3598,50.0,0.003,nan,,0.0,0.0,nan,nan,,,nan,nan,686767326
 nan,residential,nan,False,True,132.427,"[7457, 7459, 7461, 7687, 7463, 7465, 7467, 7469, 7471, 7408, 7410, 7412, 7414, 7705, 7708, 7710, 7711]",3578,60.0,0.002,nan,0.6032333374023438,1.0,0.0,nan,nan,,,nan,nan,"[591843233, 591827071]"
 nan,residential,nan,False,False,204.95999999999995,"[7489, 7397, 7399, 7401, 7403, 7405, 7569, 7475, 8693, 7477, 7479, 7481, 7483, 7485, 7487]",3562,60.0,0.003,nan,0.7307444605334051,1.0,0.0,nan,nan,,,nan,nan,591827071
@@ -2171,18 +2171,18 @@ nan,residential,nan,False,False,120.26400000000002,"[7552, 7554, 7557, 7559, 756
 nan,residential,nan,False,False,111.67200000000001,"[7393, 7391, 7395, 7491, 7493, 7495, 7497, 7387, 7389, 7613]",3566,60.0,0.002,nan,0.9158936162148753,1.0,0.0,nan,nan,,,nan,nan,591827071
 nan,residential,nan,False,False,152.77300000000002,"[7573, 7575, 7577, 7579, 7581, 7583, 7585, 7587, 7589, 7591, 7593, 7595, 7597, 7599, 7601, 7603, 7605, 7607, 7609, 7611, 7615]",3568,60.0,0.003,nan,0.26105313074021114,1.0,0.0,nan,nan,,,nan,nan,"[591838512, 591838513]"
 nan,residential,nan,False,"[False, True]",290.544,"[7505, 7753, 7754, 7369, 7756, 7371, 7758, 7373, 7760, 7377, 7762, 7375, 7764, 7509, 7766, 7511, 7768, 7507, 7770, 7379, 7772, 7381, 7774, 7383, 8416, 7385, 7499, 7501, 7503]",3581,60.0,0.005,nan,0.8266929626464844,1.0,0.0,nan,nan,,,nan,nan,"[591852198, 591827071]"
-"['Rua Costa Pinto', 'Rua Viriato']",residential,nan,False,True,80.42300000000002,"[7631, 7627, 7788, 7628]",3593,60.0,0.001,nan,0.1411374466759818,0.7246187623451608,0.0,nan,nan,,,nan,nan,"[591841708, 591841710]"
+"['Rua Costa Pinto', 'Rua Viriato']",residential,nan,False,True,80.42300000000002,"[7631, 7627, 7788, 7628]",3593,60.0,0.001,nan,0.1411374466759818,0.7246187623453951,0.0,nan,nan,,,nan,nan,"[591841708, 591841710]"
 nan,residential,nan,False,False,70.35900000000001,"[7696, 7666, 7668, 7670, 7672, 7674]",3575,60.0,0.001,nan,0.11176081498463948,0.24090776501303415,0.0,nan,nan,,,nan,nan,591843232
-nan,residential,nan,False,False,48.120000000000005,"[7689, 7691, 7693, 7663, 7697, 7678]",3576,60.0,0.001,nan,0.14567862857471814,0.8135949724704061,0.0,nan,nan,,,nan,nan,591843237
+nan,residential,nan,False,False,48.120000000000005,"[7689, 7691, 7693, 7663, 7697, 7678]",3576,60.0,0.001,nan,0.14567862857471814,0.8135949724704055,0.0,nan,nan,,,nan,nan,591843237
 nan,residential,nan,False,False,20.0,"[7684, 7698, 7700, 7702, 7704]",3577,60.0,0.001,nan,0.13969759146372476,1.0,0.0,nan,nan,5649723907.0,13037735175.0,5649723907_13037735175,nan,591843231
 nan,residential,nan,False,False,21.0,"[7684, 7698, 7700, 7702, 7704]",3577,60.0,0.001,nan,0.2480452401297433,1.0,0.0,nan,nan,13037735175.0,5649723911.0,13037735175_5649723911,nan,591843231
 Rua Santa Rita,residential,nan,False,False,53.133,7780,3584,60.0,0.001,nan,0.13053009726784445,0.8719632387246142,0.0,nan,nan,,,nan,nan,591857886
 Rua Costa Pinto,residential,nan,False,False,14.247,7781,3586,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,591841710
-"['Rua Costa Pinto', 'Rua Carlos Pereira']","['residential', 'tertiary']",60,False,True,277.0,"[9920, 7809, 7617, 7811, 7619, 7621, 7776, 7623, 8, 2987]",4173,60.0,0.007,nan,0.1201012676412409,0.36533171888128346,0.0,nan,nan,5649875457.0,13037735197.0,5649875457_13037735197,nan,"[44794760, 591841710]"
+"['Rua Costa Pinto', 'Rua Carlos Pereira']","['tertiary', 'residential']",60,False,True,277.0,"[9920, 7809, 7617, 7811, 7619, 7621, 7776, 7623, 8, 2987]",4173,60.0,0.007,nan,0.1201012676412409,0.36533171888128346,0.0,nan,nan,5649875457.0,13037735197.0,5649875457_13037735197,nan,"[44794760, 591841710]"
 Rua Costa Pinto,residential,nan,False,False,70.132,"[7624, 7787]",3592,60.0,0.001,nan,0.09539926052093506,0.4507187468445758,0.0,nan,nan,,,nan,nan,591841710
 Imp. Santa Rita,residential,nan,False,False,71.023,"[7784, 7786]",3589,60.0,0.001,nan,0.13484760431142953,0.773907742734206,0.0,nan,nan,,,nan,nan,685127965
 Rua Brito Camacho,residential,nan,False,False,179.195,7791,3594,60.0,0.003,nan,0.2557488818501317,1.0,0.0,nan,nan,,,nan,nan,685127966
-nan,residential,nan,False,True,100.247,9905,4170,60.0,0.002,nan,0.08408096631368002,0.5652396117121635,0.0,nan,nan,,,nan,nan,1270068470
+nan,residential,nan,False,True,100.247,9905,4170,60.0,0.002,nan,0.08408096631368002,0.5652396117123207,0.0,nan,nan,,,nan,nan,1270068470
 nan,residential,nan,False,False,65.56400000000001,"[7793, 7795, 7797, 7799, 7801, 7803]",3596,60.0,0.001,nan,0.09813916683197021,0.39228267625047497,0.0,nan,nan,,,nan,nan,591866410
 nan,residential,nan,False,False,34.238,"[9849, 8413]",4138,60.0,0.001,nan,0.10687124729156494,0.6361575316987408,0.0,nan,nan,,,nan,nan,592082555
 nan,residential,nan,False,True,23.778,9847,4135,60.0,0.0,nan,0.21405291557312012,1.0,0.0,nan,nan,,,nan,nan,592082555
@@ -2207,46 +2207,46 @@ nan,residential,nan,False,False,89.92,"[10162, 10171]",4214,60.0,0.001,nan,,0.0,
 nan,residential,nan,False,True,71.159,10172,4213,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,592406466
 nan,residential,nan,False,True,151.72199999999998,"[3034, 7998]",3676,60.0,0.003,nan,0.1026310682296753,0.21335046628661028,0.0,nan,nan,,,nan,nan,253461093
 nan,residential,nan,False,True,467.0,"[7936, 2689, 2691, 2693, 2695, 2697, 2699, 2701, 5918, 5920, 5922, 5924, 8546, 2673, 2675, 2677, 2679, 2681, 2683, 2685, 2687]",3672,60.0,0.008,nan,0.14138944687381869,0.2560870138920196,0.0,nan,nan,13037735168.0,6345455080.0,13037735168_6345455080,nan,253461093
-nan,residential,nan,False,True,155.0,"[7939, 7941, 7943, 7945, 7947, 7949, 7951, 7953, 7955, 7957, 7959, 7961, 7963, 7965, 7967, 7969, 7971, 7973, 7975, 7977, 7978, 8680]",3674,60.0,0.004,nan,0.14981051414243637,0.8586327448977387,0.0,nan,nan,6345455080.0,13037735173.0,6345455080_13037735173,nan,677692009
+nan,residential,nan,False,True,155.0,"[7939, 7941, 7943, 7945, 7947, 7949, 7951, 7953, 7955, 7957, 7959, 7961, 7963, 7965, 7967, 7969, 7971, 7973, 7975, 7977, 7978, 8680]",3674,60.0,0.004,nan,0.14981051414243637,0.858632744898577,0.0,nan,nan,6345455080.0,13037735173.0,6345455080_13037735173,nan,677692009
 nan,residential,nan,False,True,67.0,"[7939, 7941, 7943, 7945, 7947, 7949, 7951, 7953, 7955, 7957, 7959, 7961, 7963, 7965, 7967, 7969, 7971, 7973, 7975, 7977, 7978, 8680]",3674,60.0,0.004,nan,0.061293840408325195,0.09979872737588248,0.0,nan,nan,13037735173.0,6345455401.0,13037735173_6345455401,nan,677692009
 nan,residential,nan,False,True,108.523,"[8232, 3030]",3716,60.0,0.002,nan,0.12352144718170166,0.31685356222758626,0.0,nan,nan,,,nan,nan,253461093
-nan,residential,nan,False,False,186.68400000000003,"[7979, 7981, 7983, 7985, 8211, 8212, 7987, 7989, 7991, 7993, 7995, 8796]",3713,60.0,0.003,nan,0.12810262044270834,0.8221435124652177,0.0,nan,nan,,,nan,nan,677692008
+nan,residential,nan,False,False,186.68400000000003,"[7979, 7981, 7983, 7985, 8211, 8212, 7987, 7989, 7991, 7993, 7995, 8796]",3713,60.0,0.003,nan,0.12810262044270834,0.8221435124652186,0.0,nan,nan,,,nan,nan,677692008
 nan,residential,nan,False,True,33.0,"[8001, 3042, 8003, 8005, 5926, 8007, 5928, 8009, 3114, 8011, 8013, 8206, 8015, 8017, 8018, 3058, 3060]",3678,60.0,0.007,nan,0.3801831669277615,1.0,0.0,nan,nan,13037735174.0,6345455457.0,13037735174_6345455457,nan,677692016
-nan,residential,nan,False,True,207.57700000000003,"[8091, 8613, 8057, 8059, 8061]",3769,60.0,0.003,nan,0.36908706665039065,0.883805771216912,0.0,nan,nan,,,nan,nan,678504909
+nan,residential,nan,False,True,207.57700000000003,"[8091, 8613, 8057, 8059, 8061]",3769,60.0,0.003,nan,0.36908706665039065,0.8838057712169655,0.0,nan,nan,,,nan,nan,678504909
 nan,residential,nan,False,True,65.449,"[8072, 8074, 8075, 8070]",3691,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,678572267
 nan,residential,nan,False,False,44.801,8097,3695,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,678612544
-nan,residential,nan,False,False,76.02699999999999,"[8104, 8106, 8108, 8110, 8112]",3700,60.0,0.001,nan,0.25789332389831543,0.9374600173980414,0.0,nan,nan,,,nan,nan,678620468
-nan,residential,nan,False,True,92.05300000000001,"[8115, 8117, 8119, 8121, 8123, 8125, 8127, 8130, 8132, 8134, 8136, 8138, 8140, 8142, 8144, 8146, 8148, 8150, 8152, 8154]",3704,60.0,0.002,nan,0.23925065994262695,0.026595219733954605,0.0,nan,nan,,,nan,nan,678620481
+nan,residential,nan,False,False,76.02699999999999,"[8104, 8106, 8108, 8110, 8112]",3700,60.0,0.001,nan,0.25789332389831543,0.9374600173979545,0.0,nan,nan,,,nan,nan,678620468
+nan,residential,nan,False,True,92.05300000000001,"[8115, 8117, 8119, 8121, 8123, 8125, 8127, 8130, 8132, 8134, 8136, 8138, 8140, 8142, 8144, 8146, 8148, 8150, 8152, 8154]",3704,60.0,0.002,nan,0.23925065994262695,0.026595219734036706,0.0,nan,nan,,,nan,nan,678620481
 nan,residential,nan,False,False,75.0,"[8128, 8155, 8157, 6487, 6489, 6491, 6493]",3702,60.0,0.004,nan,0.29254096204584296,1.0,0.0,nan,nan,13037735180.0,6354224704.0,13037735180_6354224704,nan,590793500
 nan,residential,nan,False,True,36.091,9420,3945,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,478348674
 nan,residential,nan,False,True,126.85900000000001,"[8193, 8195, 8197, 8199, 8201, 8204, 8187, 8189, 8191]",3712,60.0,0.002,nan,0.21907424926757812,0.7885213115088501,0.0,nan,nan,,,nan,nan,678624478
 nan,residential,nan,False,True,107.477,"[8618, 8044, 8615]",3772,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,60944889
 nan,residential,nan,False,False,176.264,"[8225, 8227, 8229, 8233, 8215, 8217, 8219, 8221, 8223]",3717,60.0,0.003,nan,0.19396985810378503,0.6553198150340023,0.0,nan,nan,,,nan,nan,678645244
 nan,residential,nan,False,False,32.832,8256,3720,60.0,0.001,nan,0.20858114415949042,1.0,0.0,nan,nan,,,nan,nan,250456766
-nan,"['residential', 'tertiary']",nan,False,False,486.0,"[1801, 1803, 1805, 1807, 8345, 8995, 8997, 5439, 5441, 5443, 5445, 8547, 8291, 8549, 8294, 8551, 8295, 8298, 3061, 9086]",3739,59.0,0.012,nan,1.991224556915031,0.9479265690897977,0.0,nan,nan,6355204291.0,13037735167.0,6355204291_13037735167,nan,"[318655603, 678730367]"
+nan,"['tertiary', 'residential']",nan,False,False,486.0,"[1801, 1803, 1805, 1807, 8345, 8995, 8997, 5439, 5441, 5443, 5445, 8547, 8291, 8549, 8294, 8551, 8295, 8298, 3061, 9086]",3739,59.0,0.012,nan,1.991224556915031,0.9479265690897978,0.0,nan,nan,6355204291.0,13037735167.0,6355204291_13037735167,nan,"[318655603, 678730367]"
 nan,residential,nan,False,True,226.46000000000004,"[8304, 8306, 8308, 8310, 8312, 8314, 8316, 8317]",3731,60.0,0.004,nan,,0.0,0.0,nan,nan,,,nan,nan,678732844
 nan,residential,nan,False,True,103.91399999999999,"[8322, 8324, 8326, 8328, 8330, 8334]",3736,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,678735884
 nan,residential,nan,False,True,112.925,"[9036, 9038, 9040, 8336, 8338, 8340]",3851,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,678735884
 nan,residential,nan,False,True,68.047,"[9041, 9043]",3852,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,685107627
 nan,residential,nan,False,False,78.119,"[9048, 9044, 9046]",3853,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,685107627
-nan,residential,nan,False,True,305.31800000000004,"[8349, 8351, 8353, 8355, 8357, 8359, 8361, 8363, 8365, 8367, 8369, 8371, 8373, 8375, 8377, 8379, 8381, 8383, 8385, 8387, 8389, 8391, 8393, 8395, 8397, 8399, 8401, 8403, 8405, 8407, 8409, 8411, 8412]",3742,60.0,0.005,nan,0.24365875244140625,0.35510192005679614,0.0,nan,nan,,,nan,nan,678738475
-nan,"['residential', 'tertiary']",nan,False,False,207.0,"[1801, 1803, 1805, 1807, 8345, 8995, 8997, 5439, 5441, 5443, 5445, 8547, 8291, 8549, 8294, 8551, 8295, 8298, 3061, 9086]",3739,59.0,0.012,nan,2.383175339809684,0.8923001119926632,0.0,nan,nan,13037735167.0,6355281532.0,13037735167_6355281532,nan,"[318655603, 678730367]"
+nan,residential,nan,False,True,305.31800000000004,"[8349, 8351, 8353, 8355, 8357, 8359, 8361, 8363, 8365, 8367, 8369, 8371, 8373, 8375, 8377, 8379, 8381, 8383, 8385, 8387, 8389, 8391, 8393, 8395, 8397, 8399, 8401, 8403, 8405, 8407, 8409, 8411, 8412]",3742,60.0,0.005,nan,0.24365875244140625,0.35510192005680197,0.0,nan,nan,,,nan,nan,678738475
+nan,"['tertiary', 'residential']",nan,False,False,207.0,"[1801, 1803, 1805, 1807, 8345, 8995, 8997, 5439, 5441, 5443, 5445, 8547, 8291, 8549, 8294, 8551, 8295, 8298, 3061, 9086]",3739,59.0,0.012,nan,2.383175339809684,0.8923001119926632,0.0,nan,nan,13037735167.0,6355281532.0,13037735167_6355281532,nan,"[318655603, 678730367]"
 nan,tertiary,nan,False,True,278.0,"[9060, 9063, 5448, 1810, 9074, 8346]",3740,59.0,0.007,nan,1.8612145317925348,0.8852050742100752,0.0,nan,nan,13037735172.0,6355281532.0,13037735172_6355281532,nan,318655603
 nan,residential,nan,False,True,6.368,8456,3750,60.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,1000530229
 nan,residential,nan,False,False,20.999000000000002,"[1354, 9444]",3956,60.0,0.0,nan,0.5311381816864014,0.16950652073640085,0.0,nan,nan,,,nan,nan,1000530229
 nan,residential,nan,False,False,38.333,"[8451, 8445, 8447]",3749,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,685719711
 nan,residential,nan,False,True,83.94800000000001,"[8453, 8454, 8458, 8460, 8462]",3751,60.0,0.001,nan,,0.0,1474.05879116,nan,nan,,,nan,nan,489099132
 nan,residential,nan,False,True,41.778,9197,3885,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,685461129
-nan,residential,nan,False,False,19.678,8523,3757,60.0,0.0,nan,0.4158349514007568,0.8627587362637265,0.0,nan,nan,,,nan,nan,685461129
+nan,residential,nan,False,False,19.678,8523,3757,60.0,0.0,nan,0.4158349514007568,0.8627587362629943,0.0,nan,nan,,,nan,nan,685461129
 nan,tertiary,nan,True,False,16.099,9259,3899,59.0,0.0,nan,,0.0,0.0,nan,nan,,,nan,nan,44785556
 nan,residential,nan,False,False,82.08,8834,3803,60.0,0.001,nan,0.5273102124532064,1.0,0.0,nan,nan,,,nan,nan,385433667
 nan,residential,nan,False,False,30.591,9411,3942,60.0,0.001,nan,,0.0,2546.6416368500004,nan,nan,,,nan,nan,1000530229
 nan,residential,nan,False,False,35.961,"[7920, 9346, 9308, 9344]",3925,60.0,0.001,yes,1.7710124651590984,1.0,0.0,nan,nan,,,nan,nan,"[887676817, 887676818, 887676819]"
 nan,residential,nan,False,True,220.0,"[9317, 9351, 9319, 8622, 8624, 8626, 8628, 9341]",3774,60.0,0.008,nan,1.4166180537297175,0.980236631748064,0.0,nan,nan,13037735202.0,6389648871.0,13037735202_6389648871,nan,887620778
-nan,residential,nan,False,True,67.275,"[9312, 9314, 8682]",3927,60.0,0.001,yes,1.0486358404159546,0.9404368471189514,0.0,nan,nan,,,nan,nan,"[887620779, 887620780]"
+nan,residential,nan,False,True,67.275,"[9312, 9314, 8682]",3927,60.0,0.001,yes,1.0486358404159546,0.9404368471189494,0.0,nan,nan,,,nan,nan,"[887620779, 887620780]"
 Rua Dom Gonçalo da Silveira (1.057),residential,nan,False,"[False, True]",3.0,"[8684, 837, 8686]",3776,60.0,0.004,nan,,0.0,0.0,nan,nan,13037735221.0,6404679085.0,13037735221_6404679085,nan,"[590190921, 172425118]"
 nan,residential,nan,False,True,92.807,"[8704, 8706, 8739, 8708, 8710, 8712, 8714, 7902]",3791,60.0,0.002,nan,,0.0,0.0,nan,nan,,,nan,nan,592390953
-nan,residential,nan,False,"[False, True]",120.334,"[8728, 577, 9148, 8727]",3786,60.0,0.002,nan,0.1126813671805642,0.2971050889846905,0.0,nan,nan,,,nan,nan,"[183217121, 684076033]"
+nan,residential,nan,False,"[False, True]",120.334,"[8728, 577, 9148, 8727]",3786,60.0,0.002,nan,0.1126813671805642,0.29710508898348204,0.0,nan,nan,,,nan,nan,"[183217121, 684076033]"
 nan,residential,nan,False,False,69.509,"[8762, 8722, 8724]",3794,60.0,0.001,nan,0.1889091900416783,0.3749180884095869,0.0,nan,nan,,,nan,nan,684076033
 nan,residential,nan,False,True,92.85600000000001,"[8721, 8763, 8717, 8719]",3795,60.0,0.002,nan,0.13932853274875218,0.3449220409530361,0.0,nan,nan,,,nan,nan,684076033
 nan,residential,nan,False,False,27.0,"[8740, 8742, 8744, 8746, 8748, 8750, 8752, 8754, 8756, 8758, 8760]",3792,60.0,0.002,nan,,0.0,1715.69475746,nan,nan,6408421547.0,13037735187.0,6408421547_13037735187,nan,385433590
@@ -2256,10 +2256,10 @@ nan,residential,nan,False,True,102.15100000000001,"[9904, 9902]",4169,60.0,0.002
 nan,residential,nan,False,True,51.0,"[8569, 7088, 7090, 8821, 8825]",3800,60.0,0.001,nan,0.10078309263501849,1.0,0.0,nan,nan,13037735182.0,6412842950.0,13037735182_6412842950,nan,590994758
 nan,residential,nan,False,True,64.44,"[8840, 8841, 8838]",3806,60.0,0.001,nan,0.19775642846759997,1.0,0.0,nan,nan,,,nan,nan,684478697
 nan,residential,nan,False,True,55.402,8859,3810,60.0,0.001,nan,0.11101608806186253,0.5220602630843755,0.0,nan,nan,,,nan,nan,684480511
-nan,residential,nan,False,True,46.458,"[8870, 8872, 8874, 8876, 8878, 8880, 8881]",3816,60.0,0.001,nan,0.08653916012157094,0.734550167092736,0.0,nan,nan,,,nan,nan,684480513
+nan,residential,nan,False,True,46.458,"[8870, 8872, 8874, 8876, 8878, 8880, 8881]",3816,60.0,0.001,nan,0.08653916012157094,0.734550167093297,0.0,nan,nan,,,nan,nan,684480513
 nan,residential,nan,False,False,72.244,"[9536, 7017]",3990,60.0,0.001,nan,0.11881380610995823,0.8434148021734529,0.0,nan,nan,,,nan,nan,590994747
 nan,residential,nan,False,False,23.0,"[8902, 8904, 8906, 8908, 8910, 8914]",3821,60.0,0.001,nan,,0.0,0.0,nan,nan,6413500691.0,13037735179.0,6413500691_13037735179,nan,684522021
-nan,residential,nan,False,True,117.84100000000001,"[3108, 3084, 8915, 8917, 8919, 8921, 8923]",3822,60.0,0.002,nan,0.12410888671875,0.17860057908921,0.0,nan,nan,,,nan,nan,326191764
+nan,residential,nan,False,True,117.84100000000001,"[3108, 3084, 8915, 8917, 8919, 8921, 8923]",3822,60.0,0.002,nan,0.12410888671875,0.17860057908938679,0.0,nan,nan,,,nan,nan,326191764
 nan,residential,nan,False,False,49.0,"[8902, 8904, 8906, 8908, 8910, 8914]",3821,60.0,0.001,nan,,0.0,1711.49200726,nan,nan,13037735179.0,6413500697.0,13037735179_6413500697,nan,684522021
 nan,residential,nan,False,False,31.543999999999997,"[8945, 8940, 8942]",3826,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,684576965
 nan,residential,nan,False,False,54.532,"[8947, 8949, 8951, 8953, 8957]",3830,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,684576965
@@ -2292,7 +2292,7 @@ nan,secondary,nan,True,False,9.67,"[9377, 9378, 9379]",3937,50.0,0.0,nan,1.41934
 nan,secondary,nan,True,False,9.677999999999999,"[9369, 9374, 9375]",3935,50.0,0.0,nan,0.26292165120442706,1.0,0.0,nan,nan,,,nan,roundabout,887679158
 nan,secondary,nan,True,False,19.334,"[9390, 9391, 9370, 9371, 9372, 9373]",3941,50.0,0.0,nan,3.769048418317522,1.0,0.0,nan,nan,,,nan,roundabout,887679158
 nan,secondary,nan,True,False,6.452,"[9387, 9388]",3939,50.0,0.0,nan,0.7623245716094971,1.0,0.0,nan,nan,,,nan,roundabout,887679158
-nan,residential,nan,False,False,138.10299999999998,"[9408, 9413, 9415, 9417, 9421, 9398, 9400, 9402, 9404, 9406]",3947,60.0,0.002,nan,0.06880712509155273,0.04577548189404184,0.0,nan,nan,,,nan,nan,905514034
+nan,residential,nan,False,False,138.10299999999998,"[9408, 9413, 9415, 9417, 9421, 9398, 9400, 9402, 9404, 9406]",3947,60.0,0.002,nan,0.06880712509155273,0.04577548189403841,0.0,nan,nan,,,nan,nan,905514034
 nan,residential,nan,False,False,126.0,"[8169, 5290, 9419, 8171, 8173, 8175, 8177, 8179, 8181]",3946,60.0,0.003,nan,,0.0,0.0,nan,nan,13037735183.0,8409151531.0,13037735183_8409151531,nan,"[478348674, 678622221]"
 Impasse 116,residential,nan,False,True,58.846999999999994,"[9424, 9427]",3951,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,933208901
 Impasse 110,residential,nan,False,True,43.233,9435,3955,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,933245753
@@ -2309,7 +2309,7 @@ nan,residential,nan,False,True,49.188,9553,3998,60.0,0.001,nan,0.205886261803763
 nan,residential,nan,False,True,161.26,9564,4008,60.0,0.003,nan,0.20198987325032552,0.9758548278454215,0.0,nan,nan,,,nan,nan,1173665702
 nan,residential,nan,False,True,177.665,9571,4015,60.0,0.003,nan,0.13373450438181558,0.12652678973541676,0.0,nan,nan,,,nan,nan,1173665704
 nan,residential,nan,False,False,99.626,"[9579, 9572, 9574]",4021,60.0,0.002,nan,0.3774723842226226,1.0,0.0,nan,nan,,,nan,nan,1173665705
-nan,residential,nan,False,True,138.833,"[9585, 9586, 9583]",4023,60.0,0.002,nan,0.23247979138348554,0.9830861796033162,0.0,nan,nan,,,nan,nan,1173665706
+nan,residential,nan,False,True,138.833,"[9585, 9586, 9583]",4023,60.0,0.002,nan,0.23247979138348554,0.983086179603317,0.0,nan,nan,,,nan,nan,1173665706
 nan,residential,nan,False,True,63.112,10110,4196,60.0,0.001,nan,0.10766134262084961,0.3003441744734679,0.0,nan,nan,,,nan,nan,1322033052
 PG-R003,residential,nan,False,True,116.646,9616,4047,60.0,0.002,nan,0.18585174314437375,0.9545321845387578,0.0,nan,nan,,,nan,nan,346592661
 PG-R006,residential,nan,False,False,118.483,9609,4040,60.0,0.002,nan,0.42049534180585074,1.0,0.0,nan,nan,,,nan,nan,1190540603
@@ -2328,7 +2328,7 @@ PG-R007,residential,nan,False,False,75.202,"[9630, 9631]",4061,60.0,0.001,nan,0.
 PG-R002,residential,nan,False,True,117.643,9641,4066,60.0,0.002,nan,0.22442143538902545,0.8581765078478186,0.0,nan,nan,,,nan,nan,1190540616
 Rua Guerra Junqueiro,residential,nan,False,False,69.846,9652,4075,60.0,0.001,nan,0.23049980401992798,0.27398744765664346,0.0,nan,nan,,,nan,nan,253460333
 Rua Latino Coelho,residential,nan,False,False,162.838,9646,4070,60.0,0.003,nan,0.8912427425384521,0.02450639201163825,0.0,nan,nan,,,nan,nan,1191381549
-Rua Latino Coelho,residential,nan,False,True,55.034000000000006,"[9648, 9649]",4072,60.0,0.001,nan,0.21961146593093872,0.16751952143483306,0.0,nan,nan,,,nan,nan,1191381549
+Rua Latino Coelho,residential,nan,False,True,55.034000000000006,"[9648, 9649]",4072,60.0,0.001,nan,0.21961146593093872,0.16751952143660734,0.0,nan,nan,,,nan,nan,1191381549
 Avenida 24 De Julho,tertiary,nan,True,False,67.764,"[9645, 9071]",4071,59.0,0.001,nan,3.8073439598083496,1.0,0.0,nan,nan,,,nan,nan,62226379
 Avenida 24 De Julho,tertiary,nan,True,False,69.736,9650,4073,59.0,0.001,nan,2.7081027030944824,1.0,0.0,nan,nan,,,nan,nan,62226379
 Rua Trindade Coelho,residential,nan,False,True,163.974,9654,4077,60.0,0.003,nan,0.3644454002380371,0.38645834007547464,0.0,nan,nan,,,nan,nan,1191381550
@@ -2351,16 +2351,16 @@ nan,residential,nan,False,False,88.413,9878,4154,60.0,0.001,nan,0.58359580993652
 nan,residential,nan,False,False,48.786,"[9888, 9892]",4161,60.0,0.001,nan,0.13066708124600923,0.8919843423466581,0.0,nan,nan,,,nan,nan,1263826234
 nan,residential,nan,False,False,50.942,"[9896, 9898]",4165,60.0,0.001,nan,0.2067005475362142,1.0,0.0,nan,nan,,,nan,nan,590994746
 nan,residential,nan,False,True,380.80000000000007,"[9921, 9910, 9912, 9914, 9916, 9918]",4174,60.0,0.006,nan,,0.0,0.0,nan,nan,,,nan,nan,1270107335
-"['Rua Costa Pinto', 'Rua Carlos Pereira']","['residential', 'tertiary']",60,False,True,140.0,"[9920, 7809, 7617, 7811, 7619, 7621, 7776, 7623, 8, 2987]",4173,60.0,0.007,nan,,0.0,1239.84428596,nan,nan,13037735197.0,11793125033.0,13037735197_11793125033,nan,"[44794760, 591841710]"
+"['Rua Costa Pinto', 'Rua Carlos Pereira']","['tertiary', 'residential']",60,False,True,140.0,"[9920, 7809, 7617, 7811, 7619, 7621, 7776, 7623, 8, 2987]",4173,60.0,0.007,nan,,0.0,1239.84428596,nan,nan,13037735197.0,11793125033.0,13037735197_11793125033,nan,"[44794760, 591841710]"
 nan,residential,nan,False,False,90.706,9980,4189,60.0,0.002,nan,0.19891477584838868,0.9126481559127392,0.0,nan,nan,,,nan,nan,1311198467
 PG-R001,residential,nan,False,True,7.779,10109,4195,60.0,0.0,nan,0.26979931195576984,1.0,0.0,nan,nan,,,nan,nan,1173233022
 nan,residential,nan,False,False,57.362,10107,4193,60.0,0.001,nan,0.49286312527126735,1.0,0.0,nan,nan,,,nan,nan,1322033051
-nan,residential,nan,False,False,70.85,"[10112, 10114, 10116, 10118, 10122]",4200,60.0,0.001,nan,1.3446975946426392,0.05943480890538405,0.0,nan,nan,,,nan,nan,1339820501
+nan,residential,nan,False,False,70.85,"[10112, 10114, 10116, 10118, 10122]",4200,60.0,0.001,nan,1.3446975946426392,0.05943480890497244,0.0,nan,nan,,,nan,nan,1339820501
 nan,residential,nan,False,False,148.0,"[10120, 3143]",4199,60.0,0.005,nan,1.9077917734781902,0.8451819202545702,0.0,nan,nan,13037735193.0,12393511291.0,13037735193_12393511291,nan,685462031
 nan,residential,nan,False,False,48.328,10125,4203,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,1339820502
 nan,residential,nan,False,False,96.835,"[10169, 10173, 10167]",4215,60.0,0.002,nan,0.3827543258666992,0.43920002468359726,0.0,nan,nan,,,nan,nan,1374792931
 nan,residential,nan,False,False,47.539,10188,4221,60.0,0.001,nan,,0.0,0.0,nan,nan,,,nan,nan,1416955872
-nan,residential,nan,False,True,74.982,"[10209, 10211, 10203, 10205, 10207]",4224,60.0,0.001,nan,0.09007297243390765,0.37067322579440964,0.0,nan,nan,,,nan,nan,255563355
+nan,residential,nan,False,True,74.982,"[10209, 10211, 10203, 10205, 10207]",4224,60.0,0.001,nan,0.09007297243390765,0.3706732257934598,0.0,nan,nan,,,nan,nan,255563355
 nan,tertiary,nan,True,False,39.0,"[5353, 4683, 4685, 4686, 3118, 4687, 1745, 4690, 4691, 4692, 917, 916, 4688, 920, 921, 922]",639,59.0,0.003,nan,,0.0,148.84843063,nan,nan,13037735165.0,13037735164.0,13037735165_13037735164,roundabout,389968200
 nan,tertiary,nan,True,False,20.0,"[5353, 4683, 4685, 4686, 3118, 4687, 1745, 4690, 4691, 4692, 917, 916, 4688, 920, 921, 922]",639,59.0,0.003,nan,,0.0,0.0,nan,nan,13037735169.0,13037735165.0,13037735169_13037735165,roundabout,389968200
 nan,tertiary,nan,True,False,67.0,"[26, 19, 7323, 5943]",6,59.0,0.004,nan,,0.0,5205.77091026,nan,nan,13037735223.0,13037735216.0,13037735223_13037735216,nan,44785083

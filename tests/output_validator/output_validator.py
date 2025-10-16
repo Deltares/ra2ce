@@ -21,7 +21,8 @@ class OutputValidator:
         self.result_path = result_path
         self.reference_path = reference_path or result_path.joinpath("reference")
 
-    def _get_file_validator(self, file: Path) -> type[FileValidatorProtocol] | None:
+    @staticmethod
+    def _get_file_validator(file: Path) -> type[FileValidatorProtocol] | None:
         if file.suffix == ".csv":
             return CsvValidator
         if file.suffix == ".gpkg":
@@ -49,8 +50,9 @@ class OutputValidator:
             return
         _validator_type(reference_file=_reference_file, result_file=_result_file)
 
+    @staticmethod
     def _get_relative_paths(
-        self, base: Path, folder: Optional[Path] = None
+        base: Path, folder: Optional[Path] = None
     ) -> Iterator[Path]:
         # Get relative paths of all files in the folder (recursively).
         if not folder:
@@ -59,7 +61,9 @@ class OutputValidator:
         # If `static` folder is present, handle this one first to detect network problems first.
         _static_folder = "static"
         if folder.joinpath(_static_folder).is_dir():
-            yield from self._get_relative_paths(base, folder.joinpath(_static_folder))
+            yield from OutputValidator._get_relative_paths(
+                base, folder.joinpath(_static_folder)
+            )
 
         for _item in folder.iterdir():
             if _item.name == _static_folder:
@@ -67,7 +71,7 @@ class OutputValidator:
             if _item.is_file():
                 yield _item.relative_to(base)
             else:
-                yield from self._get_relative_paths(base, _item)
+                yield from OutputValidator._get_relative_paths(base, _item)
 
     def validate_output(self) -> None:
         if not self.reference_path or not self.reference_path.is_dir():
