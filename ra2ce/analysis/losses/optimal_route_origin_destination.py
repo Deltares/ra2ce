@@ -224,15 +224,11 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
                 "output_graph", "origin_destination_table.feather"
             )
         )
-        _equity_weights_file = None
-        if self.analysis.equity_weight:
-            _equity_weights_file = self.static_path.joinpath(
-                "network", self.analysis.equity_weight
-            )
+
         route_traffic_df = self.optimal_route_od_link(
             gdf,
             od_table,
-            TrafficAnalysisFactory.read_equity_weights(_equity_weights_file),
+            TrafficAnalysisFactory.read_equity_weights(self.analysis.equity_weight),
         )
         impact_csv_path = self.output_path.joinpath(
             self.analysis.config_name,
