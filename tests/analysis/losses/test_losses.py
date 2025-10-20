@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 
@@ -11,6 +12,7 @@ from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     BaseLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
@@ -82,6 +84,9 @@ class TestLosses:
         traffic_intensities_csv: Path,
         time_values_csv: Path,
     ):
+        @dataclass
+        class MockedLossesAnalysisConfigData(BaseLossesAnalysisConfigData):
+            config_name: str = "mocked_losses_analysis_config_data"
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
@@ -97,7 +102,7 @@ class TestLosses:
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
-        _analysis = BaseLossesAnalysisConfigData(
+        _analysis = SingleLinkLossesConfigData(
             traffic_period=TrafficPeriodEnum.DAY,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,
