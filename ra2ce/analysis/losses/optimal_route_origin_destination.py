@@ -208,7 +208,7 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ).optimal_route_od_link()
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
 
         gdf = self.optimal_route_origin_destination(
             self.graph_file.get_graph(), self.analysis

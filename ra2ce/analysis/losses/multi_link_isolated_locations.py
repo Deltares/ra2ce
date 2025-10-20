@@ -271,7 +271,7 @@ class MultiLinkIsolatedLocations(AnalysisBase, AnalysisLossesProtocol):
         return locations_hz, aggregation
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
 
         (gdf, df) = self.multi_link_isolated_locations(
             self.graph_file_hazard.get_graph(), self.analysis

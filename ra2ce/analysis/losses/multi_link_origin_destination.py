@@ -368,7 +368,7 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         return origin_impact_master, region_impact_master
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
         )

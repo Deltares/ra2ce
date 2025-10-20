@@ -46,7 +46,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         self._analysis_input = analysis_input
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
 
         analyzer = OriginClosestDestination(self._analysis_input)
         if self.analysis.calculate_route_without_disruption:
