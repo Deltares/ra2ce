@@ -215,7 +215,6 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
 
         if isinstance(self.analysis, EquityConfigData) and hasattr(self.origins_destinations, "origin_count"):
             self._save_equity_traffic(gdf)
-        self._save_equity_traffic(gdf)
 
         return self.generate_result_wrapper(gdf)
     
