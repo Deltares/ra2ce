@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
     BaseOriginDestinationConfigData,
@@ -19,8 +21,10 @@ from ra2ce.network.network_config_data.network_config_data import (
 class TestOriginClosestDestination:
     def test_init_with_category(self):
 
+        @dataclass
         class ConcreteClassForTest(BaseOriginDestinationConfigData):
-            pass
+            name: str = "mocked config"
+            weighing: WeighingEnum = WeighingEnum.INVALID
 
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
@@ -32,7 +36,7 @@ class TestOriginClosestDestination:
             ),
             network=NetworkSection(file_id=""),
         )
-        _analysis = BaseLossesAnalysisConfigData(threshold="", weighing=WeighingEnum.INVALID)
+        _analysis = ConcreteClassForTest()
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
             analysis_config=_config,

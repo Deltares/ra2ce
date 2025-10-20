@@ -7,6 +7,7 @@ import pytest
 from shapely.geometry import LineString
 
 from ra2ce.analysis.analysis_base import AnalysisBase
+from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
     BaseLinkLossesConfigData,
@@ -120,8 +121,10 @@ class TestLosses:
         assert isinstance(_losses, losses_analysis)
         assert isinstance(_losses, AnalysisBase)
 
+    @pytest.mark.parametrize("losses_config_type", [pytest.param(_lct, id=_lct.__name__) for _lct in LossesConfigDataTypes])
     def test_calc_vlh(
         self,
+        losses_config_type: type[BaseLinkLossesConfigData],
         resilience_curves_csv: Path,
         traffic_intensities_csv: Path,
         time_values_csv: Path,
@@ -168,10 +171,10 @@ class TestLosses:
             "losses" "csv_data_for_losses"
         )
 
-        _analysis = BaseLinkLossesConfigData(
+        _analysis = losses_config_type(
             traffic_period=TrafficPeriodEnum.DAY,
             hours_per_traffic_period=24,
-            threshold=0,
+            # threshold=0,
             production_loss_per_capita_per_hour=20,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,
