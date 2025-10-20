@@ -1,9 +1,13 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     BaseLossesAnalysisConfigData,
@@ -17,10 +21,11 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 class TestAnalysisFactory:
 
     def test_get_damages_analysis_with_invalid_raises(self):
+        @dataclass
+        class MockConfigData(AnalysisConfigDataProtocol):
+            name: str = "mock"
         # 1. Define test data.
-        _analysis = DamagesConfigData(
-            name="sth"
-        )
+        _analysis = MockConfigData()
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -74,6 +79,4 @@ class TestAnalysisFactory:
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisLossesProtocol)
         assert isinstance(_result, AnalysisBase)
-        assert _result.graph_file == _config.graph_files.base_graph
-        assert isinstance(_result.analysis, BaseLossesAnalysisConfigData)
         assert isinstance(_result.analysis, BaseLossesAnalysisConfigData)

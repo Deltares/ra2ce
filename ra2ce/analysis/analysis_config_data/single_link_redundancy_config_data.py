@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass, field
 
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     BaseLossesAnalysisConfigData,
@@ -41,6 +44,8 @@ class SingleLinkRedundancyConfigData(BaseLossesAnalysisConfigData):
 
     # Concrete properties
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
+
+    config_name: str = AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
