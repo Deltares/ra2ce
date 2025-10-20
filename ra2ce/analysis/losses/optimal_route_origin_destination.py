@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data imp
     OptimalRouteOriginDestinationConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
@@ -208,33 +209,34 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ).optimal_route_od_link()
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.config_name)
-
         gdf = self.optimal_route_origin_destination(
             self.graph_file.get_graph(), self.analysis
         )
 
-        if self.analysis.save_traffic and hasattr(
-            self.origins_destinations, "origin_count"
-        ):
-            od_table = read_feather(
-                self.static_path.joinpath(
-                    "output_graph", "origin_destination_table.feather"
-                )
-            )
-            _equity_weights_file = None
-            if self.analysis.equity_weight:
-                _equity_weights_file = self.static_path.joinpath(
-                    "network", self.analysis.equity_weight
-                )
-            route_traffic_df = self.optimal_route_od_link(
-                gdf,
-                od_table,
-                TrafficAnalysisFactory.read_equity_weights(_equity_weights_file),
-            )
-            impact_csv_path = _output_path.joinpath(
-                (self.analysis.name.replace(" ", "_") + "_link_traffic.csv"),
-            )
-            route_traffic_df.to_csv(impact_csv_path, index=False)
+        if isinstance(self.analysis, EquityConfigData) and hasattr(self.origins_destinations, "origin_count"):
+            self._save_equity_traffic(gdf)
+        self._save_equity_traffic(gdf)
 
         return self.generate_result_wrapper(gdf)
+    
+    def _save_equity_traffic(self, gdf: GeoDataFrame) -> None:
+        od_table = read_feather(
+            self.static_path.joinpath(
+                "output_graph", "origin_destination_table.feather"
+            )
+        )
+        _equity_weights_file = None
+        if self.analysis.equity_weight:
+            _equity_weights_file = self.static_path.joinpath(
+                "network", self.analysis.equity_weight
+            )
+        route_traffic_df = self.optimal_route_od_link(
+            gdf,
+            od_table,
+            TrafficAnalysisFactory.read_equity_weights(_equity_weights_file),
+        )
+        impact_csv_path = self.output_path.joinpath(
+            self.analysis.config_name,
+            (self.analysis.name.replace(" ", "_") + "_link_traffic.csv"),
+        )
+        route_traffic_df.to_csv(impact_csv_path, index=False)
