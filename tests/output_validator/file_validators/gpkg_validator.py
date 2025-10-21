@@ -3,7 +3,6 @@ from pathlib import Path
 
 import fiona
 import geopandas as gpd
-import numpy as np
 
 from tests.output_validator.file_validators.file_validator_protocol import (
     FileValidatorProtocol,
@@ -51,5 +50,6 @@ class GpkgValidator(FileValidatorProtocol, PandasValidatorBase):
             f"GPKG file {self.result_file.name} deviates in content.\n"
             f"Reference row:\n{_gdf_ref.loc[_first_mismatch_row]}\n"
             f"Result row   :\n{_gdf_res.loc[_first_mismatch_row]}\n"
-            f"Mismatching columns: {_mismatch_columns}"
+            f"Mismatching columns: {_mismatch_columns}\n"
+            f"Total mismatches: {_mismatches.sum().sum()} of {_gdf_ref.shape[0] * _gdf_ref.shape[1]} values"
         )
