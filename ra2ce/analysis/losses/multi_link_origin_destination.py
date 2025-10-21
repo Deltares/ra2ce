@@ -10,9 +10,11 @@ from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
     MultiLinkOriginDestinationConfigData,
 )
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.equity_origin_destination import EquityOriginDestination
 from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
@@ -373,9 +375,14 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
             self.graph_file_hazard.get_graph(), self.analysis
         )
         self._analysis_input.graph_file = self._analysis_input.graph_file_hazard
-        _orod_result_wrapper = OptimalRouteOriginDestination(
+        
+        # Determine analysis type
+        _analysis_type = EquityOriginDestination if isinstance(self.analysis, EquityConfigData) else OptimalRouteOriginDestination
+        _orod_result_wrapper = _analysis_type(
             self._analysis_input
         ).execute()
+
+        # Get impact results
         (disruption_impact_df, gdf_ori,) = self.multi_link_origin_destination_impact(
             gdf, _orod_result_wrapper.get_single_result()
         )

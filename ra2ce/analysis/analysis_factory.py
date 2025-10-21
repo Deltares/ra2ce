@@ -35,10 +35,7 @@ from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data imp
     OptimalRouteOriginDestinationConfigData,
 )
 from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
     BaseLossesAnalysisConfigData,
 )
@@ -53,6 +50,7 @@ from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.equity_origin_destination import EquityOriginDestination
 from ra2ce.analysis.losses.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
@@ -147,7 +145,17 @@ class AnalysisFactory:
             )
             return MultiLinkRedundancy(_analysis_input)
 
+        if isinstance(analysis, EquityConfigData):
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file=analysis_config.graph_files.origins_destinations_graph,
+            )
+            return EquityOriginDestination(_analysis_input)
+
         if isinstance(analysis, OptimalRouteOriginDestinationConfigData):
+            # NOTE: Must be checked after EquityConfigData as otherwise equity
+            # would return true here as well.
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
