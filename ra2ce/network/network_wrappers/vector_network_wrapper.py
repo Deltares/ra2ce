@@ -297,7 +297,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
             _edge_attributes = {
-                f"{self.file_id}": link_id,
+                **({f"{self.file_id}": link_id} if self.file_id else {}),
                 f"{self.link_type_column}": link_type,
                 "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
                 "geometry": row.pop("geometry"),
