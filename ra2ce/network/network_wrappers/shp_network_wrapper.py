@@ -150,6 +150,10 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         lines_merged = gpd.GeoDataFrame()
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
+
+        if not self.file_id in edges.columns:
+            raise ValueError("The file_id parameter in NetworkSection is required in order to use the cleanup functionality for a shapefile network. Please specify which attribute of the shapefile to use as unique identifier.")
+
         if self.merge_lines:
             aadt_names = []
             edges, lines_merged = nut.merge_lines_automatic(
