@@ -1,7 +1,7 @@
 Accessibility Analysis
 =======================
 
-🚑 How fast can you reach essential services?
+🚑 How quick can you reach essential services?
 --------------------------------------------
 
 Accessibility analysis in RA2CE answers practical questions like:

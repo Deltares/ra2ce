@@ -10,7 +10,7 @@ This is what criticality analysis in RA2CE is all about. It helps you:
 
 - Find out if detours exist when a road is blocked
 - Compare how much longer the detour takes (distance or time)
-- Spot the roads that have no backup routes at all
+- Spot the roads that have no alternatives routes at all
 
 
 .. note::
@@ -27,7 +27,7 @@ Case 1: What if one road is blocked?
 ------------------------------------
 
 The **single link redundancy** analysis provides insight into the criticality of each individual link in the network.
-For each link, the analysis identifies the best existing alternative route in case that link is disrupted.
+For each link, the analysis identifies the best existing alternative route in the event that the said link is disrupted.
 If no alternative exists, the analysis highlights the lack of redundancy for that link.
 
 This process is performed sequentially for each network link, and the results indicate the degree of redundancy
@@ -41,7 +41,7 @@ Case 1: One Road Blocked
 ------------------------
 
 When a single road (or *link*) is disrupted, RA2CE checks whether
-there is a **backup route** available.
+there is an **alternative route** available.
 
 For each road, the analysis:
 
