@@ -21,17 +21,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass, field
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataProtocol,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    BaseLossesAnalysisConfigData,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
-@with_legacy_mappers
 @dataclass
-class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+class SingleLinkRedundancyConfigData(BaseLossesAnalysisConfigData):
     """
     Reflects all possible settings that a single link redundancy config might contain.
     """
@@ -44,14 +45,15 @@ class SingleLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     # Concrete properties
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
 
+    config_name: str = AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY.config_value
+
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()
         if not self.name:
             _report.error("An analysis 'name' must be provided.")
         if (
             not isinstance(self.weighing, WeighingEnum)
-            or self.weighing == WeighingEnum.INVALID
-            or self.weighing == WeighingEnum.NONE
+            or self.weighing in [WeighingEnum.INVALID, WeighingEnum.NONE]
         ):
             _report.error(
                 f"For single link redundancy analysis '{self.name}': 'weighing' must be a valid WeighingEnum value."

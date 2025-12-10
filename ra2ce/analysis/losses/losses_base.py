@@ -28,9 +28,6 @@ import pandas as pd
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
-)
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -39,6 +36,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    BaseLossesAnalysisConfigData,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -64,12 +64,16 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
     Based on the analysis type a different criticality analysis is executed.
     """
 
-    analysis: AnalysisSectionLosses
+    analysis: BaseLossesAnalysisConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
+
+    @property
+    def analysis_type(self) -> type[BaseLossesAnalysisConfigData]:
+        return type(self.analysis)
 
     def __init__(
         self,
@@ -87,7 +91,6 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
 
-        self.analysis_type = self.analysis.analysis
         self.traffic_period: TrafficPeriodEnum = self.analysis.traffic_period
         self.hours_per_traffic_period: float = self.analysis.hours_per_traffic_period
         if not self.hours_per_traffic_period:

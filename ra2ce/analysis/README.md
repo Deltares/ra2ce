@@ -26,7 +26,7 @@ _Add diagram_
 
 ## Input/output
 An analysis consumes an `AnalysisInputWrapper`, containing analysis parameters from the configuration, the graph/network and some additional settings.
-The `AnalysisRunner` stores the output of an analysis in an `AnalysisResultWrapperProtocol`, a shell dataclass containing a collection of results (`AnalysisResult`), each of them relating an "analysis result" (`GeoDataFrame`) with the configuration used (`AnalysisConfigData.ANALYSIS_SECTION`).
+The `AnalysisRunner` stores the output of an analysis in an `AnalysisResultWrapperProtocol`, a shell dataclass containing a collection of results (`AnalysisResult`), each of them relating an "analysis result" (`GeoDataFrame`) with the configuration used (`AnalysisConfigDataProtocol`).
 This output can be exported to different formats using the `AnalysisResultWrapperExporter`.
 
 ## Overview of analyses

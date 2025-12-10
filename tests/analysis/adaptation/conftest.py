@@ -4,20 +4,19 @@ from typing import Iterator
 
 import pytest
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionAdaptation,
-    AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.adaptation_config_data import (
+    AdaptationConfigData,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    BaseLinkLossesConfigData,
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
@@ -25,6 +24,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    BaseLossesAnalysisConfigData,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -42,12 +44,12 @@ class AdaptationOptionCases:
     Test cases for the adaptation options.
     """
 
-    config_cases: list[AnalysisSectionAdaptationOption] = [
-        AnalysisSectionAdaptationOption(
+    config_cases: list[AdaptationOptionConfigData] = [
+        AdaptationOptionConfigData(
             id="AO0",
             name="No adaptation",
         ),
-        AnalysisSectionAdaptationOption(
+        AdaptationOptionConfigData(
             id="AO1",
             name="Cheap construction, expensive maintenance",
             construction_cost=1000.0,
@@ -55,7 +57,7 @@ class AdaptationOptionCases:
             maintenance_cost=200.0,
             maintenance_interval=3.0,
         ),
-        AnalysisSectionAdaptationOption(
+        AdaptationOptionConfigData(
             id="AO2",
             name="Expensive construction, cheap maintenance",
             construction_cost=5000.0,
@@ -68,7 +70,7 @@ class AdaptationOptionCases:
     total_benefit: list[float] = [0.0, 0.0, 0.0]
     total_bc_ratio: list[float] = [0.0, 0.0, 0.0]
     cases: list[
-        tuple[AnalysisSectionAdaptationOption, tuple[float, float, float]]
+        tuple[AdaptationOptionConfigData, tuple[float, float, float]]
     ] = list(zip(config_cases, zip(total_cost, total_benefit, total_bc_ratio)))
 
 
@@ -88,15 +90,13 @@ def _get_valid_adaptation_config_fixture(
         Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
-    def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
-        return AnalysisSectionLosses(
-            analysis=analysis,
+    def get_losses_section(analysis_type: type[BaseLinkLossesConfigData]) -> BaseLossesAnalysisConfigData:
+        return analysis_type(
             name="Losses",
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,
-            threshold=0,
             production_loss_per_capita_per_hour=42,
-            hours_per_traffic_period=8,
+            # hours_per_traffic_period=8,
             traffic_period=TrafficPeriodEnum.DAY,
             trip_purposes=[
                 TripPurposeEnum.BUSINESS,
@@ -134,8 +134,7 @@ def _get_valid_adaptation_config_fixture(
     _network_config = NetworkConfigWrapper.from_data(None, _network_config_data)
 
     # - damages
-    _damages_section = AnalysisSectionDamages(
-        analysis=AnalysisDamagesEnum.DAMAGES,
+    _damages_section = DamagesConfigData(
         name="Damages",
         event_type=EventTypeEnum.EVENT,
         damage_curve=DamageCurveEnum.MAN,
@@ -144,16 +143,15 @@ def _get_valid_adaptation_config_fixture(
     )
     # - losses
     _single_link_losses_section = get_losses_section(
-        AnalysisLossesEnum.SINGLE_LINK_LOSSES
+        SingleLinkLossesConfigData
     )
     _multi_link_losses_section = get_losses_section(
-        AnalysisLossesEnum.MULTI_LINK_LOSSES
+        MultiLinkLossesConfigData
     )
     # - adaptation
-    _adaptation_section = AnalysisSectionAdaptation(
-        analysis=AnalysisEnum.ADAPTATION,
+    _adaptation_section = AdaptationConfigData(
         name="Adaptation",
-        losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+        losses_analysis=MultiLinkLossesConfigData,
         adaptation_options=AdaptationOptionCases.config_cases,
         time_horizon=20,
         discount_rate=0.025,

@@ -21,29 +21,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Any
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    DamagesAnalysisNameList,
-    LossesAnalysisNameList,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
     AnalysisConfigDataProtocol,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkSection
-from ra2ce.network.network_config_data.network_config_data_validator import (
-    NetworkDictValues,
-)
-
-AnalysisNetworkDictValues = NetworkDictValues | {
-    "analysis": LossesAnalysisNameList + DamagesAnalysisNameList
-}
 
 
 class AnalysisConfigDataValidator(Ra2ceIoValidator):
@@ -61,14 +50,10 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
             for key, value in header.__dict__.items():
                 if not value:
                     continue
-                if isinstance(value, Ra2ceEnumBase):
-                    # enumerations
-                    _expected_values_list = value.list_valid_options()
-                else:
-                    # other items with limited value options (should become enumerations)
-                    if key not in AnalysisNetworkDictValues.keys():
-                        continue
-                    _expected_values_list = AnalysisNetworkDictValues[key]
+                if not isinstance(value, Ra2ceEnumBase):
+                    continue
+                # enumerations
+                _expected_values_list = value.list_valid_options()
                 if value not in _expected_values_list:
                     _report.error(
                         f"Wrong input to property [ {key} ]; has to be one of: {_expected_values_list}."
@@ -130,7 +115,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
         # Validate `shp_input`.
         for _analysis in filter(
-            lambda a: a.analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES,
+            lambda a: isinstance(a, MultiLinkLossesConfigData),
             self._config.analyses,
         ):
             if (

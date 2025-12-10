@@ -11,7 +11,14 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
     AdaptationOptionPartialResult,
 )
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -30,14 +37,14 @@ class TestAnalysisOptionAnalysis:
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
         [
-            pytest.param(AnalysisDamagesEnum.DAMAGES, Damages, id="damages"),
+            pytest.param(DamagesConfigData, Damages, id="damages"),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 SingleLinkLosses,
                 id="single_link_losses",
             ),
             pytest.param(
-                AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLossesConfigData,
                 MultiLinkLosses,
                 id="multi_link_losses",
             ),
@@ -45,7 +52,7 @@ class TestAnalysisOptionAnalysis:
     )
     def test_get_analysis_info_returns_tuple(
         self,
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1./2. Define test data./Run test.
@@ -70,14 +77,14 @@ class TestAnalysisOptionAnalysis:
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
         [
-            pytest.param(AnalysisDamagesEnum.DAMAGES, Damages, id="damages"),
+            pytest.param(DamagesConfigData, Damages, id="damages"),
             pytest.param(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLossesConfigData,
                 SingleLinkLosses,
                 id="single_link_losses",
             ),
             pytest.param(
-                AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLossesConfigData,
                 MultiLinkLosses,
                 id="multi_link_losses",
             ),
@@ -86,7 +93,7 @@ class TestAnalysisOptionAnalysis:
     def test_from_config_returns_object(
         self,
         valid_adaptation_config: AnalysisConfigWrapper,
-        analysis_type: AnalysisLossesEnum,
+        analysis_type: AnalysisConfigDataProtocol,
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1. Define test data.
@@ -107,7 +114,7 @@ class TestAnalysisOptionAnalysis:
 
     def test_execute_returns_result(self):
         class MockAnalysis(AnalysisBase, AnalysisProtocol):
-            analysis: AnalysisConfigData.ANALYSIS_SECTION = None
+            analysis: AnalysisConfigDataProtocol = None
             output_path: Path = None
 
             def __init__(self, *args) -> None:
@@ -127,7 +134,7 @@ class TestAnalysisOptionAnalysis:
 
         # 1. Define test data.
         _option_id = "Option1"
-        _analysis_type = AnalysisDamagesEnum.DAMAGES
+        _analysis_type = DamagesConfigData
         _analysis = AdaptationOptionAnalysis(
             option_id=_option_id,
             analysis_type=_analysis_type,
@@ -142,5 +149,5 @@ class TestAnalysisOptionAnalysis:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
-            f"{_option_id}_{_analysis_type.config_value}"
+            f"{_option_id}_{_analysis_type.config_name}"
         ].sum() == pytest.approx(55)

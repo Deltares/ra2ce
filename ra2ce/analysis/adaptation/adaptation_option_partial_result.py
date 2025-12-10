@@ -28,11 +28,8 @@ from geopandas import GeoDataFrame
 from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
 )
 
 
@@ -165,7 +162,7 @@ class AdaptationOptionPartialResult:
         option_id: str,
         gdf_in: GeoDataFrame,
         regex: str,
-        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        analysis_type: type[AnalysisConfigDataProtocol],
     ) -> AdaptationOptionPartialResult:
         """
         Create a new object from a GeoDataFrame with a column matching a regex.
@@ -174,7 +171,7 @@ class AdaptationOptionPartialResult:
             option_id (str): The ID of the adaptation option.
             gdf_in (GeoDataFrame): The input GeoDataFrame.
             regex (str): The pattern to match.
-            analysis_type (AnalysisDamagesEnum | AnalysisLossesEnum): The type of the input analysis.
+            analysis_type (type[AnalysisConfigDataProtocol]): The type of the input analysis.
 
         Returns:
             AdaptationOptionPartialResult: The object with the matched column.
@@ -185,7 +182,7 @@ class AdaptationOptionPartialResult:
             logging.warning(
                 "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
                 regex,
-                analysis_type.config_value,
+                analysis_type.config_name,
             )
             _result.add_column(analysis_type, math.nan)
         else:
@@ -194,20 +191,22 @@ class AdaptationOptionPartialResult:
         return _result
 
     def _get_column_name(
-        self, col_type: AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+        self, col_type: type[AnalysisConfigDataProtocol] | AdaptationResultEnum
     ) -> str:
-        return f"{self.option_id}_{col_type.config_value}"
+        if isinstance(col_type, AdaptationResultEnum):
+            return f"{self.option_id}_{col_type.config_value}"
+        return f"{self.option_id}_{col_type.config_name}"
 
     def add_column(
         self,
-        col_type: AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum,
+        col_type: type[AnalysisConfigDataProtocol],
         column_data: Series,
     ) -> None:
         """
         Add a data column to the result.
 
         Args:
-            col_type (AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum): The type of the column.
+            col_type (type[AnalysisConfigDataProtocol]): The type of the column.
             column_data (Series): The data to add.
         """
         self.data_frame[self._get_column_name(col_type)] = column_data

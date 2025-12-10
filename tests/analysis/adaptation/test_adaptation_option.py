@@ -17,9 +17,17 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
 )
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
 )
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    MultiLinkLossesConfigData,
+    SingleLinkLossesConfigData,
+)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -36,14 +44,14 @@ class TestAdaptationOption:
     @pytest.mark.parametrize(
         "losses_analysis_type, losses_analysis",
         [
-            (AnalysisLossesEnum.SINGLE_LINK_LOSSES, SingleLinkLosses),
-            (AnalysisLossesEnum.MULTI_LINK_LOSSES, MultiLinkLosses),
+            (SingleLinkLossesConfigData, SingleLinkLosses),
+            (MultiLinkLossesConfigData, MultiLinkLosses),
         ],
     )
     def test_from_config_returns_object_with_2_analyses(
         self,
         valid_adaptation_config: AnalysisConfigWrapper,
-        losses_analysis_type: AnalysisLossesEnum,
+        losses_analysis_type: type[AnalysisConfigDataProtocol],
         losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
@@ -65,6 +73,14 @@ class TestAdaptationOption:
         assert len(_result.analyses) == 2
         assert Damages in [x.analysis_class for x in _result.analyses]
         assert losses_analysis in [x.analysis_class for x in _result.analyses]
+
+    def test_when_losses_list_no_damages_included(self, valid_adaptation_config: AnalysisConfigWrapper):
+        # 1. Define test data.
+        assert any(isinstance(x, DamagesConfigData) for x in valid_adaptation_config.config_data.analyses)
+        assert not any(
+            isinstance(x, DamagesConfigData)
+            for x in valid_adaptation_config.config_data.losses_list
+        )
 
     @pytest.mark.parametrize(
         "keep_analyses",
@@ -106,7 +122,7 @@ class TestAdaptationOption:
         with pytest.raises(ValueError) as _exc:
             AdaptationOption.from_config(
                 analysis_config=_config,
-                adaptation_option=AnalysisSectionAdaptation(),
+                adaptation_option=AdaptationOptionConfigData(id="Option1"),
             )
 
         # 3. Verify expectations.

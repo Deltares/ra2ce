@@ -130,7 +130,7 @@ class TestAnalysisConfigDataReader:
             ),
         ],
     )
-    def test_get_analysis_sections_with_new_dataclasses(
+    def test_get_analysis_sections_returns_expected_config_data(
         self,
         analysis_config_name: str,
         expected_analysis_type: type[AnalysisConfigDataProtocol],
@@ -153,7 +153,7 @@ class TestAnalysisConfigDataReader:
         # 2. Run test
 
         # Read everything so it gets correctly initialized.
-        _analyses_config_data = _reader._get_analysis_sections_with_new_dataclasses()
+        _analyses_config_data = _reader.get_analysis_sections()
 
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)
@@ -182,7 +182,7 @@ class TestAnalysisConfigDataReader:
         # 2. Run test
 
         # Read everything so it gets correctly initialized.
-        _analyses_config_data = _reader._get_analysis_sections_with_new_dataclasses()
+        _analyses_config_data = _reader.get_analysis_sections()
 
         # 3. Verify expectations
         assert isinstance(_analyses_config_data, list)

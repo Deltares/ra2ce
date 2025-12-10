@@ -7,12 +7,14 @@ import pandas as pd
 from geopandas import GeoDataFrame, read_feather, read_file
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkOriginDestinationConfigData,
 )
+from ra2ce.analysis.analysis_config_data.equity_config_data import EquityConfigData
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.equity_origin_destination import EquityOriginDestination
 from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
@@ -24,7 +26,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: MultiLinkOriginDestinationConfigData
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
@@ -98,14 +100,14 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ]
 
     def multi_link_origin_destination(
-        self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
+        self, graph: nx.MultiGraph, analysis: MultiLinkOriginDestinationConfigData
     ) -> GeoDataFrame:
         """
         Calculates the connectivity between origins and destinations.
 
         Args:
             graph: The MultiGraph representing the network.
-            analysis: The AnalysisSectionLosses object containing OD information.
+            analysis: The MultiLinkOriginDestinationConfigData object containing OD information.
 
         Returns:
             GeoDataFrame: Connectivity results between origins and destinations.
@@ -368,14 +370,19 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         return origin_impact_master, region_impact_master
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
         )
         self._analysis_input.graph_file = self._analysis_input.graph_file_hazard
-        _orod_result_wrapper = OptimalRouteOriginDestination(
+        
+        # Determine analysis type
+        _analysis_type = EquityOriginDestination if isinstance(self.analysis, EquityConfigData) else OptimalRouteOriginDestination
+        _orod_result_wrapper = _analysis_type(
             self._analysis_input
         ).execute()
+
+        # Get impact results
         (disruption_impact_df, gdf_ori,) = self.multi_link_origin_destination_impact(
             gdf, _orod_result_wrapper.get_single_result()
         )

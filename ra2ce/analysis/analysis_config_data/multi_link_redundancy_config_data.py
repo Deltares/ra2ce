@@ -22,17 +22,18 @@ import math
 from dataclasses import dataclass, field
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
-    AnalysisConfigDataProtocol,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    BaseLossesAnalysisConfigData,
+)
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.configuration.legacy_mappers import with_legacy_mappers
 
 
-@with_legacy_mappers
 @dataclass
-class MultiLinkRedundancyConfigData(AnalysisConfigDataProtocol):
+class MultiLinkRedundancyConfigData(BaseLossesAnalysisConfigData):
     # Common properties
     name: str
     save_gpkg: bool = False
@@ -44,6 +45,8 @@ class MultiLinkRedundancyConfigData(AnalysisConfigDataProtocol):
     threshold: Optional[float] = 0.0
     threshold_destinations: Optional[float] = math.nan
     buffer_meters: Optional[float] = math.nan
+
+    config_name: str = AnalysisLossesEnum.MULTI_LINK_REDUNDANCY.config_value
 
     def validate_integrity(self) -> ValidationReport:
         _report = ValidationReport()

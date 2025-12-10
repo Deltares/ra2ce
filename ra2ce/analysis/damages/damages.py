@@ -8,9 +8,7 @@ from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDamages,
-)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -35,7 +33,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class Damages(AnalysisBase, AnalysisDamagesProtocol):
-    analysis: AnalysisSectionDamages
+    analysis: DamagesConfigData
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path

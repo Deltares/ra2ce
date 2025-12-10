@@ -19,28 +19,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol, runtime_checkable
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Optional
 
-from ra2ce.common.validation.validation_report import ValidationReport
 
+class BaseRootablePaths(ABC):
 
-@runtime_checkable
-class AnalysisConfigDataProtocol(Protocol):
-    """
-    Reflects all common settings that damages and losses analysis sections might contain.
-    """
+    def _get_new_root(self, old_root: Path, new_root: Path) -> Optional[Path]:
+        # Rewrite the path to the new root
+        if not old_root:
+            return None
+        _orig_parts = old_root.parts
+        _rel_path = Path(*_orig_parts[len(old_root.parts) :])
+        return new_root.joinpath(_rel_path)
 
-    name: str
-    save_gpkg: bool
-    save_csv: bool
-    config_name: str
-
-    def validate_integrity(self) -> ValidationReport:
+    @abstractmethod
+    def reroot_fields(self, old_root: Path, new_root: Path):
         """
-        Validates the integrity of the config data instance. This includes checking for required fields,
-        valid value ranges, and consistency between related fields.
+        Rewrites the paths of the input files in the config data instance to be relative to the new root path.
 
-        Returns:
-            ValidationReport: The validation report containing the results of the integrity check.
+        Args:
+            new_root (Path): The new root path to which the input file paths should be adjusted.
         """
         pass

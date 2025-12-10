@@ -24,7 +24,9 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 
 
 @dataclass(kw_only=True)
@@ -34,7 +36,7 @@ class AnalysisResult:
     """
 
     analysis_result: GeoDataFrame
-    analysis_config: AnalysisConfigData.ANALYSIS_SECTION
+    analysis_config: AnalysisConfigDataProtocol
     output_path: Path
 
     _custom_name: str = ""
@@ -66,7 +68,7 @@ class AnalysisResult:
             Path: base path without extension for exporting results.
         """
         return self.output_path.joinpath(
-            self.analysis_config.analysis.config_value, self.analysis_name
+            self.analysis_config.config_name, self.analysis_name
         )
 
     def is_valid_result(self) -> bool:

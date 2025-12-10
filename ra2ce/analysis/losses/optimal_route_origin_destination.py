@@ -1,3 +1,24 @@
+"""
+                GNU GENERAL PUBLIC LICENSE
+                  Version 3, 29 June 2007
+
+Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from pathlib import Path
 
 import networkx as nx
@@ -7,8 +28,8 @@ from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    OptimalRouteOriginDestinationConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -25,7 +46,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: OptimalRouteOriginDestinationConfigData
     graph_file: GraphFile
     input_path: Path
     static_path: Path
@@ -188,7 +209,7 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ]
 
     def optimal_route_origin_destination(
-        self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
+        self, graph: nx.MultiGraph, analysis: OptimalRouteOriginDestinationConfigData
     ) -> GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
@@ -208,33 +229,9 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         ).optimal_route_od_link()
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
-
         gdf = self.optimal_route_origin_destination(
             self.graph_file.get_graph(), self.analysis
         )
 
-        if self.analysis.save_traffic and hasattr(
-            self.origins_destinations, "origin_count"
-        ):
-            od_table = read_feather(
-                self.static_path.joinpath(
-                    "output_graph", "origin_destination_table.feather"
-                )
-            )
-            _equity_weights_file = None
-            if self.analysis.equity_weight:
-                _equity_weights_file = self.static_path.joinpath(
-                    "network", self.analysis.equity_weight
-                )
-            route_traffic_df = self.optimal_route_od_link(
-                gdf,
-                od_table,
-                TrafficAnalysisFactory.read_equity_weights(_equity_weights_file),
-            )
-            impact_csv_path = _output_path.joinpath(
-                (self.analysis.name.replace(" ", "_") + "_link_traffic.csv"),
-            )
-            route_traffic_df.to_csv(impact_csv_path, index=False)
-
         return self.generate_result_wrapper(gdf)
+    

@@ -18,29 +18,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from dataclasses import fields
+
+from abc import ABC
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
 
 
-def with_legacy_mappers(cls):
+class BaseLossesAnalysisConfigData(AnalysisConfigDataProtocol, ABC):
     """
-    Method to be used as a decorator to inject the inner defined (class)
-    methods in the assigned (data)class objects.
-
-    E.g.:
-    @with_legacy_mappers
-    @dataclass
-    class ConcreteLegacyIniMapper:
-        name: str
+    Base class for losses analysis configuration data.
+    It is mostly used as a marker interface to distinguish between damages and losses analysis config data.
     """
-
-    @classmethod
-    def from_ini_file(cls, **kwargs):
-        """
-        Excludes any unknown fields from the input dictionary
-        and initializes the dataclass object.
-        """
-        _field_names = set([f.name for f in fields(cls)])
-        return cls(**{k: v for k, v in kwargs.items() if k in _field_names})
-
-    setattr(cls, "from_ini_file", from_ini_file)  # add new method
-    return cls
+    pass

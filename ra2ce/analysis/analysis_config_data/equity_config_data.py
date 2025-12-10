@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
@@ -27,11 +28,11 @@ from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data imp
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
+@dataclass
 class EquityConfigData(OptimalRouteOriginDestinationConfigData):
     """Configuration data for equity analysis."""
-
     equity_weight: Path = None
-    # save_traffic: bool = True ; Should always be true!
+    config_name: str = "equity"
 
     def validate_integrity(self) -> ValidationReport:
         _report = super().validate_integrity()

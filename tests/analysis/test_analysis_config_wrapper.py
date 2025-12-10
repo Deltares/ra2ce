@@ -3,11 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -16,6 +13,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.single_link_redundancy_config_data import (
+    SingleLinkRedundancyConfigData,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
@@ -75,7 +75,7 @@ class TestAnalysisConfigWrapper:
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
         _analysis.config_data.analyses = [
-            AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
+            SingleLinkRedundancyConfigData(name="Any name"),
         ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
@@ -92,8 +92,8 @@ class TestAnalysisConfigWrapper:
         _analysis_wrapper = AnalysisConfigWrapper()
         _analysis_wrapper.config_data = AnalysisConfigData()
         _analysis_wrapper.config_data.analyses.append(
-            AnalysisSectionDamages(
-                analysis=AnalysisDamagesEnum.DAMAGES,
+            DamagesConfigData(
+                name="Any name",
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             )

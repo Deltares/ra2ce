@@ -33,9 +33,10 @@ from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
 )
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptationOption,
+from ra2ce.analysis.analysis_config_data.adaptation_option_config_data import (
+    AdaptationOptionConfigData,
 )
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -58,14 +59,14 @@ class AdaptationOption:
     def from_config(
         cls,
         analysis_config: AnalysisConfigWrapper,
-        adaptation_option: AnalysisSectionAdaptationOption,
+        adaptation_option: AdaptationOptionConfigData,
     ) -> AdaptationOption:
         """
         Classmethod to create an AdaptationOption from an analysis configuration and an adaptation option.
 
         Args:
             analysis_config (AnalysisConfigWrapper): Analysis config input
-            adaptation_option (AnalysisSectionAdaptationOption): Adaptation option input
+            adaptation_option (AdaptationOptionConfigData): Adaptation option input
 
         Raises:
             ValueError: If damages and losses sections are not present in the analysis config data.
@@ -82,7 +83,7 @@ class AdaptationOption:
             )
 
         # Create input for the damages and losses analyses (if present in config)
-        _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
+        _config_analyses = list(map(type, analysis_config.config_data.analyses))
         _analyses = [
             AdaptationOptionAnalysis.from_config(
                 analysis_config,
@@ -90,7 +91,7 @@ class AdaptationOption:
                 adaptation_option.id,
             )
             for _analysis_type in [
-                AnalysisDamagesEnum.DAMAGES,
+                DamagesConfigData,
                 analysis_config.config_data.adaptation.losses_analysis,
             ]
             if _analysis_type in _config_analyses

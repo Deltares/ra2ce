@@ -21,9 +21,7 @@
 
 from pathlib import Path
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDamages,
-)
+from ra2ce.analysis.analysis_config_data.damages_config_data import DamagesConfigData
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
@@ -31,6 +29,6 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 class AnalysisDamagesProtocol(AnalysisProtocol):
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
-    analysis: AnalysisSectionDamages
+    analysis: DamagesConfigData
     input_path: Path
     output_path: Path

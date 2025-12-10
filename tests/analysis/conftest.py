@@ -6,7 +6,12 @@ import pytest
 from geopandas import GeoDataFrame
 from shapely import Point
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
+from ra2ce.analysis.analysis_config_data.analysis_config_data_protocol import (
+    AnalysisConfigDataProtocol,
+)
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    SingleLinkLossesConfigData,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -29,11 +34,11 @@ def _get_single_analysis_result_wrapper_fixture() -> Iterator[AnalysisResultWrap
 
 @pytest.fixture(name="analysis_result_builder")
 def _get_analysis_result_builder_fixture() -> Iterator[
-    Callable[[GeoDataFrame, AnalysisSectionBase, Path], AnalysisResult]
+    Callable[[GeoDataFrame, AnalysisConfigDataProtocol, Path], AnalysisResult]
 ]:
     def create_analysis_result(
         gdf_result: GeoDataFrame,
-        analysis_config: AnalysisSectionBase = None,
+        analysis_config: AnalysisConfigDataProtocol = None,
         output_path: Path = None,
     ) -> AnalysisResult:
         return AnalysisResult(
@@ -49,13 +54,10 @@ def _get_analysis_result_builder_fixture() -> Iterator[
 def _get_mocked_analysis(
     test_result_param_case: Path,
 ) -> Iterator[AnalysisProtocol]:
+
     class MockedAnalysis(AnalysisProtocol):
         def __init__(self) -> None:
-            _analysis = AnalysisSectionBase(
-                name="Mocked Analysis", save_csv=False, save_gpkg=False
-            )
-            _analysis.analysis = AnalysisLossesEnum.SINGLE_LINK_LOSSES
-            self.analysis = _analysis
+            self.analysis = SingleLinkLossesConfigData("Mocked Analysis")
             self.output_path = test_result_param_case
 
     yield MockedAnalysis()

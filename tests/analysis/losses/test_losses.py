@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 
@@ -7,15 +8,20 @@ import pytest
 from shapely.geometry import LineString
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data import LossesConfigDataTypes
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.base_link_losses_config_data import (
+    BaseLinkLossesConfigData,
+    SingleLinkLossesConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.losses_analysis_config_data_protocol import (
+    BaseLossesAnalysisConfigData,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
@@ -54,7 +60,7 @@ class TestLosses:
         )
 
         _config.config_data.input_path = Path("sth")
-        _analysis = AnalysisSectionLosses(traffic_period=None)
+        _analysis = BaseLossesAnalysisConfigData(traffic_period=None)
 
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
@@ -78,6 +84,9 @@ class TestLosses:
         traffic_intensities_csv: Path,
         time_values_csv: Path,
     ):
+        @dataclass
+        class MockedLossesAnalysisConfigData(BaseLossesAnalysisConfigData):
+            config_name: str = "mocked_losses_analysis_config_data"
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
@@ -93,7 +102,7 @@ class TestLosses:
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
-        _analysis = AnalysisSectionLosses(
+        _analysis = SingleLinkLossesConfigData(
             traffic_period=TrafficPeriodEnum.DAY,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,
@@ -117,8 +126,10 @@ class TestLosses:
         assert isinstance(_losses, losses_analysis)
         assert isinstance(_losses, AnalysisBase)
 
+    @pytest.mark.parametrize("losses_config_type", [pytest.param(_lct, id=_lct.__name__) for _lct in LossesConfigDataTypes])
     def test_calc_vlh(
         self,
+        losses_config_type: type[BaseLinkLossesConfigData],
         resilience_curves_csv: Path,
         traffic_intensities_csv: Path,
         time_values_csv: Path,
@@ -165,10 +176,10 @@ class TestLosses:
             "losses" "csv_data_for_losses"
         )
 
-        _analysis = AnalysisSectionLosses(
+        _analysis = losses_config_type(
             traffic_period=TrafficPeriodEnum.DAY,
             hours_per_traffic_period=24,
-            threshold=0,
+            # threshold=0,
             production_loss_per_capita_per_hour=20,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,

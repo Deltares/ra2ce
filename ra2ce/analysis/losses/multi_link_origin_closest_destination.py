@@ -3,8 +3,8 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_base import AnalysisBase
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
+from ra2ce.analysis.analysis_config_data.base_origin_destination_config_data import (
+    MultiLinkOriginClosestDestinationConfigData,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -19,7 +19,7 @@ from ra2ce.network.networks_utils import get_nodes_and_edges_from_origin_graph
 
 
 class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
-    analysis: AnalysisSectionLosses
+    analysis: MultiLinkOriginClosestDestinationConfigData
     graph_file: GraphFile
     graph_file_hazard: GraphFile
     input_path: Path
@@ -46,7 +46,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         self._analysis_input = analysis_input
 
     def execute(self) -> AnalysisResultWrapper:
-        _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
+        _output_path = self.output_path.joinpath(self.analysis.config_name)
 
         analyzer = OriginClosestDestination(self._analysis_input)
         if self.analysis.calculate_route_without_disruption:
