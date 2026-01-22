@@ -40,14 +40,14 @@ You can reproject your shapefiles using QGIS, ArcGIS, or GeoPandas:
 Required Attributes
 -------------------
 
-Each shapefile must include specific attributes.
+Each shapefile must include specific attributes. Make sure that the geometry is of type Point (not MultiPoint).
 
 **Origins shapefile (origins.shp):**
 
 - ``OBJECTID`` → unique identifier for each origin point.
 - ``POPULATION`` → number of people represented at the origin
   (used to assess impact when access is lost).
-- ``geometry`` → point geometry.
+- ``geometry`` → point geometry (as Point, not MultiPoint).
 
 **Destinations shapefile (destinations.shp):**
 
@@ -58,7 +58,7 @@ Each shapefile must include specific attributes.
   - ``school``
   - ``shelter``
 
-- ``geometry`` → point geometry.
+- ``geometry`` → point geometry (as Point, not MultiPoint).
 
 
 
