@@ -47,6 +47,29 @@ Implement Features
 Look through the GitHub issues for features. Anything tagged with "enhancement"
 and "help wanted" is open to whoever wants to implement it.
 
+.. _Prerequisites:
+
+Prerequisites
+~~~~~~~~~~~~~
+
+Before you start contributing, make sure you have the following installed:
+
+- Python 3.11 or higher
+- Poetry
+- Miniforge (or Anaconda), (optional, for managing Python environments)
+- Podman (optional)
+
+.. _Checking out the code:
+
+Checking out the code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To contribute, you will need to check out the code. The easiest way to do this is
+to fork the repository on GitHub, and then clone your fork to your local machine.
+.. code-block:: bash
+
+    git clone git@github.com:<yourfork>/Deltares/ra2ce.git
+    cd ra2ce
+
 .. _Writing tests:
 
 Writing tests
