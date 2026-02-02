@@ -90,7 +90,6 @@ In this case, RA2CE performs a **multi-road analysis**:
 
 👉 Try this yourself in the
 :doc:`multi link redundancy tutorial <../_examples/criticality_multi_link_redundancy>`.
-:doc:`asdfghj <../_examples/network_from_shapefile>`.
 
 
 ----
