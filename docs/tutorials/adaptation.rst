@@ -1,6 +1,8 @@
 Adaptation Tutorial
 ===================
 
+[WORK IN PROGRESS]
+
 This workflow compares adaptation strategies.
 
 Examples:
