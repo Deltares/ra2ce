@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-    
+      - ci/migrate-to-pixi    
 jobs:
   install-package:
     if: "${{ (!startsWith(github.event.head_commit.message, 'chore: autoformat isort & black')) && (!startsWith(github.event.head_commit.message, 'bump:')) }}"
