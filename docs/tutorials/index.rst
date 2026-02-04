@@ -3,8 +3,10 @@
 Tutorials
 =========
 
-
-Choose your workflow:
+The RA2CE package offers multiple types of resilience assessments for transport networks and infrastructure systems.
+These tutorials walk you through the main analysis workflows, from network creation and hazard overlay to criticality,
+accessibility, damages, losses, and adaptation. Each workflow is illustrated with practical examples to help you assess
+network performance and resilience under disruptive events.
 
 .. grid:: 1
    :gutter: 2

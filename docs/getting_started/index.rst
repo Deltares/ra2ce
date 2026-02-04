@@ -25,7 +25,7 @@ RA2CE helps to:
 Installation
 ------------
 
-You can install **RA2CE** with pip:
+ **RA2CE** is available on PyPI and can be installed using pip for the latest stable release:
 
 .. code-block:: bash
 
@@ -50,7 +50,7 @@ To install RA2CE for development purposes, please refer to our
 Fundamentals
 ------------
 
-How to Run Python (Sandbox, Jupyter, Binder, Docker)
+How to Run RA2CE with Python (Sandbox, Jupyter, Binder, Docker)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can use **RA2CE** in several ways:
@@ -71,14 +71,14 @@ It includes ready-to-run examples, and lets you create your own notebooks or exp
 - Try our `RA2CE Binder environment <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_
 - Learn more about `Binder <https://mybinder.readthedocs.io/en/latest/>`_
 
-You can also use **Docker** to install RA2CE and run it on different cloud services.
+You can also use **Docker** to run RA2CE on different cloud services.
 See our `Docker and cloud wiki page <https://github.com/Deltares/ra2ce/wiki/Docker-and-Cloud>`_ for instructions.
 
 
 GIS Basics: Projection, Raster, Shapefiles, QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**RA2CE** heavily relies on geospatial data.
+**RA2CE** relies heavily on geospatial data.
 Familiarity with GIS tools is recommended for effective use.
 
 RA2CE generates and processes both **raster** and **vector** data.
@@ -93,7 +93,7 @@ QGIS is especially useful for:
 
    All GIS datasets must use the same **Coordinate Reference System (CRS)**.
    We recommend reprojecting to **EPSG:4326 (WGS84)** for maximum compatibility.
-   Within Python, you can use libraries such as `pyproj`, `rasterio`, and `geopandas`.
+   Within Python, you can use libraries such as `pyproj`, `rasterio`, and `geopandas` for visualisation and reprojection tasks.
 
 Key formats:
 
@@ -143,7 +143,7 @@ Quick Start
 
 .. _quick-start:
 
-Here’s a minimal working example to get you started:
+Here’s a basic working example to get you started:
 
 .. code-block:: python
 

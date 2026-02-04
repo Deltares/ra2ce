@@ -1,6 +1,8 @@
 Equity Tutorial
 ===============
 
+[WORK IN PROGRESS]
+
 This workflow evaluates who benefits most from adaptation.
 
 Frameworks:

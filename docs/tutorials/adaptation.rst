@@ -1,7 +1,10 @@
 Adaptation Tutorial
 ===================
 
-This workflow compares adaptation strategies.
+[WORK IN PROGRESS]
+
+This workflow compares adaptation strategies, see tutorial: :doc:`adapation <../_examples/adaptation>`.
+
 
 Examples:
 - Flood protection measures
