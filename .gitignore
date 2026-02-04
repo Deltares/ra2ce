@@ -154,3 +154,6 @@ dmypy.json
 examples/data/*/output/
 examples/cache/
 /ra2ce/.idea/ra2ce.iml
+# pixi environments
+.pixi/*
+!.pixi/config.toml
