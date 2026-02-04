@@ -21,9 +21,10 @@ classifiers = [
   'Natural Language :: English',
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.11',
-  'Programming Language :: Python :: 3.12'
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13'
 ]
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11,<3.14"
 
 
 [project.urls]
@@ -46,7 +47,6 @@ build = "*"
 
 [tool.pixi.tasks]
 run_ra2ce = "ra2ce.run:main"
-build-cli = "scripts.make_exe:build_cli"
 update-example-references = "examples.data.update_reference:run"
 
 [tool.pixi.dependencies]
@@ -73,6 +73,8 @@ geopy = ">=2.4.0"
 joblib = ">=1.3.2"
 pyinstaller = ">=6.2.0"
 snkit = ">=1.9.0"
+shapely = ">=2.1.2,<3"
+pyogrio = ">=0.12.1,<0.13"
 
 
 [tool.pixi.feature.dev.dependencies]
@@ -88,7 +90,7 @@ pyinstaller-versionfile = ">=2.1.1"
 [tool.pixi.feature.test.dependencies]
 pytest-cov = ">=3.0.0"
 pytest = ">=7.1.3"
-teamcity-messages = ">=1.32"
+teamcity-messages = ">=1.33,<2"
 testbook = ">=0.4.2"
 pytest-xdist = ">=3.3.1"
 pytest-profiling = ">=1.7.0"
@@ -115,11 +117,14 @@ folium = ">=0.15.0"
 matplotlib = ">=3.8.1"
 mapclassify = ">=2.6.1"
 
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
 [tool.pixi.feature.py312.dependencies]
 python = "3.12.*"
 
-[tool.pixi.feature.py311.dependencies]
-python = "3.11.*"
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
 
 
 [tool.pixi.environments]
@@ -128,12 +133,13 @@ test = { features = ["test"], solve-group = "default" }
 dev = { features = ["dev", "test"], solve-group = "default" }
 docs = { features = ["docs"], solve-group="default"}
 jupyter = { features = ["jupyter"], solve-group="default"}
-py312 = ["py312", "default"]
 py311 = ["py311", "default"]
+py312 = ["py312", "default"]
+py313 = ["py313", "default"]
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py311', 'py312', 'py313']
 exclude = '''
 (
   /(

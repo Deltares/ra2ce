@@ -8,6 +8,7 @@ permissions:
 
 jobs:
   docs:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
     name: Build (and deploy) documentation
     runs-on: ubuntu-latest
     defaults:
@@ -17,19 +18,13 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: conda-incubator/setup-miniconda@v3.2.0
+      - uses: prefix-dev/setup-pixi@v0.9.0
         with:
-          miniforge-variant: Miniforge3
-          environment-file: .devcontainer/environment.yml
-
-      - name: Install dependencies
-        run: poetry install --without dev,test
-
-      - name: Build docs
-        run: |
-          cd docs
-          poetry run make html
+          pixi-version: v0.49.0
+          cache: true
+          cache-write: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+      
+      - run: pixi run -e docs make html
 
       - name: Upload to GitHub Pages
         if: ${{ github.event_name != 'pull_request'}}
