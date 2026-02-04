@@ -2,7 +2,7 @@
                     GNU GENERAL PUBLIC LICENSE
                       Version 3, 29 June 2007
     Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
+    Copyright (C) 2023-2026 Stichting Deltares
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
