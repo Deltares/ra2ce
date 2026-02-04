@@ -70,14 +70,11 @@ def read_origin_destination_files(
     # Origins
     origins = gpd.GeoDataFrame(columns=["o_id", "geometry"], crs=crs)
 
-
     origins_in = gpd.read_file(origins_path, crs=crs, engine="pyogrio")
     # Check geometry types
     if not (origins_in.geometry.geom_type == "Point").all():
         bad_types = origins_in.geometry.geom_type.unique()
-        raise ValueError(
-            f"All geometries must be of type Point. Found: {bad_types}"
-        )
+        raise ValueError(f"All geometries must be of type Point. Found: {bad_types}")
 
     if regions_path:
         regions = gpd.read_file(regions_path, engine="pyogrio")
@@ -100,9 +97,7 @@ def read_origin_destination_files(
     # Check geometry types
     if not (destinations_in.geometry.geom_type == "Point").all():
         bad_types = destinations_in.geometry.geom_type.unique()
-        raise ValueError(
-            f"All geometries must be of type Point. Found: {bad_types}"
-        )
+        raise ValueError(f"All geometries must be of type Point. Found: {bad_types}")
 
     destinations["d_id"] = "D_" + destinations_in.index.astype(str)
     destinations["geometry"] = destinations_in["geometry"]

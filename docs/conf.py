@@ -116,7 +116,7 @@ myst_enable_extensions = [
     "colon_fence",  # optional, for ::: fences
     "html_admonition",
     "html_image",
-    "raw_html",     # <-- enables the {raw} directive
+    "raw_html",  # <-- enables the {raw} directive
 ]
 
 # source_suffix = ['.rst', '.md']
@@ -158,7 +158,7 @@ language = "en"
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-html_extra_path = ['_resources/figures']
+html_extra_path = ["_resources/figures"]
 
 
 # The name of the Pygments (syntax highlighting) style to use.
