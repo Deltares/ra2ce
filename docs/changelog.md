@@ -1,28 +1,28 @@
-## Unreleased
+## v1.1.0 (2026-02-04)
 
 ### Feat
 
-- Create dataclass for `EquityConfigData` (#764)
-- Normalize avg speed data (#761)
-- Create dataclass for `BaseOriginDestinationConfigData` (#758)
+- create dataclass for `EquityConfigData` (#764)
+- #757 normalize avg speed data (#761)
+- create dataclass for `BaseOriginDestinationConfigData` (#758)
 - Created new dataclass `MultiLinkRedundancyConfigData` (#756)
 - Create dataclass for `BaseLinkLossesConfigData` (#755)
-- create dataclass for `DamagesConfigData` (#746)
+- 735 create dataclass for `DamagesConfigData` (#746)
 - Added new config data for single link redundancy  (#742)
-- Origins file make the attribute id name origin destination optional (#728)
-- Allow overwrite of output graph folder (#724)
+- #722 origins file make the attribute id name origin destination optional (#728)
+- #699 allow overwrite of output graph folder (#724)
 - Added validation for analysis compatibility (#715)
-- Origins file make the attribute origin count optional (#723)
-- Create an example to run damages and losses without input files (#661)
+- #581 origins file make the attribute origin count optional (#723)
+- 660 create an example to run damages and losses without input files (#661)
 
 ### Fix
 
-- Investigate failures on master (#770)
-- Adaptation analysis config not read correctly (#753)
-- Fix build issue (#747)
-- Fix matching logic (#744)
+- #769 investigate failures on master (#770)
+- #752 adaptation analysis config not read correctly (#753)
+- fix build issue (#747)
+- #743 fix matching logic (#744)
 - Corrected primary and diversion file property types to `Path` (#727)
-- Edited test with external branch (#707)
+- edited test with external branch (#707)
 - Hazard overlay speed improvements (#698)
 
 ## v1.0.0 (2025-01-08)
