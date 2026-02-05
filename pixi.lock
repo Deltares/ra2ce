@@ -25732,7 +25732,32 @@ packages:
 - pypi: ./
   name: ra2ce
   version: 1.1.0
-  sha256: ca9bac7ae97a4bcab9ff1269261d239414553506f7f8de8c958e0c27c9019cc7
+  sha256: e3ee34a6152c2401ee872eec18815f4ff7f273e440f491ad15e5c92275f437bb
+  requires_dist:
+  - affine
+  - click
+  - numpy
+  - networkx
+  - pandas
+  - pyarrow
+  - rasterio
+  - rasterstats
+  - rtree
+  - seaborn
+  - openpyxl
+  - xlrd
+  - xarray
+  - scipy
+  - momepy
+  - geopandas
+  - osmnx
+  - tqdm
+  - geopy
+  - joblib
+  - snkit
+  - shapely
+  - pyogrio
+  - altgraph
   requires_python: '>=3.11,<3.14'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/rasterio-1.4.4-py311hf34719e_2.conda

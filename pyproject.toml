@@ -28,7 +28,7 @@ classifiers = [
   'Programming Language :: Python :: 3.13'
 ]
 requires-python = ">=3.11,<3.14"
-
+dependencies = ["affine", "click", "numpy", "networkx", "pandas", "pyarrow", "rasterio", "rasterstats", "rtree", "seaborn", "openpyxl", "xlrd", "xarray", "scipy", "momepy", "geopandas", "osmnx", "tqdm", "geopy", "joblib", "snkit", "shapely", "pyogrio", "altgraph"]
 
 [project.urls]
 homepage = "https://github.com/Deltares/ra2ce"
