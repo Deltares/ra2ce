@@ -2,10 +2,9 @@
 # `docker build -t vrtool_externals -f .devcontainer/externals.Dockerfile`
 
 # We use a miniforge3 image for consistency with the other development image.
-FROM condaforge/miniforge3:latest
+FROM ghcr.io/prefix-dev/pixi:latest
 
 ARG SRC_ROOT="/usr/src"
-ARG CONDA_ENV="${SRC_ROOT}/.env"
 
 # Install conda environment
 WORKDIR $SRC_ROOT/app
