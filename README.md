@@ -1,6 +1,9 @@
+![RA2CE](./docs/_resources/ra2ce_banner.png "Ra2ce banner")
+
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/release/python-31110/)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-31212/)
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/release/python-31311/)
+
 ![PyPI](https://img.shields.io/pypi/v/ra2ce?label=pypi%20package)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ra2ce)
 
@@ -12,8 +15,6 @@
 [![Binder branch](https://github.com/Deltares/ra2ce/actions/workflows/binder_branch.yml/badge.svg)](https://github.com/Deltares/ra2ce/actions/workflows/binder_branch.yml)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder)
 
-
-![RA2CE](./docs/_resources/ra2ce_banner.png "Ra2ce banner")
 
 This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package developed by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
 
