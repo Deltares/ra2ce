@@ -25418,7 +25418,7 @@ packages:
 - pypi: ./
   name: ra2ce
   version: 1.1.0
-  sha256: 36b3ff74096e80eea94d338ae49c9e34c2ab07b6693c291014ec436cfd7674e0
+  sha256: a2a027740c8783ebd94ccc7ad715b811a3d4d9d219c33a0f5dc8eb61081c05c1
   requires_python: '>=3.11,<3.14'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/rasterio-1.4.4-py311hf34719e_2.conda

@@ -11,7 +11,7 @@
     // `git config --global core.autocrlf true` prevents git from showing differences on ALL files when running
     // in the ra2ce (linux) container
     // `git config --global --add safe.directory ${containerWorkspaceFolder}` allows git to sync with the devcontainer.
-    "postStartCommand": "cp -ra /usr/src/test_external_data/ /usr/src/app/tests/ & poetry install & git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "postStartCommand": "cp -ra /usr/src/test_external_data/ /usr/src/app/tests/ & pixi install & git config --global --add safe.directory ${containerWorkspaceFolder}",
     // postCreateCommand.sh does not seem to work due to line endings.
     // "postStartCommand": "bash .devcontainer/postCreateCommand.sh",
     "customizations": {
