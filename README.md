@@ -22,7 +22,7 @@ This is the repository of RA2CE (*just say race!*) - the Resilience Assessment a
 
 Find more about the following topics in our [official documentation page](https://deltares.github.io/ra2ce/):
 
-- [Contributing](https://deltares.github.io/ra2ce/contributing/index.html)
+- [[Contributing|Contributing]]
 - [Installation](https://deltares.github.io/ra2ce/installation/installation.html)
 - [Network user guide](https://deltares.github.io/ra2ce/network_module/network_module.html)
 - [Analysis user guide](https://deltares.github.io/ra2ce/analysis_module/analysis_module.html)
