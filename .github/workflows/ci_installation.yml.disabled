@@ -1,10 +1,10 @@
+# Disabled as we are currently building and testing all possible combinations in TC.
 name: ci-install-package
 
 on:
   push:
     branches:
-      - master
-      - ci/migrate-to-pixi    
+      - master   
 jobs:
   install-package:
     if: "${{ (!startsWith(github.event.head_commit.message, 'chore: autoformat isort & black')) && (!startsWith(github.event.head_commit.message, 'bump:')) }}"
