@@ -226,7 +226,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         df = df.sort_index(axis="columns")
         values = df.values
         frequencies = df.columns
-        return np.trapz(values, frequencies, axis=1)
+        return np.trapezoid(values, frequencies, axis=1)
 
     @staticmethod
     def rework_damage_data_default(to_integrate: pd.DataFrame) -> pd.DataFrame:

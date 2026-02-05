@@ -79,4 +79,4 @@ class RiskCalculationBase(ABC):
         """
         _risk_calculations = self._get_network_risk_calculations()
         frequencies = sorted(1 / rp for rp in _risk_calculations.columns)
-        return np.trapz(_risk_calculations.values, frequencies, axis=1)
+        return np.trapezoid(_risk_calculations.values, frequencies, axis=1)
