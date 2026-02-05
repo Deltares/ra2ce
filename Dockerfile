@@ -11,7 +11,7 @@ COPY README.md LICENSE pyproject.toml /app/
 COPY ra2ce /app/ra2ce
 
 # Install ra2ce and its dependencies.
-RUN pip install --upgrade pip && pip install /app/ra2ce
+RUN pip install --upgrade pip && pip install /app
 
 # Set the entrypoint to run ra2ce as a module.
 ENTRYPOINT [ "python", "-m", "ra2ce" ]
