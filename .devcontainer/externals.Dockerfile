@@ -1,6 +1,6 @@
 # To build this docker (from the root checkout) run:
 # `podman build -t ra2ce_externals -f .devcontainer/externals.Dockerfile`
-# do not forget to locate the externals directory on the root folder, 
+# do not forget to locate the externals directory next to this file, 
 # otherwise it won't copy anything into the docker image.
 
 # We use a light weight ubuntu image as we only intend to store data through it.
