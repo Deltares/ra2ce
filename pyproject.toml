@@ -115,6 +115,9 @@ pandoc = ">=2.3"
 pillow = ">=10.1.0"
 sphinx-autodoc-typehints = ">=3.2.0"
 
+[tool.pixi.feature.docs.tasks]
+build-docs = "make html"
+
 [tool.pixi.feature.jupyter.dependencies]
 # These dependencies are required for binder (`examples\environment.yml`).
 folium = ">=0.15.0"

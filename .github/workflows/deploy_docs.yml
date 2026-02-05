@@ -24,7 +24,7 @@ jobs:
           cache: true
           cache-write: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
       
-      - run: pixi run -e docs make html
+      - run: pixi run -e docs build-docs
 
       - name: Upload to GitHub Pages
         if: ${{ github.event_name != 'pull_request'}}
