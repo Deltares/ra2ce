@@ -62,15 +62,6 @@ Overview
 
     .. grid-item-card::
         :text-align: center
-        :link: contributing/index
-        :link-type: doc
-
-        :octicon:`people;10em`
-        +++
-        Contributing
-    
-    .. grid-item-card::
-        :text-align: center
         :link: publications
         :link-type: ref
 

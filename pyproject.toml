@@ -104,6 +104,7 @@ pytest-notebook = ">=0.9.0"
 
 [tool.pixi.feature.jupyter.dependencies]
 ipykernel = ">=6.25.1"
+ipython = ">=9.10.0,<10"
 # These dependencies are required for binder (`examples\environment.yml`).
 # folium = ">=0.15.0"
 # matplotlib = ">=3.8.1"
@@ -140,9 +141,9 @@ python = "3.13.*"
 [tool.pixi.environments]
 default = { solve-group = "default" }
 jupyter = { features = ["jupyter"], solve-group="default"}
-docs = { features = ["docs"], solve-group="jupyter"}
-test = { features = ["test"], solve-group ="jupyter" }
-dev = { features = ["dev", "test"], solve-group = "docs" }
+docs = { features = ["docs", "jupyter"], solve-group="default"}
+test = { features = ["test", "docs", "jupyter"], solve-group ="default" }
+dev = { features = ["dev", "test", "docs", "jupyter"], solve-group = "default" }
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
 py313 = ["py313", "default"]
