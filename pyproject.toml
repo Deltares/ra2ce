@@ -84,8 +84,6 @@ flake8 = ">=5.0.4"
 mypy = ">=0.971"
 black = ">=22.8.0"
 urllib3 = "=1.26.15"
-pyinstaller = ">=6.2.0"
-pyinstaller-versionfile = ">=2.1.1"
 
 [tool.pixi.feature.dev.tasks]
 isort = "isort"
@@ -100,6 +98,7 @@ testbook = ">=0.4.2"
 pytest-xdist = ">=3.3.1"
 pytest-profiling = ">=1.7.0"
 pytest-notebook = ">=0.9.0"
+
 
 [tool.pixi.feature.docs.dependencies]
 jupytext = ">=1.14.5"
@@ -138,9 +137,9 @@ python = "3.13.*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-test = { features = ["test"], solve-group = "default" }
-dev = { features = ["dev", "test"], solve-group = "default" }
 docs = { features = ["docs"], solve-group="default"}
+test = { features = ["test", "docs"], solve-group = "default" }
+dev = { features = ["dev", "test", "docs"], solve-group = "default" }
 jupyter = { features = ["jupyter"], solve-group="default"}
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
