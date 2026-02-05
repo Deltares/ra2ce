@@ -99,6 +99,13 @@ pytest-xdist = ">=3.3.1"
 pytest-profiling = ">=1.7.0"
 pytest-notebook = ">=0.9.0"
 
+[tool.pixi.feature.jupyter.dependencies]
+ipython = ">=9.10.0,<10"
+ipykernel = ">=6.25.1"
+# These dependencies are required for binder (`examples\environment.yml`).
+# folium = ">=0.15.0"
+# matplotlib = ">=3.8.1"
+# mapclassify = ">=2.6.1"
 
 [tool.pixi.feature.docs.dependencies]
 jupytext = ">=1.14.5"
@@ -110,7 +117,6 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-rtd-theme = ">=3.0.0"
 sphinx-autosummary-accessors = ">=2023.4.0"
 sphinx-design = ">=0.6.1"
-ipykernel = ">=6.25.1"
 pandoc = ">=2.3"
 pillow = ">=10.1.0"
 sphinx-autodoc-typehints = ">=3.2.0"
@@ -118,12 +124,6 @@ make = ">=4.4.1,<5"
 
 [tool.pixi.feature.docs.tasks]
 build-docs = "make html"
-
-[tool.pixi.feature.jupyter.dependencies]
-# These dependencies are required for binder (`examples\environment.yml`).
-folium = ">=0.15.0"
-matplotlib = ">=3.8.1"
-mapclassify = ">=2.6.1"
 
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
@@ -137,16 +137,16 @@ python = "3.13.*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-docs = { features = ["docs"], solve-group="default"}
-test = { features = ["test", "docs"], solve-group = "default" }
-dev = { features = ["dev", "test", "docs"], solve-group = "default" }
 jupyter = { features = ["jupyter"], solve-group="default"}
+docs = { features = ["docs"], solve-group="jupyter"}
+test = { features = ["test"], solve-group ="jupyter" }
+dev = { features = ["dev"], solve-group = "docs" }
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
 py313 = ["py313", "default"]
-testpy311 = ["test", "py311", "default"]
-testpy312 = ["test", "py312", "default"]
-testpy313 = ["test", "py313", "default"]
+testpy311 = { features = ["test", "jupyter"], solve-group = "py311"}
+testpy312 = { features = ["test", "jupyter"], solve-group = "py312"}
+testpy313 = { features = ["test", "jupyter"], solve-group = "py313"}
 
 [tool.black]
 line-length = 88
