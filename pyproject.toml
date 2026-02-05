@@ -103,7 +103,6 @@ pytest-profiling = ">=1.7.0"
 pytest-notebook = ">=0.9.0"
 
 [tool.pixi.feature.jupyter.dependencies]
-ipython = ">=9.10.0,<10"
 ipykernel = ">=6.25.1"
 # These dependencies are required for binder (`examples\environment.yml`).
 # folium = ">=0.15.0"
@@ -143,7 +142,7 @@ default = { solve-group = "default" }
 jupyter = { features = ["jupyter"], solve-group="default"}
 docs = { features = ["docs"], solve-group="jupyter"}
 test = { features = ["test"], solve-group ="jupyter" }
-dev = { features = ["dev"], solve-group = "docs" }
+dev = { features = ["dev", "test"], solve-group = "docs" }
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
 py313 = ["py313", "default"]
