@@ -10,4 +10,4 @@ dependencies:
   - conda-forge::pip
   - pip:
     - git+https://github.com/Deltares/ra2ce.git
-    - osmnx==1.7.1
+    - osmnx
