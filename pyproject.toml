@@ -40,6 +40,12 @@ issues = "https://github.com/Deltares/ra2ce/issues"
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.hatch.build.targets.wheel]
+packages = ["ra2ce"]
+
+[tool.hatch.build.targets.sdist]
+include = ["ra2ce"]
+
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["linux-64","osx-arm64", "osx-64", "win-64"]

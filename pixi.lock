@@ -26202,7 +26202,7 @@ packages:
 - pypi: ./
   name: ra2ce
   version: 1.1.0
-  sha256: 1b1e22f8b94ec4ed6744326bac492bb171d7967af3833af1c88216ed1d4d977a
+  sha256: 10866424d3ea9aa9a1e45b6f71dc2497ca1c56e43654cff11b7a09c700b49445
   requires_dist:
   - affine
   - click
