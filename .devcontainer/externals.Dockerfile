@@ -1,11 +1,12 @@
 # To build this docker (from the root checkout) run:
-# `docker build -t vrtool_externals -f .devcontainer/externals.Dockerfile`
+# `podman build -t ra2ce_externals -f .devcontainer/externals.Dockerfile`
+# do not forget to locate the externals directory next to this file, 
+# otherwise it won't copy anything into the docker image.
 
-# We use a miniforge3 image for consistency with the other development image.
-FROM condaforge/miniforge3:latest
+# We use a light weight ubuntu image as we only intend to store data through it.
+FROM alpine:latest
 
 ARG SRC_ROOT="/usr/src"
-ARG CONDA_ENV="${SRC_ROOT}/.env"
 
 # Install conda environment
 WORKDIR $SRC_ROOT/app

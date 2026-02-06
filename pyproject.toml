@@ -1,106 +1,165 @@
-[tool.poetry]
+[project]
 name = "ra2ce"
 version = "1.1.0"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = [
-  "Margreet van Marle <Margreet.vanMarle@deltares.nl>", 
-  "Kees van Ginkel <kees.vanginkel@deltares.nl>",
+  {name = "Margreet van Marle", email = "Margreet.vanMarle@deltares.nl"},
+  {name = "Kees van Ginkel", email = "kees.vanginkel@deltares.nl"}
 ]
 maintainers = [
-  "Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>",
-  "Ardt Klapwijk<ardt.klapwijk@deltares.nl>",
+  {name = "Carles S. Soriano Perez", email = "carles.sorianoperez@deltares.nl"},
+  {name = "Ardt Klapwijk", email = "ardt.klapwijk@deltares.nl"},
 ]
 license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 readme = "README.md"
-repository = "https://github.com/Deltares/ra2ce"
-documentation = "https://deltares.github.io/ra2ce/"
+keywords = ["civil-engineering", "dikes", "resilience-assessment", "infrastructure", "networks", "deltares"]
 classifiers = [
   'Development Status :: 2 - Pre-Alpha',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
   'Natural Language :: English',
+  'Operating System :: Microsoft :: Windows',
+  'Operating System :: Unix',
+  'Operating System :: MacOS',
   'Programming Language :: Python :: 3',
-  'Programming Language :: Python :: 3.11'
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13'
 ]
-packages = [{include = "ra2ce"}]
+requires-python = ">=3.11,<3.14"
+dependencies = ["affine", "click", "numpy", "networkx", "pandas", "pyarrow", "rasterio", "rasterstats", "rtree", "seaborn", "openpyxl", "xlrd", "xarray", "scipy", "momepy", "geopandas", "osmnx", "tqdm", "geopy", "joblib", "snkit", "shapely", "pyogrio", "altgraph"]
 
-[tool.poetry.scripts]
+[project.urls]
+homepage = "https://github.com/Deltares/ra2ce"
+documentation = "https://deltares.github.io/ra2ce/"
+repository = "https://github.com/Deltares/ra2ce"
+issues = "https://github.com/Deltares/ra2ce/issues"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ra2ce"]
+
+[tool.hatch.build.targets.sdist]
+include = ["ra2ce"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64","osx-arm64", "osx-64", "win-64"]
+
+[tool.pixi.pypi-dependencies]
+ra2ce = { path = ".", editable = true }
+build = "*"
+
+[tool.pixi.tasks]
 run_ra2ce = "ra2ce.run:main"
-build-cli = "scripts.make_exe:build_cli"
 update-example-references = "examples.data.update_reference:run"
 
-[tool.poetry.dependencies]
-python = "^3.11, <3.12"
-affine = "^2.3.1"
-click = "^8.1.3"
-numpy = "^1.23.3"
-networkx = "^3.2.0"
-pandas = "^2.0.0"
-pyarrow = "^10.0.0"
-rasterio = "^1.3.2"
-rasterstats = "^0.17.0"
-Rtree = "^1.0.0"
-seaborn = "^0.12.0"
-openpyxl = "^3.0.10"
-xlrd = "^2.0.1"
-xarray = "^2022.6.0"
-scipy = "^1.9.1"
-pygeos = "^0.14"
-momepy = "^0.10.0"
-geopandas = "^1.1.1"
-shapely = "^2.1.1"
-osmnx = "^2.0.0"
-tqdm = "^4.66.1"
-geopy = "^2.4.0"
-pyogrio = "^0.7.2"
-joblib = "^1.3.2"
-pyinstaller = "^6.2.0"
-snkit = "^1.9.0"
-
-[tool.poetry.group.dev.dependencies]
-isort = "^5.10.1"
-commitizen = "^2.32.5"
-flake8 = "^5.0.4"
-mypy = "^0.971"
-black = "^22.8.0"
-urllib3 = "1.26.15"
-pyinstaller = "^6.2.0"
-pyinstaller-versionfile = "^2.1.1"
+[tool.pixi.dependencies]
+python = ">=3.11, <3.14"
+affine = ">=2.3.1"
+click = ">=8.1.3"
+numpy = ">=1.23.3"
+networkx = ">=3.2.0"
+pandas = ">=2.0.0, <3"
+pyarrow = ">=10.0.0"
+rasterio = ">=1.3.2"
+rasterstats = "=0.17.0"
+Rtree = ">=1.0.0"
+seaborn = ">=0.12.0"
+openpyxl = ">=3.0.10"
+xlrd = ">=2.0.1"
+xarray = ">=2022.6.0"
+scipy = ">=1.9.1"
+momepy = ">=0.10.0"
+geopandas = ">=1.1.1"
+osmnx = ">=2.0.0"
+tqdm = ">=4.66.1"
+geopy = ">=2.4.0"
+joblib = ">=1.3.2"
+snkit = ">=1.9.0"
+shapely = ">=2.1.2,<3"
+pyogrio = ">=0.12.1,<0.13"
+altgraph = ">=0.17.5,<0.18"
 
 
-[tool.poetry.group.docs.dependencies]
-jupytext = "^1.14.5"
-nbsphinx = "^0.9.1"
-myst-parser = "^4.0.0"
-sphinx = "8.2.3"
-sphinx-book-theme = "^1.0.1"
-sphinx-copybutton = "^0.5.2"
-sphinx-rtd-theme = "^3.0.0"
-sphinx-autosummary-accessors = "^2023.4.0"
-sphinx-design = "^0.6.1"
-ipykernel = "^6.25.1"
-pandoc = "^2.3"
-pillow = "^10.1.0"
-sphinx-autodoc-typehints = "^3.2.0"
+[tool.pixi.feature.dev.dependencies]
+isort = ">=5.10.1"
+commitizen = ">=2.32.5"
+flake8 = ">=5.0.4"
+mypy = ">=0.971"
+black = ">=22.8.0"
+urllib3 = "=1.26.15"
 
-[tool.poetry.group.jupyter.dependencies]
+[tool.pixi.feature.dev.tasks]
+isort = "isort"
+black = "black"
+build = "python -m build --outdir dist/"
+
+[tool.pixi.feature.test.dependencies]
+pytest-cov = ">=3.0.0"
+pytest = ">=7.1.3"
+teamcity-messages = ">=1.33,<2"
+testbook = ">=0.4.2"
+pytest-xdist = ">=3.3.1"
+pytest-profiling = ">=1.7.0"
+pytest-notebook = ">=0.9.0"
+
+[tool.pixi.feature.jupyter.dependencies]
+ipykernel = ">=6.25.1"
+ipython = ">=9.10.0,<10"
 # These dependencies are required for binder (`examples\environment.yml`).
-folium = "^0.15.0"
-matplotlib = "^3.8.1"
-mapclassify = "^2.6.1"
+# folium = ">=0.15.0"
+# matplotlib = ">=3.8.1"
+# mapclassify = ">=2.6.1"
 
-[tool.poetry.group.test.dependencies]
-pytest-cov = "^3.0.0"
-pytest = "^7.1.3"
-teamcity-messages = "^1.32"
-testbook = "^0.4.2"
-pytest-xdist = "^3.3.1"
-pytest-profiling = "^1.7.0"
-pytest-notebook = "^0.9.0"
+[tool.pixi.feature.docs.dependencies]
+jupytext = ">=1.14.5"
+nbsphinx = ">=0.9.1"
+myst-parser = ">=4.0.0"
+sphinx = "=8.2.3"
+sphinx-book-theme = ">=1.0.1"
+sphinx-copybutton = ">=0.5.2"
+sphinx-rtd-theme = ">=3.0.0"
+sphinx-autosummary-accessors = ">=2023.4.0"
+sphinx-design = ">=0.6.1"
+pandoc = ">=2.3"
+pillow = ">=10.1.0"
+sphinx-autodoc-typehints = ">=3.2.0"
+make = ">=4.4.1,<5"
+
+[tool.pixi.feature.docs.tasks]
+build-docs = "make -C ./docs html"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+jupyter = { features = ["jupyter"], solve-group="default"}
+docs = { features = ["docs", "jupyter"], solve-group="default"}
+test = { features = ["test", "docs", "jupyter"], solve-group ="default" }
+dev = { features = ["dev", "test", "docs", "jupyter"], solve-group = "default" }
+py311 = ["py311", "default"]
+py312 = ["py312", "default"]
+py313 = ["py313", "default"]
+testpy311 = { features = ["test", "jupyter"], solve-group = "py311"}
+testpy312 = { features = ["test", "jupyter"], solve-group = "py312"}
+testpy313 = { features = ["test", "jupyter"], solve-group = "py313"}
 
 [tool.black]
 line-length = 88
-target-version = ['py310', 'py311']
+target-version = ['py311', 'py312', 'py313']
 exclude = '''
 (
   /(
@@ -110,11 +169,15 @@ exclude = '''
     | \.mypy_cache
     | \.tox
     | \.venv
+    | \.env
+    | \.devcontainer
     | _build
     | buck-out
     | build
     | dist
     | \.virtualenvs
+    | .pixi
+    | .pytest_cache
   )/
 )
 '''
@@ -122,6 +185,7 @@ exclude = '''
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+skip = [".git", ".github", ".pixi", ".env", ".venv", ".devcontainer", ".pytest_cache", ".scannerwork", ".vscode", "site"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -140,6 +204,3 @@ markers = [
     "external_test_data: marks tests as a test whose required data comes from external sources (deselct with '-m \"not external_test_data\"')",
 ]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

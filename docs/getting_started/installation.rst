@@ -4,9 +4,7 @@ Installation
 ============
 
 RA2CE can be operated via the command-line interface with two commands. 
-Before RA2CE can be used, the correct Python environment needs to be installed 
-(see *environment.yml*), this can be done with a conda environment manager such
-as `miniforge <https://github.com/conda-forge/miniforge>`_ or `micromamba <https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html>`_.
+Before RA2CE can be used, the correct Python environment needs to be installed (at the moment of writing we support the Python versions ``>=3.11,<3.14``), this can be done with using a dependency magare such `pixi <https://pixi.prefix.dev/latest/>`_ or with conda as an environment manager (use `miniforge <https://github.com/conda-forge/miniforge>`_ or `micromamba <https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html>`_).
 
 .. note::
   Important! In compliance with Deltares open-source policy it is recommended to use either ``miniforge`` or ``micromamba``
@@ -32,7 +30,7 @@ Alternatively you can install the latest version available on GitHub or a specif
 Development mode
 ++++++++++++++++
 
-If you wish to contribute to the development of the tool, please refer for installation to our `installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/getting-started#installation-for-contributors>`_.
+If you wish to contribute to the development of the tool, please refer for installation to our `installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/installation-for-contributors>`_.
 
 
 Docker and cloud

@@ -1,55 +1,37 @@
 name: ci-normalize-code
-
 on:
   push:
-    branches: [master]
+    branches: [ master ]
 
 env:
   AUTOFORMAT_COMMIT_MESSAGE: 'chore: autoformat isort & black'
 
 jobs:
-  normalize-code:
+  code-autoformat:
     if: "${{ (!startsWith(github.event.head_commit.message, 'chore: autoformat isort & black')) && (!startsWith(github.event.head_commit.message, 'bump:')) }}"
-    name: "Normalize code with internal standards"
-    permissions: write-all
-    strategy:
-      fail-fast: true
-      matrix:
-        python-version: ['3.11']
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    name: Normalize code with internal standards
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
-      - name: Check out
+      - name: Checkout source
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.BYPASS_PROTECTED_BRANCHES_PAT }}
-          fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: prefix-dev/setup-pixi@v0.9.0
         with:
-          python-version: ${{ matrix.python-version }}
+          pixi-version: v0.49.0
+          cache: true
+          cache-write: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
 
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: 1.4.0
-
-      - name: Set Poetry config
+      - name: Autoformat code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: |
-          poetry config virtualenvs.in-project false
-          poetry config virtualenvs.path ~/.virtualenvs
-
-      - name: Install Dependencies
-        run: poetry install --only dev
-
-      - name: Autoformat code if the check fails
-        run: |
-          poetry run isort .
-          poetry run black .
-  
-      - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with: 
-          commit_message: ${{ env.AUTOFORMAT_COMMIT_MESSAGE }}
-          push_options: --force
+          pixi run -e dev isort .
+          pixi run -e dev black .
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "chore: autoformat with isort & black" && git push || true

@@ -5,23 +5,6 @@ Frequently Asked Questions
 
 This page contains the most frequently asked questions about working with RA2CE.
 
-Installation
-------------------------------
-
-| **Q**: What to do if my environment fails to install at the `conda env create -f .config\environment.yml` step?
-
-When install poetry 1.3.2 (1.4.*) gives issues: install it manually with::
-
-::
-
-    conda install -c conda-forge poetry=1.3.2
-
-
-| **Q**: What to do if my environment fails to install at the `poetry install` step?
-
-Try to run `poetry install` again.
-
-
 Set up RA2CE model
 ----------------------------
  | **Q**: Where do I store the input data for RA2CE?

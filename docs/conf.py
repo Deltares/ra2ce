@@ -110,6 +110,7 @@ extensions = [
     "sphinx_autosummary_accessors",
     "nbsphinx",
     "sphinx_autodoc_typehints",
+    "IPython.sphinxext.ipython_console_highlighting"
 ]
 
 myst_enable_extensions = [

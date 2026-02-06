@@ -7,7 +7,7 @@ class TestLossesBase:
     def test_initialize_base_class_raises(self):
         # 1. Run test.
         with pytest.raises(TypeError) as exc:
-            _losses = LossesBase(None, None)
+            LossesBase(None, None)
 
         # 2. Verify final expectations
         assert str(exc.value).startswith(

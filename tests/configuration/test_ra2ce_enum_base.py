@@ -20,10 +20,11 @@ class TestRa2ceEnumBase:
     def test_get_enum_base_raises(self):
         # 1./2. Define test data / Run test
         with pytest.raises(AttributeError) as exc_err:
-            _enum = Ra2ceEnumBase.get_enum("sth")
+            Ra2ceEnumBase.get_enum("sth")
 
         # 3. Verify results
-        assert str(exc_err.value) == "INVALID"
+        # Disclaimer: Done like this as in Python 3.11 the exception error differs slightly.
+        assert "INVALID" in str(exc_err.value)
 
     @pytest.mark.parametrize(
         "config_name, expected_outcome",
@@ -51,10 +52,11 @@ class TestRa2ceEnumBase:
     def test_get_config_name_base_raises(self):
         # 1./2. Define test data / Run test
         with pytest.raises(AttributeError) as exc_err:
-            _name = Ra2ceEnumBase.INVALID.config_value
+            Ra2ceEnumBase.INVALID.config_value
 
         # 3. Verify results
-        assert str(exc_err.value) == "INVALID"
+        # Disclaimer: Done like this as in Python 3.11 the exception error differs slightly.
+        assert "INVALID" in str(exc_err.value)
 
     @pytest.mark.parametrize(
         "enum, expected_value",

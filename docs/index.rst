@@ -23,7 +23,6 @@ Or navigate directly to another section:
    tutorials/index.rst
    api/index.rst
    technical_documentation/technical_documentation.rst
-   contributing/index.rst
 
 
 Lost..? Try the :ref:`search`.
