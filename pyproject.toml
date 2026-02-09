@@ -155,7 +155,7 @@ dev = { features = ["dev", "test", "docs", "jupyter"], solve-group = "default" }
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
 py313 = ["py313", "default"]
-py313 = ["py314", "default"]
+py314 = ["py314", "default"]
 testpy311 = { features = ["test", "jupyter"], solve-group = "py311"}
 testpy312 = { features = ["test", "jupyter"], solve-group = "py312"}
 testpy313 = { features = ["test", "jupyter"], solve-group = "py313"}
