@@ -31333,8 +31333,8 @@ packages:
   timestamp: 1757356458097
 - pypi: ./
   name: ra2ce
-  version: 1.2.0
-  sha256: b64c39b18d87bfa2d14697e99b9581ceca3743270d969f6f725d7b8be8617225
+  version: 1.2.1
+  sha256: e38a38446e1d0b6d18e7708f8941bcc6793fb5b77040bc6cca029b6cb7514b5f
   requires_dist:
   - affine
   - click

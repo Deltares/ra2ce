@@ -1,6 +1,6 @@
 [project]
 name = "ra2ce"
-version = "1.2.0"
+version = "1.2.1"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = [
   {name = "Margreet van Marle", email = "Margreet.vanMarle@deltares.nl"},
@@ -15,8 +15,10 @@ license-files = ["LICENSE"]
 readme = "README.md"
 keywords = ["civil-engineering", "dikes", "resilience-assessment", "infrastructure", "networks", "deltares"]
 classifiers = [
-  'Development Status :: 2 - Pre-Alpha',
+  'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Developers',
+  'Intended Audience :: Education',
+  'Intended Audience :: Science/Research',
   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
   'Natural Language :: English',
   'Operating System :: Microsoft :: Windows',
@@ -25,7 +27,8 @@ classifiers = [
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
-  'Programming Language :: Python :: 3.13'
+  'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3.14'
 ]
 requires-python = ">=3.11,<3.15"
 dependencies = ["affine", "click", "numpy", "networkx", "pandas", "pyarrow", "rasterio", "rasterstats", "rtree", "seaborn", "openpyxl", "xlrd", "xarray", "scipy", "momepy", "geopandas", "osmnx", "tqdm", "geopy", "joblib", "snkit", "shapely", "pyogrio", "altgraph"]
@@ -195,7 +198,7 @@ skip = [".git", ".github", ".pixi", ".env", ".venv", ".devcontainer", ".pytest_c
 [tool.commitizen]
 name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
-version = "1.2.0"
+version = "1.2.1"
 tag_format = "v$major.$minor.$patch"
 version_files= [
     "ra2ce/__init__.py",

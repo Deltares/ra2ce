@@ -1,3 +1,9 @@
+## v1.2.1 (2026-02-09)
+
+### Chore
+ 
+- Corrected classifiers from previous version.
+
 ## v1.2.0 (2026-02-09)
 
 ### Feat
