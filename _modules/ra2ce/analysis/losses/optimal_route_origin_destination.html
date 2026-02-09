@@ -1,0 +1,753 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.losses.optimal_route_origin_destination &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/losses/optimal_route_origin_destination';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.losses.optimal_route_origin_destination</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">read_feather</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">MultiLineString</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisSectionLosses</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.weighing_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeighingEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_input_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisInputWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_result.analysis_result_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisResultWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.analysis_losses_protocol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisLossesProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.traffic_analysis.traffic_analysis_factory</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TrafficAnalysisFactory</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.graph_files.graph_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.hazard.hazard_names</span><span class="w"> </span><span class="kn">import</span> <span class="n">HazardNames</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OriginsDestinationsSection</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimalRouteOriginDestination</span><span class="p">(</span><span class="n">AnalysisBase</span><span class="p">,</span> <span class="n">AnalysisLossesProtocol</span><span class="p">):</span>
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisSectionLosses</span>
+    <span class="n">graph_file</span><span class="p">:</span> <span class="n">GraphFile</span>
+    <span class="n">input_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">static_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">output_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">hazard_names</span><span class="p">:</span> <span class="n">HazardNames</span>
+    <span class="n">origins_destinations</span><span class="p">:</span> <span class="n">OriginsDestinationsSection</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis_input</span><span class="p">:</span> <span class="n">AnalysisInputWrapper</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_file</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">graph_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">static_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">output_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">hazard_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">origins_destinations</span>
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination.extract_od_nodes_from_graph">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination.extract_od_nodes_from_graph">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_od_nodes_from_graph</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts all Origin - Destination nodes from the graph, prevents from entries</span>
+<span class="sd">        with list of nodes for a node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            graph (nx.MultiGraph): Graph containing origin-destination nodes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># NOTE: this code is duplicated in multi_link_origin_destination.py</span>
+        <span class="n">_od_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;od_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">_o_node_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;od_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)))</span>
+            <span class="n">_od_nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_o_node_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_od_nodes</span></div>
+
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination.find_route_ods">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination.find_route_ods">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_route_ods</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">od_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]],</span>
+        <span class="n">weighing</span><span class="p">:</span> <span class="n">WeighingEnum</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="c1"># create the routes between all OD pairs</span>
+        <span class="p">(</span>
+            <span class="n">o_node_list</span><span class="p">,</span>
+            <span class="n">d_node_list</span><span class="p">,</span>
+            <span class="n">origin_list</span><span class="p">,</span>
+            <span class="n">destination_list</span><span class="p">,</span>
+            <span class="n">opt_path_list</span><span class="p">,</span>
+            <span class="n">weighing_list</span><span class="p">,</span>
+            <span class="n">match_ids_list</span><span class="p">,</span>
+            <span class="n">geometries_list</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">od_nodes</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Finding optimal routes.&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">has_path</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="c1"># calculate the length of the preferred route and preferred route nodes</span>
+                <span class="p">[</span><span class="n">pref_route</span><span class="p">,</span> <span class="n">pref_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">single_source_dijkstra</span><span class="p">(</span>
+                    <span class="n">graph</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="n">weighing</span><span class="o">.</span><span class="n">config_value</span>
+                <span class="p">)</span>
+
+                <span class="c1"># found out which edges belong to the preferred path</span>
+                <span class="n">edgesinpath</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">pref_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">:],</span> <span class="n">pref_nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+                <span class="n">pref_edges</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">match_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edgesinpath</span><span class="p">:</span>
+                    <span class="c1"># get edge with the lowest weighing if there are multiple edges that connect u and v</span>
+                    <span class="n">_uv_graph</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+                    <span class="n">edge_key</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                        <span class="n">_uv_graph</span><span class="p">,</span>
+                        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_fgraph</span><span class="o">=</span><span class="n">_uv_graph</span><span class="p">:</span> <span class="n">_fgraph</span><span class="p">[</span><span class="n">x</span><span class="p">][</span>
+                            <span class="n">weighing</span><span class="o">.</span><span class="n">config_value</span>
+                        <span class="p">],</span>
+                    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">_uv_graph_edge</span> <span class="o">=</span> <span class="n">_uv_graph</span><span class="p">[</span><span class="n">edge_key</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">_uv_graph_edge</span><span class="p">:</span>
+                        <span class="n">pref_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_uv_graph_edge</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pref_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">LineString</span><span class="p">(</span>
+                                <span class="p">[</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">&quot;rfid&quot;</span> <span class="ow">in</span> <span class="n">_uv_graph_edge</span><span class="p">:</span>
+                        <span class="n">match_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_uv_graph_edge</span><span class="p">[</span><span class="s2">&quot;rfid&quot;</span><span class="p">])</span>
+
+                <span class="n">combined_pref_edges</span> <span class="o">=</span> <span class="n">MultiLineString</span><span class="p">([])</span>
+                <span class="k">for</span> <span class="n">geometry</span> <span class="ow">in</span> <span class="n">pref_edges</span><span class="p">:</span>
+                    <span class="n">combined_pref_edges</span> <span class="o">=</span> <span class="n">combined_pref_edges</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">combined_pref_edges</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">combined_pref_edges</span><span class="o">.</span><span class="n">is_valid</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="c1"># save all data to lists (of lists)</span>
+                <span class="n">o_node_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">d_node_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">origin_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">destination_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">opt_path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pref_nodes</span><span class="p">)</span>
+                <span class="n">weighing_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pref_route</span><span class="p">)</span>
+                <span class="n">match_ids_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_list</span><span class="p">)</span>
+                <span class="n">geometries_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">combined_pref_edges</span><span class="p">)</span>
+                <span class="c1"># geometries_list.append(pref_edges)</span>
+
+        <span class="c1"># Geodataframe to save all the optimal routes</span>
+        <span class="n">pref_routes</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;o_node&quot;</span><span class="p">:</span> <span class="n">o_node_list</span><span class="p">,</span>
+                <span class="s2">&quot;d_node&quot;</span><span class="p">:</span> <span class="n">d_node_list</span><span class="p">,</span>
+                <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">origin_list</span><span class="p">,</span>
+                <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="n">destination_list</span><span class="p">,</span>
+                <span class="s2">&quot;opt_path&quot;</span><span class="p">:</span> <span class="n">opt_path_list</span><span class="p">,</span>
+                <span class="n">weighing</span><span class="o">.</span><span class="n">config_value</span><span class="p">:</span> <span class="n">weighing_list</span><span class="p">,</span>
+                <span class="s2">&quot;match_ids&quot;</span><span class="p">:</span> <span class="n">match_ids_list</span><span class="p">,</span>
+                <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">geometries_list</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Remove potential duplicates (o, d node) with a different Origin name.</span>
+        <span class="n">_duplicate_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;o_node&quot;</span><span class="p">,</span> <span class="s2">&quot;d_node&quot;</span><span class="p">,</span> <span class="s2">&quot;destination&quot;</span><span class="p">,</span> <span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+        <span class="n">pref_routes</span> <span class="o">=</span> <span class="n">pref_routes</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+            <span class="n">subset</span><span class="o">=</span><span class="n">_duplicate_columns</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pref_routes</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_origin_destination_pairs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="c1"># NOTE: this code is duplicated in multi_link_origin_destination.py</span>
+        <span class="n">od_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+            <span class="s2">&quot;output_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;origin_destination_table.feather&quot;</span>
+        <span class="p">)</span>
+        <span class="n">od</span> <span class="o">=</span> <span class="n">read_feather</span><span class="p">(</span><span class="n">od_path</span><span class="p">)</span>
+        <span class="n">od_pairs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">od</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">od</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">(),</span> <span class="s2">&quot;o_id&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">od</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">od</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">(),</span> <span class="s2">&quot;d_id&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">all_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_od_nodes_from_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_find_node</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+            <span class="c1"># it is possible that there are multiple origins/destinations at the same &#39;entry-point&#39; in the road</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n_name</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">n_name</span> <span class="ow">in</span> <span class="n">nodes</span>
+                <span class="k">if</span> <span class="n">n_name</span> <span class="o">==</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">n_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">_find_node</span><span class="p">(</span><span class="n">aa</span><span class="p">,</span> <span class="n">all_nodes</span><span class="p">),</span> <span class="n">_find_node</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">all_nodes</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">aa</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">od_pairs</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination.optimal_route_origin_destination">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination.optimal_route_origin_destination">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimal_route_origin_destination</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisSectionLosses</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="c1"># create list of origin-destination pairs</span>
+        <span class="n">od_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_origin_destination_pairs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">pref_routes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_route_ods</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">od_nodes</span><span class="p">,</span> <span class="n">analysis</span><span class="o">.</span><span class="n">weighing</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pref_routes</span></div>
+
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination.optimal_route_od_link">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination.optimal_route_od_link">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimal_route_od_link</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">road_network</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">od_table</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">equity</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TrafficAnalysisFactory</span><span class="o">.</span><span class="n">get_analysis</span><span class="p">(</span>
+            <span class="n">road_network</span><span class="p">,</span>
+            <span class="n">od_table</span><span class="p">,</span>
+            <span class="n">equity</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">optimal_route_od_link</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="OptimalRouteOriginDestination.execute">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.optimal_route_origin_destination.OptimalRouteOriginDestination.execute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisResultWrapper</span><span class="p">:</span>
+        <span class="n">_output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">config_value</span><span class="p">)</span>
+
+        <span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimal_route_origin_destination</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">graph_file</span><span class="o">.</span><span class="n">get_graph</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">save_traffic</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="p">,</span> <span class="s2">&quot;origin_count&quot;</span>
+        <span class="p">):</span>
+            <span class="n">od_table</span> <span class="o">=</span> <span class="n">read_feather</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                    <span class="s2">&quot;output_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;origin_destination_table.feather&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_equity_weights_file</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">equity_weight</span><span class="p">:</span>
+                <span class="n">_equity_weights_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                    <span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">equity_weight</span>
+                <span class="p">)</span>
+            <span class="n">route_traffic_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimal_route_od_link</span><span class="p">(</span>
+                <span class="n">gdf</span><span class="p">,</span>
+                <span class="n">od_table</span><span class="p">,</span>
+                <span class="n">TrafficAnalysisFactory</span><span class="o">.</span><span class="n">read_equity_weights</span><span class="p">(</span><span class="n">_equity_weights_file</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">impact_csv_path</span> <span class="o">=</span> <span class="n">_output_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_link_traffic.csv&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">route_traffic_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">impact_csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_result_wrapper</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

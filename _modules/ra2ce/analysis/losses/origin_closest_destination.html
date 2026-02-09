@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.losses.origin_closest_destination &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/losses/origin_closest_destination';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.losses.origin_closest_destination</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023-2026 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">MultiLineString</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_input_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisInputWrapper</span>
+
+
+<div class="viewcode-block" id="OriginClosestDestination">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OriginClosestDestination</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The origin closest destination analyses using NetworkX graphs.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        file_id: The file id of the network.</span>
+<span class="sd">        origins_destinations: An object with the origins and destinations.</span>
+<span class="sd">        analysis: An object with the analysis details.</span>
+<span class="sd">        graph_file: An object with the NetworkX graph.</span>
+<span class="sd">        graph_file_hazard: An object with the NetworkX graph with hazard disruption.</span>
+<span class="sd">        hazard_names: An object with the hazard names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis_input</span><span class="p">:</span> <span class="n">AnalysisInputWrapper</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_file</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">graph_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_file_hazard</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">graph_file_hazard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">static_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">hazard_names</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="mi">4326</span>  <span class="c1"># TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_destinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">threshold_destinations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weighing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">weighing</span><span class="o">.</span><span class="n">config_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">origins_destinations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">origin_out_fraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">origin_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span> <span class="o">=</span> <span class="s2">&quot;od_id&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">analysis_input</span><span class="o">.</span><span class="n">file_id</span> <span class="k">if</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">file_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;rfid&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">category</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span> <span class="o">=</span> <span class="s2">&quot;category&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_key_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">category</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span>
+
+<div class="viewcode-block" id="OriginClosestDestination.optimal_route_origin_closest_destination">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.optimal_route_origin_closest_destination">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimal_route_origin_closest_destination</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates per origin the location of its closest destination&quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_file</span><span class="o">.</span><span class="n">get_graph</span><span class="p">()</span>
+
+        <span class="c1"># Load the origins and destinations</span>
+        <span class="n">origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_origins</span><span class="p">()</span>
+        <span class="n">destinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_destinations</span><span class="p">()</span>
+
+        <span class="c1"># Create a copy of the graph to save all the results in</span>
+        <span class="n">base_graph</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+        <span class="c1"># Add a column for the number of people that go to a certain destination, per flood map</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;noHaz&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">destinations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">category</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_names_short</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">dn</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span><span class="si">}{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_names_short</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">destinations</span><span class="p">[</span><span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_P&quot;</span> <span class="o">+</span> <span class="n">dn</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="p">(</span>
+                <span class="n">base_graph</span><span class="p">,</span>
+                <span class="n">origins</span><span class="p">,</span>
+                <span class="n">destinations</span><span class="p">,</span>
+                <span class="n">list_disrupted_dest</span><span class="p">,</span>
+                <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_multiple_closest_locations</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="n">base_graph</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">col_name</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">destinations</span><span class="p">[</span><span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_P&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="p">(</span>
+                <span class="n">base_graph</span><span class="p">,</span>
+                <span class="n">origins</span><span class="p">,</span>
+                <span class="n">destinations</span><span class="p">,</span>
+                <span class="n">list_disrupted_dest</span><span class="p">,</span>
+                <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_closest_location</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="n">base_graph</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">col_name</span>
+            <span class="p">)</span>
+
+        <span class="n">cnt_per_destination</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">optimal_routes_gdf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">)[</span><span class="s2">&quot;origin_cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">dest</span><span class="p">,</span> <span class="n">origin_cnt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">cnt_per_destination</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">],</span>
+            <span class="n">cnt_per_destination</span><span class="p">[</span><span class="s2">&quot;origin_cnt&quot;</span><span class="p">],</span>
+        <span class="p">):</span>
+            <span class="n">destinations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">destinations</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dest</span><span class="p">,</span> <span class="s2">&quot;origin_cnt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_cnt</span>
+
+        <span class="k">return</span> <span class="n">base_graph</span><span class="p">,</span> <span class="n">optimal_routes_gdf</span><span class="p">,</span> <span class="n">destinations</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.multi_link_origin_closest_destination">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.multi_link_origin_closest_destination">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multi_link_origin_closest_destination</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates per origin the location of its closest destination with hazard disruption&quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_file_hazard</span><span class="o">.</span><span class="n">get_graph</span><span class="p">()</span>
+
+        <span class="c1"># Load the origins and destinations</span>
+        <span class="n">origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_origins</span><span class="p">()</span>
+        <span class="n">destinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_destinations</span><span class="p">()</span>
+
+        <span class="c1"># Create a copy of the graph to save all the results in</span>
+        <span class="n">base_graph</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">destinations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">origins_destinations</span><span class="o">.</span><span class="n">category</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination_names_short</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">dn</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span><span class="si">}{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span><span class="p">)</span>
+            <span class="p">}</span>
+
+        <span class="n">aggregated</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">opt_routes_aggregated</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Calculate the criticality</span>
+        <span class="n">hazards</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span><span class="o">.</span><span class="n">names_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span><span class="o">.</span><span class="n">names_df</span><span class="p">[</span><span class="s2">&quot;File name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hazard</span><span class="p">,</span> <span class="s2">&quot;RA2CE name&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">hazard</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span><span class="o">.</span><span class="n">names</span>
+        <span class="p">]</span>
+        <span class="n">hazards</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">hazard_name</span> <span class="ow">in</span> <span class="n">hazards</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="s2">&quot;Hazard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">hazard_name</span><span class="p">]</span>
+
+            <span class="c1"># Add a column for the number of people that go to a certain destination, per flood map</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_names_short</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">destinations</span><span class="p">[</span><span class="n">hazard_name</span> <span class="o">+</span> <span class="s2">&quot;_P&quot;</span> <span class="o">+</span> <span class="n">dn</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">destinations</span><span class="p">[</span><span class="n">hazard_name</span> <span class="o">+</span> <span class="s2">&quot;_P&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+            <span class="n">edges_remove</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">hazard_name</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;bridge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;bridge&quot;</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;bridge&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">edges_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">edges_remove</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges_remove</span> <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">hazard_name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)]</span>
+            <span class="n">edges_remove</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">e</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges_remove</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">hazard_name</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_threshold</span><span class="p">))</span>
+            <span class="p">]</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">remove_edges_from</span><span class="p">(</span><span class="n">edges_remove</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">origins</span><span class="p">,</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                    <span class="n">list_disrupted_dest</span><span class="p">,</span>
+                    <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_multiple_closest_locations</span><span class="p">(</span>
+                    <span class="n">h</span><span class="p">,</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">origins</span><span class="p">,</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                    <span class="n">hazard_name</span><span class="p">,</span>
+                    <span class="n">hazard_name</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">origins</span><span class="p">,</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                    <span class="n">list_disrupted_dest</span><span class="p">,</span>
+                    <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_closest_location</span><span class="p">(</span>
+                    <span class="n">h</span><span class="p">,</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">origins</span><span class="p">,</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                    <span class="n">hazard_name</span><span class="p">,</span>
+                    <span class="n">hazard_name</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">aggregated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">))</span>
+
+            <span class="n">optimal_routes_gdf</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hazard_name</span>
+            <span class="n">opt_routes_aggregated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optimal_routes_gdf</span><span class="p">)</span>
+
+        <span class="c1"># Create one dataframe from the aggregated results</span>
+        <span class="n">aggregated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">aggregated</span><span class="p">)</span>
+        <span class="n">opt_routes_aggregated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">opt_routes_aggregated</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">base_graph</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">aggregated</span><span class="p">,</span> <span class="n">opt_routes_aggregated</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.get_route_length">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.get_route_length">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_route_length</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span> <span class="n">origin_node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="c1"># calculate the length of the preferred route</span>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">dijkstra_path_length</span><span class="p">(</span>
+            <span class="n">graph</span><span class="p">,</span> <span class="n">origin_node</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.compare_route_with_without_disruption">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.compare_route_with_without_disruption">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_route_with_without_disruption</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pref_routes</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">nr_per_route</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">alt_route</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">alt_dist</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pp_no_delay</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pp_delayed</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">extra_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">extra_kms_total</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># If the destination is different from the origin, the destination is further than without hazard disruption</span>
+        <span class="k">if</span> <span class="n">pref_routes</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">pref_routes</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">pref_routes</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span><span class="p">)</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="c1"># subtract the length/time of the optimal route from the alternative route</span>
+            <span class="n">extra_dist</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">alt_route</span>
+                <span class="o">-</span> <span class="n">pref_routes</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">pref_routes</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighing</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">extra_km</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">alt_dist</span>
+                <span class="o">-</span> <span class="n">pref_routes</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">pref_routes</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span><span class="p">,</span> <span class="s2">&quot;tot_km&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">pp_delayed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nr_per_route</span><span class="p">)</span>
+            <span class="n">extra_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extra_dist</span><span class="p">)</span>
+            <span class="n">extra_kms_total</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extra_km</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pp_no_delay</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nr_per_route</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pp_no_delay</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="s2">&quot;Nr. no delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">pp_no_delay</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">pp_delayed</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="s2">&quot;Nr. delayed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">pp_delayed</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">extra_weights</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Total extra detour </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">sum</span><span class="p">(</span><span class="n">extra_weights</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">if</span> <span class="n">extra_kms_total</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Total extra detour distance (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">sum</span><span class="p">(</span><span class="n">extra_kms_total</span><span class="p">)</span>
+            <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.get_route_path">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.get_route_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_route_path</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">base_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">origin_node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">destination_node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nr_from_origin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">MultiLineString</span><span class="p">]:</span>
+        <span class="c1"># Get the nodes of the optimal route</span>
+        <span class="n">route_nodes</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">dijkstra_path</span><span class="p">(</span>
+            <span class="n">graph</span><span class="p">,</span> <span class="n">origin_node</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span>
+        <span class="p">)</span>
+
+        <span class="c1"># find out which edges belong to the preferred path</span>
+        <span class="n">edgesinpath</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">route_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">:],</span> <span class="n">route_nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+        <span class="c1"># calculate the total length of the alternative route</span>
+        <span class="c1"># Find the road segments that are used for the detour to the same or another destination</span>
+        <span class="n">pref_edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">length_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edgesinpath</span><span class="p">:</span>
+            <span class="c1"># get edge with the lowest weighing if there are multiple edges that connect u and v</span>
+            <span class="n">_uv_graph</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+            <span class="n">edge_key</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">_uv_graph</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_fgraph</span><span class="o">=</span><span class="n">_uv_graph</span><span class="p">:</span> <span class="n">_fgraph</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="p">]</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_uv_graph_edge</span> <span class="o">=</span> <span class="n">_uv_graph</span><span class="p">[</span><span class="n">edge_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">_uv_graph_edge</span><span class="p">:</span>
+                <span class="n">pref_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_uv_graph_edge</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pref_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">LineString</span><span class="p">([</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]])</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;length&quot;</span> <span class="ow">in</span> <span class="n">_uv_graph_edge</span><span class="p">:</span>
+                <span class="n">length_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_uv_graph_edge</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Add the number of people that need to go to a destination to the road segments. For now, each road segment in a route</span>
+            <span class="c1"># gets attributed all the people that are taking that route.</span>
+            <span class="n">base_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="n">edge_key</span><span class="p">][</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">base_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="n">edge_key</span><span class="p">][</span><span class="n">col_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">nr_from_origin</span>
+            <span class="p">)</span>
+
+        <span class="n">pref_edges</span> <span class="o">=</span> <span class="n">MultiLineString</span><span class="p">(</span><span class="n">pref_edges</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">base_graph</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">length_list</span><span class="p">),</span> <span class="n">pref_edges</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.get_nr_people_on_route">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.get_nr_people_on_route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_nr_people_on_route</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">origin_node</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="c1"># If there is no origin count specified, we cannot calculate the number of people on the route</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="c1"># Find the number of people per neighborhood</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nr_people_per_route_total</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">origins</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">origin_node</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">,</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">origin_node</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">origin_node</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span> <span class="ow">in</span> <span class="n">a</span>
+            <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">nr_people_per_route_total</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">origins</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">origin_node</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">,</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nr_per_route</span> <span class="o">=</span> <span class="n">nr_people_per_route_total</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_out_fraction</span>
+
+        <span class="k">return</span> <span class="n">nr_per_route</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.update_destinations">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.update_destinations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_destinations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">destinations</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">destination_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">nr_per_route</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">dest_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">dest</span> <span class="k">for</span> <span class="n">dest</span> <span class="ow">in</span> <span class="n">destination_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span> <span class="ow">in</span> <span class="n">d</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Add the number of people to the total number of people that go to that destination</span>
+        <span class="n">destinations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">destinations</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dest_ids</span><span class="p">),</span> <span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">destinations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">destinations</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dest_ids</span><span class="p">),</span> <span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="o">+</span> <span class="n">nr_per_route</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">destinations</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.update_origins">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.update_origins">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_origins</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="c1"># Attribute to the origins that don&#39;t have access that they do not have any access</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">oth</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                <span class="n">od_id_list</span> <span class="o">=</span> <span class="n">oth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">od_id</span> <span class="ow">in</span> <span class="n">od_id_list</span><span class="p">:</span>
+                    <span class="n">origins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="n">origins</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">od_id</span><span class="p">,</span>
+                        <span class="n">col_name</span><span class="p">,</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;no access&quot;</span>
+        <span class="k">return</span> <span class="n">origins</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.get_nr_without_access">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.get_nr_without_access">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_nr_without_access</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">origins_without_access</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">add_key_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If there is no origin count specified, we cannot calculate the number of people without access</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Nr. no access</span><span class="si">{</span><span class="n">add_key_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Calculate the number of people that cannot access any destination</span>
+        <span class="n">origins_no_access</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">o</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">oth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">origins_without_access</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">oth</span> <span class="ow">in</span> <span class="n">origins_without_access</span>
+            <span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">origins_no_access</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">origins_no_access</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+        <span class="n">pp_no_access</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">origins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                            <span class="n">origins</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">origins_no_access</span><span class="p">),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">,</span>
+                        <span class="p">]</span>
+                        <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_out_fraction</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">origins_no_access</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Nr. no access</span><span class="si">{</span><span class="n">add_key_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pp_no_access</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.find_closest_location">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.find_closest_location">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_closest_location</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">disrupted_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">base_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">destinations</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">hazard_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pref_routes</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the closest destination nodes with a certain attribute from all origin nodes for a single destination.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            disrupted_graph (nx.MultiGraph): NetworkX graph with origin and destination nodes and disrupted edges removed.</span>
+<span class="sd">            base_graph (nx.MultiGraph): Original NetworkX graph.</span>
+<span class="sd">            origins (gpd.GeoDataFrame): GeoDataFrame containing the origins.</span>
+<span class="sd">            destinations (gpd.GeoDataFrame): GeoDataFrame containing the destinations.</span>
+<span class="sd">            column_name (str): Name of the column to be added to the base_graph, origins, destinations, and results_dict.</span>
+<span class="sd">            hazard_name (str, optional): Name of the hazard (an attribute of the edges in disrupted_graph). Defaults to None.</span>
+<span class="sd">            pref_routes (gpd.GeoDataFrame, optional): GeoDataFrame containing preferred routes without disruption. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple:</span>
+<span class="sd">                - base_graph (nx.MultiGraph): The updated base graph.</span>
+<span class="sd">                - origins (gpd.GeoDataFrame): Updated origins GeoDataFrame.</span>
+<span class="sd">                - destinations (gpd.GeoDataFrame): Updated destinations GeoDataFrame.</span>
+<span class="sd">                - list_disrupted_destinations (list): List of tuples with origin and destination node id and name for unreachable destinations.</span>
+<span class="sd">                - pref_routes (gpd.GeoDataFrame): Updated preferred routes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_save</span> <span class="o">=</span> <span class="n">column_name</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{}</span><span class="s2">&quot;</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">set_edge_attributes</span><span class="p">(</span><span class="n">base_graph</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Add a column to the neighborhoods, to indicate if they have access to any destination POI.</span>
+        <span class="c1"># The origins without access are indicated later</span>
+        <span class="n">origins</span><span class="p">[</span><span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;access&quot;</span>
+
+        <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+            <span class="s2">&quot;special&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">speciallabel</span><span class="o">=</span><span class="s2">&quot;special&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">special_edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ndat</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span> <span class="ow">in</span> <span class="n">ndat</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_prefix</span> <span class="ow">in</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">]:</span>
+                <span class="n">special_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;special&quot;</span><span class="p">,</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="p">:</span> <span class="mi">0</span><span class="p">}))</span>
+
+        <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">special_edges</span><span class="p">)</span>
+
+        <span class="n">optimal_routes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_disrupted_destinations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_no_path</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">node_checked_has_path</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n_ndat</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Finding optimal routes&quot;</span><span class="p">):</span>
+            <span class="n">_new_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_optimal_routes</span><span class="p">(</span>
+                <span class="n">node_checked_has_path</span><span class="p">,</span>
+                <span class="n">list_no_path</span><span class="p">,</span>
+                <span class="n">n_ndat</span><span class="p">,</span>
+                <span class="n">disrupted_graph</span><span class="p">,</span>
+                <span class="n">hazard_name</span><span class="p">,</span>
+                <span class="n">list_disrupted_destinations</span><span class="p">,</span>
+                <span class="n">pref_routes</span><span class="p">,</span>
+                <span class="s2">&quot;special&quot;</span><span class="p">,</span>
+                <span class="n">name_save</span><span class="p">,</span>
+                <span class="n">optimal_routes</span><span class="p">,</span>
+                <span class="n">origins</span><span class="p">,</span>
+                <span class="n">base_graph</span><span class="p">,</span>
+                <span class="n">destinations</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">_new_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">origins</span> <span class="o">=</span> <span class="n">_new_origins</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_nr_without_access</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">list_no_path</span><span class="p">)</span>
+
+        <span class="c1"># Remove the special edges</span>
+        <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">remove_edges_from</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;special&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Remove the closest attribute from the nodes</span>
+        <span class="n">origin_closest_dst</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;closest&quot;</span> <span class="ow">in</span> <span class="n">nn</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">origin_closest_dst</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">origin_closest_dst</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">o</span><span class="p">][</span><span class="s2">&quot;closest&quot;</span><span class="p">]</span>
+
+            <span class="n">optimal_routes_gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">optimal_routes</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">base_graph</span><span class="p">,</span>
+            <span class="n">origins</span><span class="p">,</span>
+            <span class="n">destinations</span><span class="p">,</span>
+            <span class="n">list_disrupted_destinations</span><span class="p">,</span>
+            <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_optimal_routes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">node_checked_has_path</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">list_no_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">n_ndat</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">disrupted_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">hazard_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">list_disrupted_destinations</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">pref_routes</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">dest_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name_save</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">optimal_routes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">base_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">destinations</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:</span>
+<span class="sd">        - The first would not use a `dest_name` attribute.</span>
+<span class="sd">        - The second one would use &#39;ndat[&quot;closest&quot;]&#39; instead of the assigned &#39;closest_dest&#39;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[gpd.GeoDataFrame]: When the wrapper for-loop needs to go into the next iteration it will return &#39;None&#39;. Otherwise a resulting `gpd.GeoDataFrame`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">ndat</span> <span class="o">=</span> <span class="n">n_ndat</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span> <span class="ow">in</span> <span class="n">ndat</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_prefix</span> <span class="ow">in</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">has_path</span><span class="p">(</span><span class="n">disrupted_graph</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">dest_name</span><span class="p">):</span>
+                <span class="c1"># Add elements to the dictionary this way to prevent an exception when</span>
+                <span class="c1"># their key is not present.</span>
+                <span class="n">node_checked_has_path</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">],</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span>
+                    <span class="n">disrupted_graph</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">dest_name</span><span class="p">,</span>
+                    <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># Closest node with destLabelContains in keyName</span>
+                <span class="n">ndat</span><span class="p">[</span><span class="s2">&quot;closest&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">closest_dest</span> <span class="o">=</span> <span class="n">ndat</span><span class="p">[</span><span class="s2">&quot;closest&quot;</span><span class="p">]</span>
+
+                <span class="c1"># Check if the destination that is accessed, is flooded</span>
+                <span class="k">if</span> <span class="n">hazard_name</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_dest</span><span class="p">][</span><span class="n">hazard_name</span><span class="p">]</span>
+                            <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_destinations</span>
+                        <span class="p">):</span>
+                            <span class="n">list_disrupted_destinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="p">(</span>
+                                    <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">]),</span>
+                                    <span class="p">(</span>
+                                        <span class="n">closest_dest</span><span class="p">,</span>
+                                        <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_dest</span><span class="p">][</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span>
+                                        <span class="p">],</span>
+                                    <span class="p">),</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="k">return</span> <span class="kc">None</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;The destination nodes do not contain the required attribute &#39;</span><span class="si">{</span><span class="n">hazard_name</span><span class="si">}</span><span class="s2">&#39;,&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot; please make sure that the hazard overlay is done correctly by rerunning the &#39;network.ini&#39;&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot; and checking the output files.&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">e</span>
+
+                <span class="n">nr_per_route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nr_people_on_route</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">])</span>
+                <span class="n">base_graph</span><span class="p">,</span> <span class="n">route_path</span><span class="p">,</span> <span class="n">route_geoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_route_path</span><span class="p">(</span>
+                    <span class="n">disrupted_graph</span><span class="p">,</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">n</span><span class="p">,</span>
+                    <span class="n">closest_dest</span><span class="p">,</span>
+                    <span class="n">nr_per_route</span><span class="p">,</span>
+                    <span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">pref_routes</span><span class="p">:</span>
+                    <span class="n">route_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_route_length</span><span class="p">(</span>
+                        <span class="n">disrupted_graph</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">closest_dest</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">compare_route_with_without_disruption</span><span class="p">(</span>
+                        <span class="n">pref_routes</span><span class="p">,</span>
+                        <span class="n">nr_per_route</span><span class="p">,</span>
+                        <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">],</span>
+                        <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_dest</span><span class="p">],</span>
+                        <span class="n">route_length</span><span class="p">,</span>
+                        <span class="n">route_path</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">destinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_destinations</span><span class="p">(</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                    <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_dest</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">],</span>
+                    <span class="n">nr_per_route</span><span class="p">,</span>
+                    <span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">route_geoms</span><span class="p">:</span>
+                    <span class="n">optimal_routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;o_node&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                                <span class="s2">&quot;d_node&quot;</span><span class="p">:</span> <span class="n">closest_dest</span><span class="p">,</span>
+                                <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">],</span>
+                                <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_dest</span><span class="p">][</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span>
+                                <span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="p">:</span> <span class="n">route_path</span><span class="p">,</span>
+                                <span class="s2">&quot;origin_cnt&quot;</span><span class="p">:</span> <span class="n">nr_per_route</span><span class="p">,</span>
+                                <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">route_geoms</span><span class="p">],</span>
+                                <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="n">dest_name</span><span class="p">,</span>
+                            <span class="p">},</span>
+                            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_checked_has_path</span><span class="p">:</span>
+                    <span class="n">list_no_path</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">od_key</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_origins</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">list_no_path</span><span class="p">,</span> <span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="OriginClosestDestination.find_multiple_closest_locations">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.find_multiple_closest_locations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_multiple_closest_locations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">disrupted_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">base_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">origins</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">destinations</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">hazard_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pref_routes</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">,</span>
+        <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the closest destination nodes with a certain attribute from all origin nodes for multiple destinations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            disrupted_graph (nx.MultiGraph): NetworkX graph with origin and destination nodes and disrupted edges removed.</span>
+<span class="sd">            base_graph (nx.MultiGraph): Original NetworkX graph.</span>
+<span class="sd">            origins (gpd.GeoDataFrame): GeoDataFrame containing the origins.</span>
+<span class="sd">            destinations (gpd.GeoDataFrame): GeoDataFrame containing the destinations.</span>
+<span class="sd">            column_name (str): Name of the column to be added to base_graph, origins, destinations, and results_dict.</span>
+<span class="sd">            hazard_name (str, optional): Name of the hazard. Defaults to None.</span>
+<span class="sd">            pref_routes (gpd.GeoDataFrame, optional): GeoDataFrame containing the preferred routes without disruption. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple:</span>
+<span class="sd">                - base_graph (nx.MultiGraph): The updated base graph.</span>
+<span class="sd">                - origins (gpd.GeoDataFrame): Updated origins GeoDataFrame.</span>
+<span class="sd">                - destinations (gpd.GeoDataFrame): Updated destinations GeoDataFrame.</span>
+<span class="sd">                - list_disrupted_destinations (list): List of tuples with origin and destination node id and node name for unreachable destinations.</span>
+<span class="sd">                - pref_routes (gpd.GeoDataFrame): Updated preferred routes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">optimal_routes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dest_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_categories</span><span class="p">:</span>
+            <span class="n">name_save</span> <span class="o">=</span> <span class="n">column_name</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_names_short</span><span class="p">[</span><span class="n">dest_name</span><span class="p">]</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">set_edge_attributes</span><span class="p">(</span><span class="n">base_graph</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Add a column to the neighborhoods, to indicate if they have access to any destination POI.</span>
+            <span class="c1"># The origins without access are indicated later</span>
+            <span class="n">origins</span><span class="p">[</span><span class="n">name_save</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;access&quot;</span>
+
+            <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">dest_name</span><span class="p">,</span> <span class="n">speciallabel</span><span class="o">=</span><span class="n">dest_name</span><span class="p">)</span>
+
+            <span class="n">special_edges</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ndat</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">od_key</span> <span class="ow">in</span> <span class="n">ndat</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span> <span class="ow">in</span> <span class="n">ndat</span>
+                    <span class="ow">and</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">dest_name</span>
+                <span class="p">):</span>
+                    <span class="n">special_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">ndat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">destination_key</span><span class="p">],</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weighing</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+                    <span class="p">)</span>
+
+            <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">special_edges</span><span class="p">)</span>
+
+            <span class="n">list_disrupted_destinations</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">list_no_path</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">node_checked_has_path</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">n_ndat</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">(),</span>
+                <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Finding optimal routes to </span><span class="si">{</span><span class="n">dest_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">_new_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_optimal_routes</span><span class="p">(</span>
+                    <span class="n">node_checked_has_path</span><span class="p">,</span>
+                    <span class="n">list_no_path</span><span class="p">,</span>
+                    <span class="n">n_ndat</span><span class="p">,</span>
+                    <span class="n">disrupted_graph</span><span class="p">,</span>
+                    <span class="n">hazard_name</span><span class="p">,</span>
+                    <span class="n">list_disrupted_destinations</span><span class="p">,</span>
+                    <span class="n">pref_routes</span><span class="p">,</span>
+                    <span class="n">dest_name</span><span class="p">,</span>
+                    <span class="n">name_save</span><span class="p">,</span>
+                    <span class="n">optimal_routes</span><span class="p">,</span>
+                    <span class="n">origins</span><span class="p">,</span>
+                    <span class="n">base_graph</span><span class="p">,</span>
+                    <span class="n">destinations</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">_new_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">origins</span> <span class="o">=</span> <span class="n">_new_origins</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_nr_without_access</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">list_no_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">dest_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Remove the special edges</span>
+            <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">remove_edges_from</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">dest_name</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Remove the closest attribute from the nodes</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;closest&quot;</span> <span class="ow">in</span> <span class="n">nn</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">]:</span>
+                <span class="k">del</span> <span class="n">disrupted_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">o</span><span class="p">][</span><span class="s2">&quot;closest&quot;</span><span class="p">]</span>
+
+        <span class="n">optimal_routes_gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">optimal_routes</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">base_graph</span><span class="p">,</span>
+            <span class="n">origins</span><span class="p">,</span>
+            <span class="n">destinations</span><span class="p">,</span>
+            <span class="n">list_disrupted_destinations</span><span class="p">,</span>
+            <span class="n">optimal_routes_gdf</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.load_origins">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.load_origins">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_origins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">od_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+            <span class="s2">&quot;output_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;origin_destination_table.feather&quot;</span>
+        <span class="p">)</span>
+        <span class="n">od</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_feather</span><span class="p">(</span><span class="n">od_path</span><span class="p">)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">od</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
+        <span class="k">del</span> <span class="n">origin</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">origin</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.load_destinations">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.load_destinations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_destinations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">od_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+            <span class="s2">&quot;output_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;origin_destination_table.feather&quot;</span>
+        <span class="p">)</span>
+        <span class="n">od</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_feather</span><span class="p">(</span><span class="n">od_path</span><span class="p">)</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">od</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
+        <span class="k">del</span> <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">destination</span></div>
+
+
+<div class="viewcode-block" id="OriginClosestDestination.difference_length_with_without_hazard">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.origin_closest_destination.OriginClosestDestination.difference_length_with_without_hazard">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">difference_length_with_without_hazard</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">with_hazard</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">without_hazard</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">with_hazard</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="s2">&quot;lengthDisr&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">without_hazard</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="s2">&quot;lengthNorm&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">diff_length_bc_hazard</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">with_hazard</span><span class="p">,</span>
+            <span class="n">without_hazard</span><span class="p">[[</span><span class="s2">&quot;lengthNorm&quot;</span><span class="p">,</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;destination&quot;</span><span class="p">]],</span>
+            <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;destination&quot;</span><span class="p">],</span>
+            <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">diff_length_bc_hazard</span><span class="p">[</span><span class="s2">&quot;difference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">diff_length_bc_hazard</span><span class="p">[</span><span class="s2">&quot;lengthDisr&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="o">-</span> <span class="n">diff_length_bc_hazard</span><span class="p">[</span><span class="s2">&quot;lengthNorm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">diff_length_bc_hazard</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

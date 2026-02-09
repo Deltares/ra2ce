@@ -1,0 +1,931 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Manual Damage Curves Tutorial &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=4b0575c0" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_examples/damages_manual_curves';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Expected Annual Damage (EAD) Tutorial" href="damages_EAD.html" />
+    <link rel="prev" title="Reference Damage Curves Tutorial" href="damages_reference_damage_curves.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../showcases/index.html">Showcases</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/network.html">Network</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="network_from_shapefile.html">Network from shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="network_from_OSM.html">Network from OSM download</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/hazard.html">Hazard</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="hazard.html">Hazard Overlay</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/criticality.html">Criticality Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="criticality_single_link_redundancy.html">Single Link Redundancy Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="criticality_multi_link_redundancy.html">Multi Link Redundancy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/accessibility.html">Accessibility Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/accessibility.prepare_data_origin_destinations.html">Origins and Destinations Data Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_all_pairs_origin_destinations.html">Defined Origin–Destination Pairs Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_closest_origin_destinations.html">Origins to Closest Destinations Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../tutorials/damages.html">Damages Analysis</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="damages_reference_damage_curves.html">Reference Damage Curves Tutorial</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Manual Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="damages_EAD.html">Expected Annual Damage (EAD) Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/losses.html">Losses Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="losses_multi_link_redundancy_losses.html">Losses Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/adaptation.html">Adaptation Tutorial</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/equity.html">Equity Tutorial</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="accessibility_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Docstrings Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/network.html">ra2ce.network package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/analysis.html">ra2ce.analysis package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/ra2ce.handler.html">ra2ce.handler package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorials/damages.html" class="nav-link">Damages Analysis</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Manual...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Manual-Damage-Curves-Tutorial">
+<h1>Manual Damage Curves Tutorial<a class="headerlink" href="#Manual-Damage-Curves-Tutorial" title="Link to this heading">#</a></h1>
+<div class="line-block">
+<div class="line">This tutorial demonstrates how to perform a <strong>damage analysis using custom/manual damage curves</strong> in RA2CE.</div>
+<div class="line">Manual curves allow you to define site-specific or locally calibrated hazard–damage relationships rather than relying on generic reference curves.</div>
+</div>
+<p>This is particularly useful when:</p>
+<ul class="simple">
+<li><p>You have local historical damage data.</p></li>
+<li><p>You want to account for specific infrastructure types.</p></li>
+<li><p>You need to test alternative vulnerability scenarios.</p></li>
+</ul>
+<hr class="docutils" />
+<section id="Step-1:-Define-project-paths">
+<h2>Step 1: Define project paths<a class="headerlink" href="#Step-1:-Define-project-paths" title="Link to this heading">#</a></h2>
+<p>As usual, define your project folder and subdirectories:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;damage_manual&quot;</span><span class="p">)</span>
+<span class="n">static_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;static&quot;</span><span class="p">)</span>
+<span class="n">hazard_path</span> <span class="o">=</span> <span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;hazard&quot;</span><span class="p">)</span>
+<span class="n">network_path</span> <span class="o">=</span> <span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">)</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="Step-2:-Configure-the-road-network-and-hazard">
+<h2>Step 2: Configure the road network and hazard<a class="headerlink" href="#Step-2:-Configure-the-road-network-and-hazard" title="Link to this heading">#</a></h2>
+<div class="line-block">
+<div class="line">The network is downloaded from <strong>OpenStreetMap (OSM)</strong>, clipped to a region polygon (<code class="docutils literal notranslate"><span class="pre">polygon.geojson</span></code>).</div>
+<div class="line">We specify which <strong>road types</strong> should be included in the analysis.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.road_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoadTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.source_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.network_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkSection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.ra2ce_handler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ra2ceHandler</span>
+
+
+<span class="n">network_section</span> <span class="o">=</span> <span class="n">NetworkSection</span><span class="p">(</span>
+    <span class="n">network_type</span><span class="o">=</span><span class="n">NetworkTypeEnum</span><span class="o">.</span><span class="n">DRIVE</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">SourceEnum</span><span class="o">.</span><span class="n">OSM_DOWNLOAD</span><span class="p">,</span>
+    <span class="n">polygon</span><span class="o">=</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;polygon.geojson&quot;</span><span class="p">),</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">road_types</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">SECONDARY_LINK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY_LINK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">TRUNK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY_LINK</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong>: The damage analysis requires two attributes from the network file: highway (for the type of roads) and lanes (number of lanes). These attributes are present by default from OSM. Make sure these are also present if you are using your own shapefile.</p>
+</div></blockquote>
+<div class="line-block">
+<div class="line">We provide hazard input in the form of <strong>GeoTIFF raster files</strong> (e.g., flood depth maps).</div>
+<div class="line">RA2CE will overlay these rasters with the road network to compute hazard intensities for each asset.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.aggregate_wl_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateWlEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">HazardSection</span>
+
+<span class="n">hazard_section</span> <span class="o">=</span> <span class="n">HazardSection</span><span class="p">(</span>
+    <span class="n">hazard_map</span><span class="o">=</span><span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">hazard_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tif&quot;</span><span class="p">)],</span>
+    <span class="n">aggregate_wl</span><span class="o">=</span><span class="n">AggregateWlEnum</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>  <span class="c1"># mean water depth used in analysis</span>
+    <span class="n">hazard_crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>  <span class="c1"># ensure hazard map is in EPSG:4326 projection</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We combine the network and hazard information into a single configuration object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkConfigData</span>
+
+<span class="n">network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span>
+    <span class="n">root_path</span><span class="o">=</span><span class="n">root_dir</span><span class="p">,</span>
+    <span class="n">static_path</span><span class="o">=</span><span class="n">static_path</span><span class="p">,</span>
+    <span class="n">network</span><span class="o">=</span><span class="n">network_section</span><span class="p">,</span>
+    <span class="n">hazard</span><span class="o">=</span><span class="n">hazard_section</span>
+<span class="p">)</span>
+<span class="n">network_config_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">network_config_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">reuse_network_output</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<p>The network is segment by default into 100m segments. This can be modified using the attribute <code class="docutils literal notranslate"><span class="pre">segmentation_length</span></code> from <a class="reference external" href="../api/ra2ce.network.network_config_data.html#ra2ce.network.network_config_data.network_config_data.CleanupSection">CleanupSection</a>.</p>
+</section>
+<hr class="docutils" />
+<section id="Step-3:-Define-the-damage-analysis">
+<h2>Step 3: Define the damage analysis<a class="headerlink" href="#Step-3:-Define-the-damage-analysis" title="Link to this heading">#</a></h2>
+<p>Here, we specify that RA2CE should perform a <strong>damage analysis</strong> using <strong>manual damage curves (MAN)</strong> with the class <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages">AnalysisSectionDamages</a> and the attribute <code class="docutils literal notranslate"><span class="pre">damage_curve</span></code> set to <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.MAN">DamageCurveEnum.MAN</a> For manual damage
+curves, it is important to also specify the input data in the folder path in the config <code class="docutils literal notranslate"><span class="pre">input_path</span></code>. This is the location where the custom manual curves will be defined and placed (see next step).</p>
+<p>The event type can be set to EVENT if damages are to be calculated for the hazard maps only (example below), or to RETURN_PERIOD if the analysis should estimate risk over a specified return period (see tutorial ).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisSectionDamages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisDamagesEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.event_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.damage_curve_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">DamageCurveEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisConfigData</span>
+
+<span class="n">damages_analysis</span> <span class="o">=</span> <span class="p">[</span><span class="n">AnalysisSectionDamages</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;damages_reference_curve_manual&#39;</span><span class="p">,</span>
+    <span class="n">analysis</span><span class="o">=</span><span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">DAMAGES</span><span class="p">,</span>
+    <span class="n">event_type</span><span class="o">=</span><span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span>
+    <span class="n">damage_curve</span><span class="o">=</span><span class="n">DamageCurveEnum</span><span class="o">.</span><span class="n">MAN</span><span class="p">,</span>  <span class="c1"># use manual damage curve</span>
+    <span class="n">save_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)]</span>
+
+<span class="n">analysis_config_data</span> <span class="o">=</span> <span class="n">AnalysisConfigData</span><span class="p">(</span>
+    <span class="n">analyses</span><span class="o">=</span><span class="n">damages_analysis</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span>
+    <span class="n">input_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_data&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="Step-4:-Create-damage-curve-files">
+<h2>Step 4: Create damage curve files<a class="headerlink" href="#Step-4:-Create-damage-curve-files" title="Link to this heading">#</a></h2>
+<p>In the manual situation, two input files are expected:</p>
+<ol class="arabic simple">
+<li><p>A file that specifies the <strong>shape of the vulnerability curve</strong>:</p>
+<ul class="simple">
+<li><p>x-axis = hazard intensity (e.g. water depth in cm)</p></li>
+<li><p>y-axis = damage fraction (0–1, representing the % of total construction cost)</p></li>
+</ul>
+</li>
+<li><p>A file that specifies the <strong>construction costs</strong> per road type and number of lanes.</p></li>
+</ol>
+<p>Both files should be placed in the folder <code class="docutils literal notranslate"><span class="pre">input_data/damage_functions/all_road_types/</span></code>.</p>
+<section id="Vulnerability-curve-(hazard-severity-vs.-damage-fraction)">
+<h3>Vulnerability curve (hazard severity vs. damage fraction)<a class="headerlink" href="#Vulnerability-curve-(hazard-severity-vs.-damage-fraction)" title="Link to this heading">#</a></h3>
+<p>The file <code class="docutils literal notranslate"><span class="pre">hazard_severity_damage_fraction.csv</span></code> looks like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>depth;damage
+cm;% of total construction costs
+0;0
+100;0.1
+200;0.2
+400;0.4
+800;0.8
+12000;1
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code> = water depth in <strong>cm</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">damage</span></code> = damage fraction (0–1, relative to construction cost)</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">input_data_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_data&quot;</span><span class="p">)</span>
+<span class="n">vuln_curves</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">input_data_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;damage_functions&quot;</span><span class="p">,</span> <span class="s2">&quot;all_road_types&quot;</span><span class="p">,</span><span class="s2">&quot;hazard_severity_damage_fraction.csv&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">],</span> <span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;damage&quot;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Depth [cm]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Damage fraction&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Manual vulnerability curve&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p><img alt="Manual vulnerability curve" src="../_images/manual_vuln_curve.png" /></p>
+</section>
+<section id="Maximum-construction-costs-per-road-type-and-lanes">
+<h3>Maximum construction costs per road type and lanes<a class="headerlink" href="#Maximum-construction-costs-per-road-type-and-lanes" title="Link to this heading">#</a></h3>
+<p>The file <code class="docutils literal notranslate"><span class="pre">max_damage_road_types.csv</span></code> looks like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Road_type \ lanes;1;2;3;4;5;6;7;8
+unit;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m
+tertiary_link;110;120;130;140;150;130;140;150
+tertiary;110;120;130;140;150;130;140;150
+trunk;110;120;130;140;150;130;140;150
+trunk_link;110;120;130;140;150;130;140;150
+secondary_link;11;12;13;14;15;13;14;15
+secondary;11;12;13;14;15;13;14;15
+primary_link;11;12;13;14;15;13;14;15
+primary;11;12;13;14;15;13;14;15
+residential;1100;1200;1300;1400;1500;1300;1400;1500
+[&#39;tertiary&#39;, &#39;residential&#39;];510;520;530;540;550;530;540;550
+motorway;1100;1200;1300;1400;1500;1300;1400;1500
+motorway_link;510;520;530;540;550;530;540;550
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong></p>
+<ul class="simple">
+<li><p>The <em>first file</em> defines the shape of the damage curve (hazard → damage fraction).</p></li>
+<li><p>The <em>second file</em> defines the maximum construction costs per road type and lane count.</p></li>
+<li><p>Together, they allow RA2CE to estimate damages in absolute currency units.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="Step-5:-Run-the-analysis">
+<h2>Step 5: Run the analysis<a class="headerlink" href="#Step-5:-Run-the-analysis" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Ra2ceHandler</span><span class="o">.</span><span class="n">run_with_config_data</span><span class="p">(</span><span class="n">network_config_data</span><span class="p">,</span> <span class="n">analysis_config_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="Output">
+<h2>Output<a class="headerlink" href="#Output" title="Link to this heading">#</a></h2>
+<p>The results of the manual damage analysis are provided in <strong>two GeoPackage (GPKG) files</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">damages_reference_curve_manual_link_based.gpkg</span></code>: damage estimates per <strong>network link</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">damages_reference_curve_manual_segment.gpkg</span></code>: damage estimates per <strong>100m segment</strong></p></li>
+</ul>
+<p>Key attributes of interest (in currency):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dam_EV1_al</span></code> : estimated damage for the first flood map (manual method).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dam_EV2_al</span></code> : estimated damage for the second flood map (manual method).</p></li>
+</ul>
+<p>You can open these files in GIS software (QGIS, ArcGIS) or load them in Python with GeoPandas:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;output&quot;</span> <span class="o">/</span> <span class="s1">&#39;damages&#39;</span>
+<span class="n">link_based</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;damages_reference_curve_manual_link_based.gpkg&quot;</span><span class="p">)</span>
+<span class="n">segment_based</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;damages_reference_curve_manual_segmented.gpkg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Inspect the first rows</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">link_based</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">segment_based</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<p>You can open the results in GIS software to visualize which road segments are most affected by the hazard.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="damages_reference_damage_curves.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Reference Damage Curves Tutorial</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="damages_EAD.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Expected Annual Damage (EAD) Tutorial</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-1:-Define-project-paths">Step 1: Define project paths</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-2:-Configure-the-road-network-and-hazard">Step 2: Configure the road network and hazard</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-3:-Define-the-damage-analysis">Step 3: Define the damage analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-4:-Create-damage-curve-files">Step 4: Create damage curve files</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Vulnerability-curve-(hazard-severity-vs.-damage-fraction)">Vulnerability curve (hazard severity vs. damage fraction)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Maximum-construction-costs-per-road-type-and-lanes">Maximum construction costs per road type and lanes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-5:-Run-the-analysis">Step 5: Run the analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Output">Output</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/_examples/damages_manual_curves.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_examples/damages_manual_curves.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

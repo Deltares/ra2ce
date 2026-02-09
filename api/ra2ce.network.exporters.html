@@ -1,0 +1,987 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ra2ce.network.exporters package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.network.exporters';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-network-exporters-package">
+<h1>ra2ce.network.exporters package<a class="headerlink" href="#ra2ce-network-exporters-package" title="Link to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.network.exporters.geodataframe_network_exporter">
+<span id="ra2ce-network-exporters-geodataframe-network-exporter-module"></span><h2>ra2ce.network.exporters.geodataframe_network_exporter module<a class="headerlink" href="#module-ra2ce.network.exporters.geodataframe_network_exporter" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeoDataFrameNetworkExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_types=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickle_path=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/geodataframe_network_exporter.html#GeoDataFrameNetworkExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase" title="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkExporterBase</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basename</strong> (<em>str</em>)</p></li>
+<li><p><strong>export_types</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>pickle_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_gpkg">
+<span class="sig-name descname"><span class="pre">export_to_gpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/geodataframe_network_exporter.html#GeoDataFrameNetworkExporter.export_to_gpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_gpkg" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.gpkg</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>GeoDataFrame</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_pickle">
+<span class="sig-name descname"><span class="pre">export_to_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/geodataframe_network_exporter.html#GeoDataFrameNetworkExporter.export_to_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_pickle" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.p</cite> or <cite>.feather</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>GeoDataFrame</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.exporters.json_exporter">
+<span id="ra2ce-network-exporters-json-exporter-module"></span><h2>ra2ce.network.exporters.json_exporter module<a class="headerlink" href="#module-ra2ce.network.exporters.json_exporter" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.json_exporter.JsonExporter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JsonExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/json_exporter.html#JsonExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.json_exporter.JsonExporter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.io.writers.html#ra2ce.common.io.writers.ra2ce_exporter_protocol.Ra2ceExporterProtocol" title="ra2ce.common.io.writers.ra2ce_exporter_protocol.Ra2ceExporterProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceExporterProtocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.json_exporter.JsonExporter.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/json_exporter.html#JsonExporter.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.json_exporter.JsonExporter.export" title="Link to this definition">#</a></dt>
+<dd><p>Exports into JSON the given data at the given path. When the parent(s) directory does not exist then it will be created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>export_path</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>export_path (Path): File path where to store the final ‘json’ file.
+export_data (Any): Data to export.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.exporters.multi_graph_network_exporter">
+<span id="ra2ce-network-exporters-multi-graph-network-exporter-module"></span><h2>ra2ce.network.exporters.multi_graph_network_exporter module<a class="headerlink" href="#module-ra2ce.network.exporters.multi_graph_network_exporter" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiGraphNetworkExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_types=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickle_path=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/multi_graph_network_exporter.html#MultiGraphNetworkExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase" title="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkExporterBase</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basename</strong> (<em>str</em>)</p></li>
+<li><p><strong>export_types</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>pickle_path</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_gpkg">
+<span class="sig-name descname"><span class="pre">export_to_gpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/multi_graph_network_exporter.html#MultiGraphNetworkExporter.export_to_gpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_gpkg" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.gpkg</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_pickle">
+<span class="sig-name descname"><span class="pre">export_to_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/multi_graph_network_exporter.html#MultiGraphNetworkExporter.export_to_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_pickle" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.p</cite> or <cite>.feather</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.exporters.network_exporter_base">
+<span id="ra2ce-network-exporters-network-exporter-base-module"></span><h2>ra2ce.network.exporters.network_exporter_base module<a class="headerlink" href="#module-ra2ce.network.exporters.network_exporter_base" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkExporterBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_types=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickle_path=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_base.html#NetworkExporterBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.io.writers.html#ra2ce.common.io.writers.ra2ce_exporter_protocol.Ra2ceExporterProtocol" title="ra2ce.common.io.writers.ra2ce_exporter_protocol.Ra2ceExporterProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceExporterProtocol</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basename</strong> (<em>str</em>)</p></li>
+<li><p><strong>export_types</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>pickle_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.basename" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_base.html#NetworkExporterBase.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data to the specified types.
+TODO: I do not particularly like this approach, but at least gives better clarity on what the export options at the moment are.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>export_path</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>GeoDataFrame</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>export_path (Path): Path to the output directory where to export the data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_gpkg">
+<span class="sig-name descname"><span class="pre">export_to_gpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_base.html#NetworkExporterBase.export_to_gpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_gpkg" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.gpkg</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>GeoDataFrame</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_pickle">
+<span class="sig-name descname"><span class="pre">export_to_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_base.html#NetworkExporterBase.export_to_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_pickle" title="Link to this definition">#</a></dt>
+<dd><p>Exports the given data into a <cite>*.p</cite> or <cite>.feather</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_data</strong> (<em>GeoDataFrame</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_dir (Path): Output directory where the save the exported data.
+export_data (NETWORK_TYPE): Data that needs to be exported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_types">
+<span class="sig-name descname"><span class="pre">export_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_types" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.pickle_path">
+<span class="sig-name descname"><span class="pre">pickle_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.pickle_path" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.exporters.network_exporter_factory">
+<span id="ra2ce-network-exporters-network-exporter-factory-module"></span><h2>ra2ce.network.exporters.network_exporter_factory module<a class="headerlink" href="#module-ra2ce.network.exporters.network_exporter_factory" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkExporterFactory</span></span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_factory.html#NetworkExporterFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_factory.html#NetworkExporterFactory.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.export" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>network</strong> (<em>GeoDataFrame</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>basename</strong> (<em>str</em>)</p></li>
+<li><p><strong>output_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>export_types</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_exporter_type">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_exporter_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_factory.html#NetworkExporterFactory.get_exporter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_exporter_type" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<a class="reference internal" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase" title="ra2ce.network.exporters.network_exporter_base.NetworkExporterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkExporterBase</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>network</strong> (<em>GeoDataFrame</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_pickle_path">
+<span class="sig-name descname"><span class="pre">get_pickle_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/exporters/network_exporter_factory.html#NetworkExporterFactory.get_pickle_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_pickle_path" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.exporters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.network.exporters" title="Link to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters.geodataframe_network_exporter">ra2ce.network.exporters.geodataframe_network_exporter module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter"><code class="docutils literal notranslate"><span class="pre">GeoDataFrameNetworkExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_gpkg"><code class="docutils literal notranslate"><span class="pre">GeoDataFrameNetworkExporter.export_to_gpkg()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.geodataframe_network_exporter.GeoDataFrameNetworkExporter.export_to_pickle"><code class="docutils literal notranslate"><span class="pre">GeoDataFrameNetworkExporter.export_to_pickle()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters.json_exporter">ra2ce.network.exporters.json_exporter module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.json_exporter.JsonExporter"><code class="docutils literal notranslate"><span class="pre">JsonExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.json_exporter.JsonExporter.export"><code class="docutils literal notranslate"><span class="pre">JsonExporter.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters.multi_graph_network_exporter">ra2ce.network.exporters.multi_graph_network_exporter module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter"><code class="docutils literal notranslate"><span class="pre">MultiGraphNetworkExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_gpkg"><code class="docutils literal notranslate"><span class="pre">MultiGraphNetworkExporter.export_to_gpkg()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.multi_graph_network_exporter.MultiGraphNetworkExporter.export_to_pickle"><code class="docutils literal notranslate"><span class="pre">MultiGraphNetworkExporter.export_to_pickle()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters.network_exporter_base">ra2ce.network.exporters.network_exporter_base module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.basename"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.basename</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.export()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_gpkg"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.export_to_gpkg()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_to_pickle"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.export_to_pickle()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.export_types"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.export_types</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_base.NetworkExporterBase.pickle_path"><code class="docutils literal notranslate"><span class="pre">NetworkExporterBase.pickle_path</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters.network_exporter_factory">ra2ce.network.exporters.network_exporter_factory module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory"><code class="docutils literal notranslate"><span class="pre">NetworkExporterFactory</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.export"><code class="docutils literal notranslate"><span class="pre">NetworkExporterFactory.export()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_exporter_type"><code class="docutils literal notranslate"><span class="pre">NetworkExporterFactory.get_exporter_type()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.exporters.network_exporter_factory.NetworkExporterFactory.get_pickle_path"><code class="docutils literal notranslate"><span class="pre">NetworkExporterFactory.get_pickle_path()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.exporters">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.network.exporters.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.network.exporters.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

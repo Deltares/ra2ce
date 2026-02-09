@@ -1,0 +1,1298 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.network.network_simplification.snkit_network_merge_wrapper &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/network/network_simplification/snkit_network_merge_wrapper';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.network.network_simplification.snkit_network_merge_wrapper</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023-2026 Stichting Deltares</span>
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiGraph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">MultiLineString</span><span class="p">,</span> <span class="n">MultiPoint</span><span class="p">,</span> <span class="n">Point</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">linemerge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">snkit.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span> <span class="k">as</span> <span class="n">SnkitNetwork</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">NxGraph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span> <span class="o">|</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiDiGraph</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Disclaimer!</span>
+
+<span class="sd">This file contains several complex logic introduced in feature #277.</span>
+<span class="sd">At the moment it was not possible to streamline / improve it further than</span>
+<span class="sd">its current state.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="merge_edges">
+<a class="viewcode-back" href="../../../../api/ra2ce.network.network_simplification.html#ra2ce.network.network_simplification.snkit_network_merge_wrapper.merge_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_edges</span><span class="p">(</span>
+    <span class="n">snkit_network</span><span class="p">:</span> <span class="n">SnkitNetwork</span><span class="p">,</span>
+    <span class="n">networkx_graph</span><span class="p">:</span> <span class="n">NxGraph</span><span class="p">,</span>
+    <span class="n">aggregate_func</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">id_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SnkitNetwork</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges the edges of a given `snkit.network.Network`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        snkit_network (SnkitNetwork): network to merge.</span>
+<span class="sd">        networkx_graph (NxGraph): networkx graph to merge</span>
+<span class="sd">        aggregate_func (str | dict): Aggregation function to apply.</span>
+<span class="sd">        by (str | list): Arguments (column names).</span>
+<span class="sd">        id_col (str, optional): Name of the column representing the &#39;id&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SnkitNetwork: _description_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_connectivity_degree</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">snkit_network</span><span class="p">:</span> <span class="n">SnkitNetwork</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">from_id</span> <span class="o">==</span> <span class="n">node</span><span class="p">)</span>
+                <span class="o">|</span> <span class="p">(</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">to_id</span> <span class="o">==</span> <span class="n">node</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_edge_ids_to_update</span><span class="p">(</span><span class="n">edges_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">ids_to_update</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">edges</span> <span class="ow">in</span> <span class="n">edges_list</span><span class="p">:</span>
+            <span class="n">ids_to_update</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">edges</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">ids_to_update</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_merged_edges</span><span class="p">(</span>
+        <span class="n">paths_to_group</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">by</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">net</span><span class="p">:</span> <span class="n">SnkitNetwork</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">updated_edges</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">crs</span>
+        <span class="p">)</span>  <span class="c1"># merged edges</span>
+
+        <span class="k">for</span> <span class="n">edge_path</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">paths_to_group</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;merge_edge_paths&quot;</span><span class="p">):</span>
+            <span class="c1"># Convert None values to a placeholder value</span>
+            <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">by</span><span class="p">:</span>
+                <span class="n">edge_path</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_path</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
+            <span class="n">merged_edges</span> <span class="o">=</span> <span class="n">_get_merge_edge_paths</span><span class="p">(</span><span class="n">edge_path</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">aggfunc</span><span class="p">,</span> <span class="n">net</span><span class="p">)</span>
+            <span class="n">updated_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">updated_edges</span><span class="p">,</span> <span class="n">merged_edges</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">updated_edges_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">updated_edges</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+        <span class="n">updated_edges_gdf</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">updated_edges_gdf</span> <span class="o">=</span> <span class="n">updated_edges_gdf</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">updated_edges_gdf</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_node</span><span class="p">(</span><span class="n">_node_set</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">_degrees</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
+        <span class="n">_filtered</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_node_id</span> <span class="ow">in</span> <span class="n">_node_set</span><span class="p">:</span>
+            <span class="c1"># Get the predecessors (antecedents) and successors (precedents) to make sure for to filter correctly</span>
+            <span class="c1"># For _node_set with all degree 2: this filters on the nodes that have only one predecessor and successor.</span>
+            <span class="c1"># E.g. filters on 2 in 1-&gt;2, 1-&gt;5, 2-&gt;3, 3-&gt;4, 3-&gt;5</span>
+            <span class="c1"># For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.</span>
+            <span class="c1"># E.g. filters on 2 in 1-&gt;2, 2-&gt;3, 2-&gt;1, 3-&gt;2.</span>
+            <span class="n">predecessors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">networkx_graph</span><span class="o">.</span><span class="n">predecessors</span><span class="p">(</span><span class="n">_node_id</span><span class="p">))</span>
+            <span class="n">successors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">networkx_graph</span><span class="o">.</span><span class="n">successors</span><span class="p">(</span><span class="n">_node_id</span><span class="p">))</span>
+
+            <span class="c1"># Check the degree of the _node_set and the corresponding criterium.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">_degrees</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">predecessors</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">successors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">_degrees</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">predecessors</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">successors</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">_filtered</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_node_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_filtered</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_edge_paths</span><span class="p">(</span><span class="n">node_set</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">_snkit_network</span><span class="p">:</span> <span class="n">SnkitNetwork</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_adjacency_list</span><span class="p">(</span>
+            <span class="n">edges_gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">from_id_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">to_id_column</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">:</span>
+            <span class="c1"># Convert the edges of a GeoDataFrame to an adjacency list using vectorized operations.</span>
+            <span class="n">_edge_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+            <span class="c1"># Extract the &#39;from_id&#39; and &#39;to_id&#39; columns as numpy arrays for efficient processing</span>
+            <span class="n">from_ids</span> <span class="o">=</span> <span class="n">edges_gdf</span><span class="p">[</span><span class="n">from_id_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">to_ids</span> <span class="o">=</span> <span class="n">edges_gdf</span><span class="p">[</span><span class="n">to_id_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="c1"># Vectorized operation to populate the adjacency list</span>
+            <span class="k">for</span> <span class="n">from_id</span><span class="p">,</span> <span class="n">to_id</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">([</span><span class="n">from_ids</span><span class="p">,</span> <span class="n">to_ids</span><span class="p">]):</span>
+                <span class="n">_edge_dict</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">from_id</span><span class="p">)]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">to_id</span><span class="p">))</span>
+                <span class="n">_edge_dict</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">to_id</span><span class="p">)]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">from_id</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="n">_edge_dict</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_edge</span><span class="p">(</span><span class="n">node1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">node2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Retrieve the edge from snkit_network.edges GeoDataFrame between two nodes.&quot;&quot;&quot;</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;from_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">node1</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;to_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">node2</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">return</span> <span class="n">edge</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">edge</span><span class="o">.</span><span class="n">empty</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">construct_path</span><span class="p">(</span>
+            <span class="n">start_node</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">end_node</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">intermediate_nodes</span><span class="p">:</span> <span class="nb">list</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">current_node</span> <span class="o">=</span> <span class="n">start_node</span>
+            <span class="n">_intermediates</span> <span class="o">=</span> <span class="n">intermediate_nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="n">_explored_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Ensure we go through all the items.</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">intermediate_nodes</span><span class="p">)):</span>
+                <span class="c1"># Filter out nodes already used for edge retrieval</span>
+                <span class="n">_to_explore</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_explored_nodes</span><span class="p">,</span> <span class="n">intermediate_nodes</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">_next_node</span> <span class="ow">in</span> <span class="n">_to_explore</span><span class="p">:</span>
+                    <span class="n">_edge</span> <span class="o">=</span> <span class="n">retrieve_edge</span><span class="p">(</span><span class="n">current_node</span><span class="p">,</span> <span class="n">_next_node</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_edge</span><span class="p">)</span>
+                        <span class="n">_explored_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_next_node</span><span class="p">)</span>
+                        <span class="n">current_node</span> <span class="o">=</span> <span class="n">_next_node</span>
+
+            <span class="n">final_edge</span> <span class="o">=</span> <span class="n">retrieve_edge</span><span class="p">(</span><span class="n">current_node</span><span class="p">,</span> <span class="n">end_node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">final_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_edge</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>  <span class="c1"># Combine edges into a single GeoDataFrame</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">find_and_append_degree_4_paths</span><span class="p">(</span><span class="n">_edge_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">_edge_paths_results</span> <span class="o">=</span> <span class="n">_edge_paths</span>
+            <span class="n">boundary_nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">node_path</span> <span class="o">-</span> <span class="n">filtered_degree_4_set</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">boundary_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">from_node</span><span class="p">,</span> <span class="n">to_node</span> <span class="o">=</span> <span class="n">boundary_nodes</span>
+                <span class="n">_intermediates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">node_path</span> <span class="o">&amp;</span> <span class="n">filtered_degree_4_set</span><span class="p">)</span>
+
+                <span class="c1"># Construct and append the forward path</span>
+                <span class="n">forward_gdf</span> <span class="o">=</span> <span class="n">construct_path</span><span class="p">(</span><span class="n">from_node</span><span class="p">,</span> <span class="n">to_node</span><span class="p">,</span> <span class="n">_intermediates</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">forward_gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_edge_paths_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">forward_gdf</span><span class="p">)</span>
+
+                <span class="c1"># Construct and append the backward path</span>
+                <span class="n">backward_gdf</span> <span class="o">=</span> <span class="n">construct_path</span><span class="p">(</span><span class="n">to_node</span><span class="p">,</span> <span class="n">from_node</span><span class="p">,</span> <span class="n">_intermediates</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">backward_gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_edge_paths_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">backward_gdf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_edge_paths_results</span>
+
+        <span class="c1"># Convert edges to an adjacency list using vectorized operations</span>
+        <span class="n">edge_dict</span> <span class="o">=</span> <span class="n">get_adjacency_list</span><span class="p">(</span>
+            <span class="n">edges_gdf</span><span class="o">=</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">,</span>
+            <span class="n">from_id_column</span><span class="o">=</span><span class="s2">&quot;from_id&quot;</span><span class="p">,</span>
+            <span class="n">to_id_column</span><span class="o">=</span><span class="s2">&quot;to_id&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_edge_paths</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># find the edge paths for the nodes in node_set</span>
+        <span class="k">while</span> <span class="n">node_set</span><span class="p">:</span>
+            <span class="c1"># for each node in node_set find other nodes on the path</span>
+            <span class="n">intermediates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">popped_node</span> <span class="o">=</span> <span class="n">node_set</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="c1"># intermediates are the nodes in the node_path that are between two other nodes in the path</span>
+            <span class="n">intermediates</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">popped_node</span><span class="p">)</span>
+            <span class="n">node_path</span> <span class="o">=</span> <span class="p">{</span><span class="n">popped_node</span><span class="p">}</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="p">{</span><span class="n">popped_node</span><span class="p">}</span>
+            <span class="k">while</span> <span class="n">candidates</span><span class="p">:</span>
+                <span class="n">popped_cand</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="c1"># matches are the nodes that belong to a node_path</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">edge_dict</span><span class="p">[</span><span class="n">popped_cand</span><span class="p">]</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">matches</span> <span class="o">-</span> <span class="n">node_path</span>
+                <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+                    <span class="n">intermediates</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">popped_cand</span><span class="p">)</span>
+                    <span class="c1"># if the found node on the path is in the node_set, then keep looking for other connected nodes on</span>
+                    <span class="c1"># the path</span>
+                    <span class="k">if</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">:</span>
+                        <span class="n">candidates</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                        <span class="n">node_path</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                        <span class="n">node_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                    <span class="c1"># If the found node is not in node_set stop.</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">node_path</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+            <span class="c1"># After finding all nodes on a path find the edges that are connected to these nodes.</span>
+            <span class="c1"># Finding the edges is different for the nodes in the node path with degree 2 and 4.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_path</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">node_path</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">filtered_degree_4_set</span><span class="p">)):</span>
+                    <span class="c1"># node_path has nodes with degree 4 =&gt; get the forward and backward paths</span>
+                    <span class="n">_edge_paths</span> <span class="o">=</span> <span class="n">find_and_append_degree_4_paths</span><span class="p">(</span><span class="n">_edge_paths</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># node_path has nodes with degree 2 =&gt; find the edges connected to the intermediates</span>
+                    <span class="n">edge_paths_gdf</span> <span class="o">=</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span>
+                        <span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">intermediates</span><span class="p">)</span>
+                        <span class="o">|</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">intermediates</span><span class="p">)</span>
+                    <span class="p">]</span>
+                    <span class="n">_edge_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge_paths_gdf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_edge_paths</span>
+
+    <span class="c1"># Adds degree column which is needed to find the to-be-simplified nodes and edges.</span>
+    <span class="k">if</span> <span class="s2">&quot;degree&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">id_col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">node_connectivity_degree</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">snkit_network</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Filter on the nodes with degree 2 and 4 which suffice the following criteria:</span>
+    <span class="c1"># For _node_set with all degree 2: this filters on the nodes that have only one predecessor and successor.</span>
+    <span class="c1"># E.g. filters on 2 in 1-&gt;2, 1-&gt;5, 2-&gt;3, 3-&gt;4, 3-&gt;5</span>
+    <span class="c1"># For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.</span>
+    <span class="c1"># E.g. filters on 2 in 1-&gt;2, 2-&gt;3, 2-&gt;1, 3-&gt;2.</span>
+    <span class="n">degree_2_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">id_col</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">filtered_degree_2_set</span> <span class="o">=</span> <span class="n">filter_node</span><span class="p">(</span><span class="n">degree_2_set</span><span class="p">,</span> <span class="n">_degrees</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">degree_4_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">id_col</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">4</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">filtered_degree_4_set</span> <span class="o">=</span> <span class="n">filter_node</span><span class="p">(</span><span class="n">degree_4_set</span><span class="p">,</span> <span class="n">_degrees</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">nodes_of_interest</span> <span class="o">=</span> <span class="n">filtered_degree_2_set</span> <span class="o">|</span> <span class="n">filtered_degree_4_set</span>
+
+    <span class="n">edge_paths</span> <span class="o">=</span> <span class="n">get_edge_paths</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">nodes_of_interest</span><span class="p">),</span> <span class="n">snkit_network</span><span class="p">)</span>
+
+    <span class="n">edge_ids_to_update</span> <span class="o">=</span> <span class="n">get_edge_ids_to_update</span><span class="p">(</span><span class="n">edge_paths</span><span class="p">)</span>
+    <span class="n">edges_to_keep</span> <span class="o">=</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span>
+        <span class="o">~</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">edge_ids_to_update</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">updated_edges</span> <span class="o">=</span> <span class="n">get_merged_edges</span><span class="p">(</span>
+        <span class="n">paths_to_group</span><span class="o">=</span><span class="n">edge_paths</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="n">aggregate_func</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">snkit_network</span>
+    <span class="p">)</span>
+    <span class="n">edges_to_keep</span> <span class="o">=</span> <span class="n">edges_to_keep</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+    <span class="n">updated_edges</span> <span class="o">=</span> <span class="n">updated_edges</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">new_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">edges_to_keep</span><span class="p">,</span> <span class="n">updated_edges</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">new_edges_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+    <span class="n">new_edges_gdf</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">edges_to_keep</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">new_edges_gdf</span> <span class="o">=</span> <span class="n">new_edges_gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">nodes_to_keep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">new_edges</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="n">new_edges</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+    <span class="n">new_nodes_gdf</span> <span class="o">=</span> <span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">id_col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">nodes_to_keep</span><span class="p">)]</span>
+    <span class="n">new_nodes_gdf</span> <span class="o">=</span> <span class="n">new_nodes_gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">merged_snkit_network</span> <span class="o">=</span> <span class="n">SnkitNetwork</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">new_nodes_gdf</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="n">new_edges_gdf</span><span class="p">)</span>
+    <span class="n">merged_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">id_col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">node_connectivity_degree</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">merged_snkit_network</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">merged_snkit_network</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_connected_lines</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">by</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge connected lines in a GeoDataFrame into a single LineString.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    gdf (gpd.GeoDataFrame): GeoDataFrame containing the lines to merge.</span>
+<span class="sd">    by (str): Column name to group by.</span>
+<span class="sd">    aggfunc (dict): Dictionary of aggregation functions for other columns.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    gpd.GeoDataFrame: GeoDataFrame with merged lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Merge all geometries into a single MultiLineString</span>
+    <span class="n">merged_geometry</span> <span class="o">=</span> <span class="n">linemerge</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">by</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Create a new GeoDataFrame with the merged geometry</span>
+    <span class="n">merged_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="p">[{</span><span class="o">**</span><span class="n">indices</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">merged_geometry</span><span class="p">}],</span> <span class="n">crs</span><span class="o">=</span><span class="n">gdf</span><span class="o">.</span><span class="n">crs</span>
+    <span class="p">)</span>
+    <span class="n">merged_gdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Combine the attributes using the aggregation function</span>
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">aggfunc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span>
+            <span class="c1"># Try to convert the column to float if needed</span>
+            <span class="k">if</span> <span class="n">gdf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>  <span class="c1"># Skip conversion if it fails</span>
+            <span class="n">merged_gdf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="p">(</span><span class="n">gdf</span><span class="p">[</span><span class="n">col</span><span class="p">])]</span>
+
+    <span class="k">return</span> <span class="n">merged_gdf</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_merge_edge_paths</span><span class="p">(</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="n">excluded_edge_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">aggfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">snkit_network</span><span class="p">:</span> <span class="n">SnkitNetwork</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_connected_lines</span><span class="p">(</span><span class="n">ids</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find groups of connected lines in a GeoDataFrame.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        gdf (GeoDataFrame): A GeoDataFrame containing LINESTRING geometries.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        list of lists: Each sublist contains indices of lines in gdf that are connected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialize an empty graph</span>
+        <span class="n">_networkx_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="c1"># Add edges to the graph for each line in the GeoDataFrame</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="c1"># Get the start and end points of the line</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+            <span class="n">start_point</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">end_point</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Add the line as an edge between its start and end points with the id as attribute</span>
+            <span class="n">_networkx_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Find connected components in the graph</span>
+        <span class="n">connected_components</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">_networkx_graph</span><span class="p">))</span>
+
+        <span class="c1"># Map each component to the corresponding line ids</span>
+        <span class="n">connected_line_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">connected_components</span><span class="p">:</span>
+            <span class="n">line_ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">_networkx_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">line_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+            <span class="n">connected_line_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_ids</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">connected_line_groups</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_paths_to_merge</span><span class="p">(</span><span class="n">groups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">_paths_to_merge</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of gpds to merge</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">edge_group_ids</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">sub_path_parts</span> <span class="o">=</span> <span class="n">get_connected_lines</span><span class="p">(</span><span class="n">edge_group_ids</span><span class="p">)</span>
+            <span class="n">_paths_to_merge</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sub_path_parts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_paths_to_merge</span>
+
+    <span class="c1"># _get_merged_paths starts here</span>
+    <span class="n">grouped_edges</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">excluded_edge_types</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped_edges</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">merged_edges</span> <span class="o">=</span> <span class="n">GdfSnkitNetworkMerger</span><span class="p">(</span>
+            <span class="n">geo_dataframe</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">snkit_network</span><span class="o">=</span><span class="n">snkit_network</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">by</span><span class="o">=</span><span class="n">excluded_edge_types</span><span class="p">,</span>
+            <span class="n">aggregate_func</span><span class="o">=</span><span class="n">aggfunc</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">merged_edges</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="n">edges</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">edges</span><span class="o">.</span><span class="n">crs</span>
+        <span class="p">)</span>  <span class="c1"># merged edges</span>
+        <span class="n">edge_groups</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">excluded_edge_types</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span>
+        <span class="n">paths_to_merge</span> <span class="o">=</span> <span class="n">_get_paths_to_merge</span><span class="p">(</span><span class="n">edge_groups</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">path_ids</span> <span class="ow">in</span> <span class="n">paths_to_merge</span><span class="p">:</span>
+            <span class="n">path_to_merge</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span>
+                <span class="n">edges</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">path_ids</span><span class="p">)</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># indices of the edges in edges gdf</span>
+            <span class="n">merged</span> <span class="o">=</span> <span class="n">GdfSnkitNetworkMerger</span><span class="p">(</span>
+                <span class="n">geo_dataframe</span><span class="o">=</span><span class="n">path_to_merge</span><span class="p">,</span> <span class="n">snkit_network</span><span class="o">=</span><span class="n">snkit_network</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">excluded_edge_types</span><span class="p">,</span>
+                <span class="n">aggregate_func</span><span class="o">=</span><span class="n">aggfunc</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">merged_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">merged_edges</span><span class="p">,</span> <span class="n">merged</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">merged_edges</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">crs</span>
+
+    <span class="k">return</span> <span class="n">merged_edges</span>
+
+
+<div class="viewcode-block" id="GdfSnkitNetworkMerger">
+<a class="viewcode-back" href="../../../../api/ra2ce.network.network_simplification.html#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GdfSnkitNetworkMerger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merger of a `gpd.GeoDataFrame` and a `snkit.network.network`.</span>
+<span class="sd">    This class was created to contain the related close and try reducing the code&#39;s complexity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">geo_dataframe</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">snkit_network</span><span class="p">:</span> <span class="n">SnkitNetwork</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geo_dataframe</span> <span class="o">=</span> <span class="n">geo_dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span> <span class="o">=</span> <span class="n">snkit_network</span>
+
+<div class="viewcode-block" id="GdfSnkitNetworkMerger.merge">
+<a class="viewcode-back" href="../../../../api/ra2ce.network.network_simplification.html#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger.merge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">by</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">aggregate_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges the inner defined `gpd.GeoDataFrame` and `snkit.network.Network`</span>
+<span class="sd">        based on the given arguments (`by`) and aggregation function ()`aggregate_func`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_geo_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo_dataframe</span>
+        <span class="n">_snkit_network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span>
+        <span class="c1"># _merge function starts from here:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;intersections&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_intersections</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_geo_dataframe</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="c1"># _merged = gdf.dissolve(by=by, aggfunc=_aggfunc, sort=False)</span>
+        <span class="n">_merged</span> <span class="o">=</span> <span class="n">_merge_connected_lines</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">aggregate_func</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># 1. no merging is occurring</span>
+            <span class="n">start_path_extremities</span> <span class="o">=</span> <span class="p">[</span><span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;from_id&quot;</span><span class="p">]]</span>
+            <span class="n">end_path_extremities</span> <span class="o">=</span> <span class="p">[</span><span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;to_id&quot;</span><span class="p">]]</span>
+            <span class="n">_merged</span><span class="o">.</span><span class="n">from_id</span> <span class="o">=</span> <span class="n">start_path_extremities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_merged</span><span class="o">.</span><span class="n">to_id</span> <span class="o">=</span> <span class="n">end_path_extremities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 2. merging is occurring</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">_geo_dataframe</span><span class="p">[</span>
+                        <span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;intersections&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="o">==</span> <span class="mi">0</span>
+            <span class="p">):</span>
+                <span class="c1"># 2.1. a loop with two nodes degree &gt; 2</span>
+                <span class="n">gdf_node_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="nb">set</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+                <span class="p">)</span>
+                <span class="n">gdf_node_slice</span> <span class="o">=</span> <span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span>
+                    <span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gdf_node_ids</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># 2.1.1. a loop with only degree 2 edges =&gt; isolated from the rest of the graph</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">                        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    A sub-graph loop isolated from the main graph is detected and removed.</span>
+<span class="sd">                    This isolated part had %s nodes with node_fids {gdf_node_slice.id.tolist()} in</span>
+<span class="sd">                    the input node graph.</span>
+<span class="sd">                    &quot;&quot;&quot;</span><span class="p">,</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">gdf_node_slice</span><span class="p">),</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">&quot;demand_edge&quot;</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">                            </span><span class="sd">&quot;&quot;&quot;&#39;This sub-graph had these demand nodes %s&quot;&quot;&quot;</span><span class="p">,</span>
+                            <span class="p">(</span>
+                                <span class="n">_geo_dataframe</span><span class="p">[</span>
+                                    <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span>
+                                <span class="p">]</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="p">[</span>
+                                    <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span>
+                                <span class="p">]</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+                        <span class="n">crs</span><span class="o">=</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># 2.1.2. If there is only one node with the degree bigger than 2</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="s2">&quot;demand_edge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span>
+                        <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="p">):</span>
+                        <span class="c1"># No demand node is in this loop. Then omit this loop and return empty gdf</span>
+                        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                            <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+                            <span class="n">crs</span><span class="o">=</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="s2">&quot;demand_edge&quot;</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span>
+                        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                    <span class="p">):</span>
+                        <span class="n">demand_node_ids</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">i</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span>
+                                <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="p">)</span>
+                            <span class="k">if</span> <span class="p">(</span>
+                                <span class="n">_geo_dataframe</span><span class="p">[</span>
+                                    <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span>
+                                <span class="p">]</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="p">[</span>
+                                    <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span>
+                                <span class="p">]</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                            <span class="o">==</span> <span class="mi">2</span>
+                        <span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">demand_node_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="c1"># merging this situation is skipped: not probable + complicated</span>
+                            <span class="k">return</span> <span class="n">_geo_dataframe</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Only one demand node exists in the loop</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                                <span class="n">linemerge</span><span class="p">(</span><span class="n">_merged</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">MultiLineString</span>
+                            <span class="p">):</span>
+                                <span class="c1"># to exclude the merged geoms for which linemerge does not work</span>
+                                <span class="k">return</span> <span class="n">_geo_dataframe</span>
+                            <span class="n">path_extremities_node_ids</span> <span class="o">=</span> <span class="p">{</span>
+                                <span class="n">x</span>
+                                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gdf_node_slice</span><span class="p">[</span>
+                                    <span class="n">gdf_node_slice</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
+                                <span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="n">demand_node_ids</span>
+                            <span class="p">}</span>
+                            <span class="n">_merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_merged_multiple_demand_edges</span><span class="p">(</span>
+                                <span class="n">_merged</span><span class="p">,</span> <span class="n">path_extremities_node_ids</span>
+                            <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># 2.1.3. the only remaining option is two nodes with degrees bigger than 2</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="s2">&quot;demand_edge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span>
+                        <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="p">):</span>
+                        <span class="c1"># No demand node is in this loop. Then merge</span>
+                        <span class="n">_merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_merged_in_a_loop</span><span class="p">(</span><span class="n">_merged</span><span class="p">,</span> <span class="n">gdf_node_slice</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">_geo_dataframe</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 2.2. merging non-loop paths</span>
+                <span class="n">path_extremities_node_ids</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">i</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span>
+                        <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="o">==</span> <span class="mi">1</span>
+                <span class="p">}</span>
+                <span class="c1"># if len(path_extremities_node_ids) &gt; 0:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;demand_edge&quot;</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                <span class="p">):</span>
+                    <span class="n">_merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_merged_multiple_demand_edges</span><span class="p">(</span>
+                        <span class="n">_merged</span><span class="p">,</span> <span class="n">path_extremities_node_ids</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="p">(</span>
+                    <span class="s2">&quot;demand_edge&quot;</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span>
+                    <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="n">_geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+                <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;demand_edge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+                    <span class="c1"># 2.2.2.no dem node is in the to_be_merged path or only one dem node. In the later case dem node</span>
+                    <span class="c1"># will not be dissolved because it is in the path_extremities_node_ids</span>
+                    <span class="n">_merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_merged_one_or_none_demand_edges</span><span class="p">(</span>
+                        <span class="n">_merged</span><span class="p">,</span> <span class="n">path_extremities_node_ids</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Check the lines with the following ids </span><span class="si">{</span><span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;&quot;&quot;</span>
+                    <span class="p">)</span>
+
+        <span class="n">_merged</span><span class="o">.</span><span class="n">node_A</span> <span class="o">=</span> <span class="n">_merged</span><span class="o">.</span><span class="n">from_id</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">node_B</span> <span class="o">=</span> <span class="n">_merged</span><span class="o">.</span><span class="n">to_id</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">_geo_dataframe</span><span class="o">.</span><span class="n">crs</span>
+        <span class="k">return</span> <span class="n">_merged</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_merged_in_a_loop</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">_merged</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">gdf_node_slice</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="c1"># 2.1.2. pick one with one intersection point</span>
+        <span class="n">start_path_extrms</span> <span class="o">=</span> <span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="n">end_path_extrms</span> <span class="o">=</span> <span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="n">gdf_node_slice</span><span class="p">[</span><span class="s2">&quot;degree&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">from_id</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">start_path_extremity</span> <span class="k">for</span> <span class="n">start_path_extremity</span> <span class="ow">in</span> <span class="n">start_path_extrms</span>
+        <span class="p">]</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">to_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">end_path_extremity</span> <span class="k">for</span> <span class="n">end_path_extremity</span> <span class="ow">in</span> <span class="n">end_path_extrms</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">_merged</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_merged_multiple_demand_edges</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">_merged</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">path_extrms_nod_ids</span><span class="p">:</span> <span class="nb">set</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_node_id</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path_extrms_nod_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="c1"># to fill from_id and to_id of the to-be-merged paths</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">path_extremities_node_id</span> <span class="ow">in</span> <span class="n">path_extrms_nod_ids</span><span class="p">:</span>
+                    <span class="n">path_extremities_node_geom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">path_extremities_node_id</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">path_extremities_node_geom</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">path_extremities_node_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+
+        <span class="n">_mrgd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_split_edges_info</span><span class="p">(</span><span class="n">_merged</span><span class="p">)</span>
+        <span class="n">_mrgd</span><span class="o">.</span><span class="n">from_id</span> <span class="o">=</span> <span class="n">_mrgd</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">get_node_id</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;from_id&quot;</span><span class="p">,</span> <span class="n">path_extrms_nod_ids</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">_mrgd</span><span class="o">.</span><span class="n">to_id</span> <span class="o">=</span> <span class="n">_mrgd</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">get_node_id</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;to_id&quot;</span><span class="p">,</span> <span class="n">path_extrms_nod_ids</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_mrgd</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_split_edges_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">merged</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="c1"># used for the cases where demand nodes exist in the to-be-merged paths</span>
+        <span class="c1"># make the demand node from_id of the merged edge</span>
+        <span class="n">geo_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo_dataframe</span>
+        <span class="n">dem_nod_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">i</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">geo_dataframe</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="n">geo_dataframe</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">geo_dataframe</span><span class="p">[</span><span class="n">geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">from_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="o">+</span> <span class="n">geo_dataframe</span><span class="p">[</span><span class="n">geo_dataframe</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">]</span>
+        <span class="n">split_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">merged</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">split_edges_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">merged</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dem_nod_id</span> <span class="ow">in</span> <span class="n">dem_nod_ids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">split_parts</span><span class="p">:</span>
+                <span class="n">part_splits</span><span class="p">,</span> <span class="n">split_edges_gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span>
+                    <span class="n">merged</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">dem_nod_id</span><span class="p">,</span> <span class="n">split_edges_gdf</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">part_splits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">split_parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">part_splits</span><span class="p">)</span>
+                    <span class="n">split_parts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">split_edges_gdf</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_split</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">merged</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">line_geom</span><span class="p">:</span> <span class="n">MultiLineString</span> <span class="o">|</span> <span class="n">LineString</span><span class="p">,</span>
+        <span class="n">dem_nod_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">splits_gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="c1"># used for the cases where demand nodes exist in the to-be-merged paths</span>
+        <span class="n">dem_nod_geom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_snkit_network</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">dem_nod_id</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">line_geom</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">dem_nod_geom</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line_geom</span><span class="p">,</span> <span class="n">MultiLineString</span><span class="p">):</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">linemerge</span><span class="p">(</span><span class="n">line_geom</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">linemerge</span><span class="p">(</span><span class="n">line_geom</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">line_geom</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_geom</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="c1"># Add the coords from the points</span>
+            <span class="n">coords</span> <span class="o">+=</span> <span class="n">dem_nod_geom</span><span class="o">.</span><span class="n">coords</span>
+            <span class="c1"># Calculate the distance along the line for each point</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="p">[</span><span class="n">linemerge</span><span class="p">(</span><span class="n">line_geom</span><span class="p">)</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">]</span>
+            <span class="c1"># sort the coordinates</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">coords</span><span class="p">))]</span>
+            <span class="n">splits</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">LineString</span><span class="p">([</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">splits_gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_split_edges_gdf</span><span class="p">(</span>
+                <span class="n">merged</span><span class="p">,</span> <span class="n">splits</span><span class="p">,</span> <span class="n">dem_nod_id</span><span class="p">,</span> <span class="n">splits_gdf</span><span class="p">,</span> <span class="n">line_geom</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">splits</span><span class="p">,</span> <span class="n">splits_gdf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">splits_gdf</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_split_edges_gdf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">merged</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">dem_nod_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">splt_edgs</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">_split_line_geom</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="c1"># used for the cases where demand nodes exist in the to-be-merged paths</span>
+        <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+            <span class="c1"># _split_line_geom is the line divided and produced parts</span>
+            <span class="k">if</span> <span class="n">_split_line_geom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">splt_edgs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                <span class="n">part_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">part</span><span class="p">,</span>
+                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">splt_edgs</span><span class="p">),</span>
+                        <span class="s2">&quot;from_id&quot;</span><span class="p">:</span> <span class="n">dem_nod_id</span><span class="p">,</span>
+                        <span class="s2">&quot;to_id&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">merged</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;from_id&quot;</span><span class="p">,</span> <span class="s2">&quot;to_id&quot;</span><span class="p">]),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># if _split_line_geom is divided and n stored in splt_edgs, we need to retrieve from/to_id info</span>
+                <span class="c1"># and update splt_edgs</span>
+                <span class="n">part_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">part</span><span class="p">,</span>
+                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;from_id&quot;</span><span class="p">:</span> <span class="n">splt_edgs</span><span class="p">[</span>
+                            <span class="n">splt_edgs</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="n">_split_line_geom</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">row</span><span class="o">.</span><span class="n">from_id</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">from_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">dem_nod_id</span>
+                            <span class="p">),</span>
+                            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="p">),</span>
+                        <span class="s2">&quot;to_id&quot;</span><span class="p">:</span> <span class="n">splt_edgs</span><span class="p">[</span>
+                            <span class="n">splt_edgs</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="n">_split_line_geom</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">to_id</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">to_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">dem_nod_id</span><span class="p">),</span>
+                            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="p">),</span>
+                        <span class="o">**</span><span class="n">merged</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;from_id&quot;</span><span class="p">,</span> <span class="s2">&quot;to_id&quot;</span><span class="p">]),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+                <span class="n">_split_line_index</span> <span class="o">=</span> <span class="n">splt_edgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">splt_edgs</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="n">_split_line_geom</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">splt_edgs</span> <span class="o">=</span> <span class="n">splt_edgs</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">_split_line_index</span><span class="p">)</span>
+            <span class="n">splt_edgs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">splt_edgs</span><span class="p">,</span> <span class="n">part_gdf</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">splt_edgs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_merged_one_or_none_demand_edges</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">_merged</span><span class="p">,</span> <span class="n">path_extrms_nod_ids</span><span class="p">:</span> <span class="nb">set</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="n">geo_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo_dataframe</span>
+        <span class="n">_start_edges</span> <span class="o">=</span> <span class="n">geo_dataframe</span><span class="p">[</span>
+            <span class="n">geo_dataframe</span><span class="p">[</span><span class="s2">&quot;intersections&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;demand_edge&quot;</span> <span class="ow">in</span> <span class="n">geo_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">geo_dataframe</span><span class="p">[</span><span class="n">geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_start_edge</span> <span class="o">=</span> <span class="n">_start_edges</span><span class="p">[</span><span class="n">_start_edges</span><span class="o">.</span><span class="n">demand_edge</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s2">&quot;demand_edge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">geo_dataframe</span><span class="p">[</span><span class="n">geo_dataframe</span><span class="p">[</span><span class="s2">&quot;demand_edge&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_start_edge</span> <span class="o">=</span> <span class="n">_start_edges</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">start_path_extrms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">_start_edge</span><span class="p">[</span><span class="s2">&quot;from_id&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">_start_edge</span><span class="p">[</span><span class="s2">&quot;from_id&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">path_extrms_nod_ids</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">_start_edge</span><span class="p">[</span><span class="s2">&quot;to_id&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">end_path_extrms</span> <span class="o">=</span> <span class="p">[(</span><span class="n">path_extrms_nod_ids</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">start_path_extrms</span><span class="p">))</span><span class="o">.</span><span class="n">pop</span><span class="p">()]</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">from_id</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">start_path_extremity</span> <span class="k">for</span> <span class="n">start_path_extremity</span> <span class="ow">in</span> <span class="n">start_path_extrms</span>
+        <span class="p">]</span>
+        <span class="n">_merged</span><span class="o">.</span><span class="n">to_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">end_path_extremity</span> <span class="k">for</span> <span class="n">end_path_extremity</span> <span class="ow">in</span> <span class="n">end_path_extrms</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">_merged</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_intersections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_edge</span><span class="p">,</span> <span class="n">_edges</span><span class="p">):</span>
+        <span class="n">intersections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">edge_geometry</span> <span class="o">=</span> <span class="n">_edge</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">other_edge</span> <span class="ow">in</span> <span class="n">_edges</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">other_edge_geometry</span> <span class="o">=</span> <span class="n">other_edge</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">edge_geometry</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other_edge_geometry</span><span class="p">):</span>  <span class="c1"># avoid self-intersection</span>
+                <span class="n">intersection</span> <span class="o">=</span> <span class="n">edge_geometry</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">other_edge_geometry</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">intersection</span><span class="o">.</span><span class="n">is_empty</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="n">intersection</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">edge_geometry</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">geoms</span>
+                <span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span> <span class="n">MultiPoint</span><span class="p">):</span>
+                        <span class="n">intersections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">point</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">intersection</span><span class="o">.</span><span class="n">geoms</span>
+                                <span class="k">if</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">other_edge_geometry</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">geoms</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">intersections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intersection</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">intersections</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

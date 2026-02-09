@@ -1,0 +1,864 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ra2ce.network.hazard.hazard_intersect package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.network.hazard.hazard_intersect';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-network-hazard-hazard-intersect-package">
+<h1>ra2ce.network.hazard.hazard_intersect package<a class="headerlink" href="#ra2ce-network-hazard-hazard-intersect-package" title="Link to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base">
+<span id="ra2ce-network-hazard-hazard-intersect-hazard-intersect-builder-base-module"></span><h2>ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base module<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HazardIntersectBuilderBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_base.html#HazardIntersectBuilderBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <a class="reference internal" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol" title="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">HazardIntersectBuilderProtocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase.get_intersection">
+<span class="sig-name descname"><span class="pre">get_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_overlay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_base.html#HazardIntersectBuilderBase.get_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase.get_intersection" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves the resulting network from intersecting the hazard layer with a graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>hazard_overlay</strong> (<em>GeoDataFrame</em><em> | </em><em>Graph</em>)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>hazard_overlay (GeoDataFrame | Graph): Layer containing hazards.</p>
+</dd>
+<dt>Returns:</dt><dd><p>GeoDataFrame | Graph: Intersected graph with hazards.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg">
+<span id="ra2ce-network-hazard-hazard-intersect-hazard-intersect-builder-for-gpkg-module"></span><h2>ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg module<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HazardIntersectBuilderForGpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_field_name=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_aggregate_wl=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra2ce_names=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_gpkg_files=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_for_gpkg.html#HazardIntersectBuilderForGpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase" title="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">HazardIntersectBuilderBase</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hazard_field_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>hazard_aggregate_wl</strong> (<em>str</em>)</p></li>
+<li><p><strong>ra2ce_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>hazard_gpkg_files</strong> (<em>list</em><em>[</em><em>Path</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_aggregate_wl">
+<span class="sig-name descname"><span class="pre">hazard_aggregate_wl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_aggregate_wl" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_field_name">
+<span class="sig-name descname"><span class="pre">hazard_field_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_field_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_gpkg_files">
+<span class="sig-name descname"><span class="pre">hazard_gpkg_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_gpkg_files" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.ra2ce_names">
+<span class="sig-name descname"><span class="pre">ra2ce_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.ra2ce_names" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table">
+<span id="ra2ce-network-hazard-hazard-intersect-hazard-intersect-builder-for-table-module"></span><h2>ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table module<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HazardIntersectBuilderForTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_file_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra2ce_name_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RA2CE</span> <span class="pre">name'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_for_table.html#HazardIntersectBuilderForTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase" title="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">HazardIntersectBuilderBase</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hazard_field_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>network_file_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>hazard_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>ra2ce_name_key</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_field_name">
+<span class="sig-name descname"><span class="pre">hazard_field_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_field_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_id">
+<span class="sig-name descname"><span class="pre">hazard_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.network_file_id">
+<span class="sig-name descname"><span class="pre">network_file_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.network_file_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.ra2ce_name_key">
+<span class="sig-name descname"><span class="pre">ra2ce_name_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'RA2CE</span> <span class="pre">name'</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.ra2ce_name_key" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif">
+<span id="ra2ce-network-hazard-hazard-intersect-hazard-intersect-builder-for-tif-module"></span><h2>ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif module<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HazardIntersectBuilderForTif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_aggregate_wl=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_names=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra2ce_names=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_tif_files=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_for_tif.html#HazardIntersectBuilderForTif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase" title="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">HazardIntersectBuilderBase</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hazard_aggregate_wl</strong> (<em>str</em>)</p></li>
+<li><p><strong>hazard_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>ra2ce_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>hazard_tif_files</strong> (<em>list</em><em>[</em><em>Path</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_aggregate_wl">
+<span class="sig-name descname"><span class="pre">hazard_aggregate_wl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_aggregate_wl" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_names">
+<span class="sig-name descname"><span class="pre">hazard_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_names" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_tif_files">
+<span class="sig-name descname"><span class="pre">hazard_tif_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_tif_files" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.ra2ce_names">
+<span class="sig-name descname"><span class="pre">ra2ce_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.ra2ce_names" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol">
+<span id="ra2ce-network-hazard-hazard-intersect-hazard-intersect-builder-protocol-module"></span><h2>ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol module<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HazardIntersectBuilderProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_protocol.html#HazardIntersectBuilderProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol.get_intersection">
+<span class="sig-name descname"><span class="pre">get_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_overlay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/hazard/hazard_intersect/hazard_intersect_builder_protocol.html#HazardIntersectBuilderProtocol.get_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol.get_intersection" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves the resulting network from intersecting the hazard layer with a graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>hazard_overlay</strong> (<em>GeoDataFrame</em><em> | </em><em>Graph</em>)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>hazard_overlay (GeoDataFrame | Graph): Layer containing hazards.</p>
+</dd>
+<dt>Returns:</dt><dd><p>GeoDataFrame | Graph: Intersected graph with hazards.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.hazard.hazard_intersect">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.network.hazard.hazard_intersect" title="Link to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base">ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderBase</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base.HazardIntersectBuilderBase.get_intersection"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderBase.get_intersection()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg">ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForGpkg</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_aggregate_wl"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForGpkg.hazard_aggregate_wl</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_field_name"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForGpkg.hazard_field_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.hazard_gpkg_files"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForGpkg.hazard_gpkg_files</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg.HazardIntersectBuilderForGpkg.ra2ce_names"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForGpkg.ra2ce_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table">ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTable</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_field_name"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTable.hazard_field_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.hazard_id"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTable.hazard_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.network_file_id"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTable.network_file_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table.HazardIntersectBuilderForTable.ra2ce_name_key"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTable.ra2ce_name_key</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif">ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTif</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_aggregate_wl"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTif.hazard_aggregate_wl</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_names"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTif.hazard_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.hazard_tif_files"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTif.hazard_tif_files</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif.HazardIntersectBuilderForTif.ra2ce_names"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderForTif.ra2ce_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol">ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderProtocol</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol.HazardIntersectBuilderProtocol.get_intersection"><code class="docutils literal notranslate"><span class="pre">HazardIntersectBuilderProtocol.get_intersection()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.hazard.hazard_intersect">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.network.hazard.hazard_intersect.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.network.hazard.hazard_intersect.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

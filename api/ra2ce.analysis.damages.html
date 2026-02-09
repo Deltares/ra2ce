@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ra2ce.analysis.damages package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.analysis.damages';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-analysis-damages-package">
+<h1>ra2ce.analysis.damages package<a class="headerlink" href="#ra2ce-analysis-damages-package" title="Link to this heading">#</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html">ra2ce.analysis.damages.damage_calculation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#module-ra2ce.analysis.damages.damage_calculation.damage_network_base">ra2ce.analysis.damages.damage_calculation.damage_network_base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_HZ"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_HZ()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_OSdaMage"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_OSdaMage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_manual_functions"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_manual_functions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.clean_and_interpolate_missing_lane_data"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.clean_and_interpolate_missing_lane_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.create_mask"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.create_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.do_cleanup_and_mask_creation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.do_cleanup_and_mask_creation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.fix_extraordinary_lanes"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.fix_extraordinary_lanes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remap_road_types_to_fewer_classes"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.remap_road_types_to_fewer_classes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remove_unclassified_road_types_from_mask"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.remove_unclassified_road_types_from_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.replace_none_with_nan"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.replace_none_with_nan()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#module-ra2ce.analysis.damages.damage_calculation.damage_network_events">ra2ce.analysis.damages.damage_calculation.damage_network_events module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents"><code class="docutils literal notranslate"><span class="pre">DamageNetworkEvents</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkEvents.main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#module-ra2ce.analysis.damages.damage_calculation.damage_network_return_periods">ra2ce.analysis.damages.damage_calculation.damage_network_return_periods module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.construct_from_csv"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.construct_from_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.control_risk_calculation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.control_risk_calculation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.integrate_df_trapezoidal"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.integrate_df_trapezoidal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_cut_from"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_cut_from()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_default"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_default()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#module-ra2ce.analysis.damages.damage_calculation.risk_utils">ra2ce.analysis.damages.damage_calculation.risk_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html#module-ra2ce.analysis.damages.damage_calculation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html">ra2ce.analysis.damages.damage_functions package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions.damage_fraction_uniform">ra2ce.analysis.damages.damage_functions.damage_fraction_uniform module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.create_interpolator"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.create_interpolator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.data"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.from_csv"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.from_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.hazard_unit"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.hazard_unit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.interpolator"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.interpolator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.name"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_fraction_uniform.DamageFractionUniform.origin_path"><code class="docutils literal notranslate"><span class="pre">DamageFractionUniform.origin_path</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane">ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.add_max_damage"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.add_max_damage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.calculate_damage"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.calculate_damage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.damage_fraction"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.damage_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.from_input_folder"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.from_input_folder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.max_damage"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.max_damage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.name"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane.DamageFunctionByRoadTypeByLane.prefix"><code class="docutils literal notranslate"><span class="pre">DamageFunctionByRoadTypeByLane.prefix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions.manual_damage_functions">ra2ce.analysis.damages.damage_functions.manual_damage_functions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions"><code class="docutils literal notranslate"><span class="pre">ManualDamageFunctions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions.damage_functions"><code class="docutils literal notranslate"><span class="pre">ManualDamageFunctions.damage_functions</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader">ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader.ManualDamageFunctionsReader"><code class="docutils literal notranslate"><span class="pre">ManualDamageFunctionsReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader.ManualDamageFunctionsReader.read"><code class="docutils literal notranslate"><span class="pre">ManualDamageFunctionsReader.read()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions.max_damage">ra2ce.analysis.damages.damage_functions.max_damage module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage"><code class="docutils literal notranslate"><span class="pre">MaxDamage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage.damage_unit"><code class="docutils literal notranslate"><span class="pre">MaxDamage.damage_unit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage.data"><code class="docutils literal notranslate"><span class="pre">MaxDamage.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage.from_csv"><code class="docutils literal notranslate"><span class="pre">MaxDamage.from_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage.name"><code class="docutils literal notranslate"><span class="pre">MaxDamage.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.max_damage.MaxDamage.origin_path"><code class="docutils literal notranslate"><span class="pre">MaxDamage.origin_path</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#module-ra2ce.analysis.damages.damage_functions">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html">ra2ce.analysis.damages.shape_to_integrate_object package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper">ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper.HzToIntegrateShaper"><code class="docutils literal notranslate"><span class="pre">HzToIntegrateShaper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper.HzToIntegrateShaper.gdf"><code class="docutils literal notranslate"><span class="pre">HzToIntegrateShaper.gdf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper.HzToIntegrateShaper.get_return_periods"><code class="docutils literal notranslate"><span class="pre">HzToIntegrateShaper.get_return_periods()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper.HzToIntegrateShaper.shape_to_integrate_object"><code class="docutils literal notranslate"><span class="pre">HzToIntegrateShaper.shape_to_integrate_object()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper">ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper.ManToIntegrateShaper"><code class="docutils literal notranslate"><span class="pre">ManToIntegrateShaper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper.ManToIntegrateShaper.gdf"><code class="docutils literal notranslate"><span class="pre">ManToIntegrateShaper.gdf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper.ManToIntegrateShaper.get_return_periods"><code class="docutils literal notranslate"><span class="pre">ManToIntegrateShaper.get_return_periods()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper.ManToIntegrateShaper.shape_to_integrate_object"><code class="docutils literal notranslate"><span class="pre">ManToIntegrateShaper.shape_to_integrate_object()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper">ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper.OsdToIntegrateShaper"><code class="docutils literal notranslate"><span class="pre">OsdToIntegrateShaper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper.OsdToIntegrateShaper.gdf"><code class="docutils literal notranslate"><span class="pre">OsdToIntegrateShaper.gdf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper.OsdToIntegrateShaper.get_return_periods"><code class="docutils literal notranslate"><span class="pre">OsdToIntegrateShaper.get_return_periods()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper.OsdToIntegrateShaper.shape_to_integrate_object"><code class="docutils literal notranslate"><span class="pre">OsdToIntegrateShaper.shape_to_integrate_object()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol">ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol.ToIntegrateShaperProtocol"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperProtocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol.ToIntegrateShaperProtocol.gdf"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperProtocol.gdf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol.ToIntegrateShaperProtocol.get_return_periods"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperProtocol.get_return_periods()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol.ToIntegrateShaperProtocol.shape_to_integrate_object"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperProtocol.shape_to_integrate_object()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object.to_integrate_shaper_factory">ra2ce.analysis.damages.shape_to_integrate_object.to_integrate_shaper_factory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_integrate_shaper_factory.ToIntegrateShaperFactory"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#ra2ce.analysis.damages.shape_to_integrate_object.to_integrate_shaper_factory.ToIntegrateShaperFactory.get_shaper"><code class="docutils literal notranslate"><span class="pre">ToIntegrateShaperFactory.get_shaper()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html#module-ra2ce.analysis.damages.shape_to_integrate_object">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subpackages">Subpackages</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.analysis.damages.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.analysis.damages.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

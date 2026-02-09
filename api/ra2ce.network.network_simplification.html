@@ -1,0 +1,1167 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ra2ce.network.network_simplification package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.network.network_simplification';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-network-network-simplification-package">
+<h1>ra2ce.network.network_simplification package<a class="headerlink" href="#ra2ce-network-network-simplification-package" title="Link to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.network.network_simplification.network_graph_simplificator">
+<span id="ra2ce-network-network-simplification-network-graph-simplificator-module"></span><h2>ra2ce.network.network_simplification.network_graph_simplificator module<a class="headerlink" href="#module-ra2ce.network.network_simplification.network_graph_simplificator" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkGraphSimplificator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_complex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_to_exclude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rfid'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_graph_simplificator.html#NetworkGraphSimplificator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Factory dataclass to simplify the containing graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_complex</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>attributes_to_exclude</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>new_id</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.attributes_to_exclude">
+<span class="sig-name descname"><span class="pre">attributes_to_exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.attributes_to_exclude" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.graph_complex">
+<span class="sig-name descname"><span class="pre">graph_complex</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGraph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.graph_complex" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.new_id">
+<span class="sig-name descname"><span class="pre">new_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rfid'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.new_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.simplify">
+<span class="sig-name descname"><span class="pre">simplify</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_graph_simplificator.html#NetworkGraphSimplificator.simplify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.simplify" title="Link to this definition">#</a></dt>
+<dd><p>Create a simplified graph with unique ids from a complex graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]]</span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>tuple[nx.Graph, nx.Graph, tuple[dict, dict]]: The simple and complex graph and the “id” tables.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion">
+<span id="ra2ce-network-network-simplification-network-simplification-with-attribute-exclusion-module"></span><h2>ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion module<a class="headerlink" href="#module-ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkSimplificationWithAttributeExclusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_to_exclude</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_simplification_with_attribute_exclusion.html#NetworkSimplificationWithAttributeExclusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simplifies a network by excluding a given set of attributes (columns).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nx_graph</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>attributes_to_exclude</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.attributes_to_exclude">
+<span class="sig-name descname"><span class="pre">attributes_to_exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.attributes_to_exclude" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.nx_graph">
+<span class="sig-name descname"><span class="pre">nx_graph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGraph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.nx_graph" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.simplify_graph">
+<span class="sig-name descname"><span class="pre">simplify_graph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_simplification_with_attribute_exclusion.html#NetworkSimplificationWithAttributeExclusion.simplify_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.simplify_graph" title="Link to this definition">#</a></dt>
+<dd><p>Simplifies the inner graph by using the <cite>snkit</cite> package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>nx.Graph: Resulting simplified graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion">
+<span id="ra2ce-network-network-simplification-network-simplification-without-attribute-exclusion-module"></span><h2>ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion module<a class="headerlink" href="#module-ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkSimplificationWithoutAttributeExclusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_simplification_without_attribute_exclusion.html#NetworkSimplificationWithoutAttributeExclusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simplifies a network with the <cite>osmnx.simplification</cite> functionality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nx_graph</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.nx_graph">
+<span class="sig-name descname"><span class="pre">nx_graph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGraph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.nx_graph" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.simplify_graph">
+<span class="sig-name descname"><span class="pre">simplify_graph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/network_simplification_without_attribute_exclusion.html#NetworkSimplificationWithoutAttributeExclusion.simplify_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.simplify_graph" title="Link to this definition">#</a></dt>
+<dd><p>Simplify the graph after adding missing x and y attributes to nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>nx.Graph: Simplified graph</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.nx_to_snkit_network_converter">
+<span id="ra2ce-network-network-simplification-nx-to-snkit-network-converter-module"></span><h2>ra2ce.network.network_simplification.nx_to_snkit_network_converter module<a class="headerlink" href="#module-ra2ce.network.network_simplification.nx_to_snkit_network_converter" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NxToSnkitNetworkConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">networkx_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_from_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'from_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_to_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'to_id'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/nx_to_snkit_network_converter.html#NxToSnkitNetworkConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class responsible to convert a <cite>networkx.MultiGraph</cite> into
+a matching <cite>snkit.network.Network</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>networkx_graph</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>node_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_from_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_to_id_column_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/nx_to_snkit_network_converter.html#NxToSnkitNetworkConverter.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.convert" title="Link to this definition">#</a></dt>
+<dd><p>Converts a regular <cite>NetworkX.graph</cite> into a <cite>snkit.network.Network</cite> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>SnkitNetwork: The resulting <cite>snkit.network.Network</cite> converted object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_from_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_from_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'from_id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_from_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_to_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_to_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'to_id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_to_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.networkx_graph">
+<span class="sig-name descname"><span class="pre">networkx_graph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGraph</span></code> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.networkx_graph" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.node_id_column_name">
+<span class="sig-name descname"><span class="pre">node_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.node_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.snkit_network_merge_wrapper">
+<span id="ra2ce-network-network-simplification-snkit-network-merge-wrapper-module"></span><h2>ra2ce.network.network_simplification.snkit_network_merge_wrapper module<a class="headerlink" href="#module-ra2ce.network.network_simplification.snkit_network_merge_wrapper" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GdfSnkitNetworkMerger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snkit_network</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_merge_wrapper.html#GdfSnkitNetworkMerger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Merger of a <cite>gpd.GeoDataFrame</cite> and a <cite>snkit.network.network</cite>.
+This class was created to contain the related close and try reducing the code’s complexity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geo_dataframe</strong> (<em>GeoDataFrame</em>)</p></li>
+<li><p><strong>snkit_network</strong> (<em>Network</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_merge_wrapper.html#GdfSnkitNetworkMerger.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger.merge" title="Link to this definition">#</a></dt>
+<dd><p>Merges the inner defined <cite>gpd.GeoDataFrame</cite> and <cite>snkit.network.Network</cite>
+based on the given arguments (<cite>by</cite>) and aggregation function ()`aggregate_func`).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeoDataFrame</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>by</strong> (<em>list</em>)</p></li>
+<li><p><strong>aggregate_func</strong> (<em>dict</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_merge_wrapper.NxGraph">
+<span class="sig-name descname"><span class="pre">NxGraph</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">networkx.classes.graph.Graph</span> <span class="pre">|</span> <span class="pre">networkx.classes.multigraph.MultiGraph</span> <span class="pre">|</span> <span class="pre">networkx.classes.multidigraph.MultiDiGraph</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.NxGraph" title="Link to this definition">#</a></dt>
+<dd><p>Disclaimer!</p>
+<p>This file contains several complex logic introduced in feature #277.
+At the moment it was not possible to streamline / improve it further than
+its current state.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_merge_wrapper.merge_edges">
+<span class="sig-name descname"><span class="pre">merge_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snkit_network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">networkx_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_merge_wrapper.html#merge_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.merge_edges" title="Link to this definition">#</a></dt>
+<dd><p>Merges the edges of a given <cite>snkit.network.Network</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>snkit_network</strong> (<em>Network</em>)</p></li>
+<li><p><strong>networkx_graph</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>aggregate_func</strong> (<em>str</em><em> | </em><em>dict</em>)</p></li>
+<li><p><strong>by</strong> (<em>str</em><em> | </em><em>list</em>)</p></li>
+<li><p><strong>id_col</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>snkit_network (SnkitNetwork): network to merge.
+networkx_graph (NxGraph): networkx graph to merge
+aggregate_func (str | dict): Aggregation function to apply.
+by (str | list): Arguments (column names).
+id_col (str, optional): Name of the column representing the ‘id’.</p>
+</dd>
+<dt>Returns:</dt><dd><p>SnkitNetwork: _description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.snkit_network_wrapper">
+<span id="ra2ce-network-network-simplification-snkit-network-wrapper-module"></span><h2>ra2ce.network.network_simplification.snkit_network_wrapper module<a class="headerlink" href="#module-ra2ce.network.network_simplification.snkit_network_wrapper" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SnkitNetworkWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snkit_network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_from_id_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_to_id_column_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_wrapper.html#SnkitNetworkWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper created to reduce complexity of conversion and processing of a <cite>snkit.network.Network</cite>
+within the rest of the code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snkit_network</strong> (<em>Network</em>)</p></li>
+<li><p><strong>node_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_from_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_to_id_column_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_from_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_from_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_from_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_to_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_to_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_to_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.from_networkx">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_networkx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networkx_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_names_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_wrapper.html#SnkitNetworkWrapper.from_networkx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.from_networkx" title="Link to this definition">#</a></dt>
+<dd><p>Generates a <cite>SnkitNetworkWrapper</cite> based on the given <cite>NxGraph</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper" title="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">SnkitNetworkWrapper</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>networkx_graph</strong> (<em>Graph</em><em> | </em><em>MultiGraph</em><em> | </em><em>MultiDiGraph</em>)</p></li>
+<li><p><strong>column_names_dict</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>networkx_graph (NxGraph): Graph to convert.
+column_names_dict (dict[str, str]): Column names to use.</p>
+</dd>
+<dt>Returns:</dt><dd><p>SnkitNetworkWrapper: Wrapper containing the converted <cite>snkit.network.Network</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.merge_edges">
+<span class="sig-name descname"><span class="pre">merge_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributes_to_exclude</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_wrapper.html#SnkitNetworkWrapper.merge_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.merge_edges" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>attributes_to_exclude</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.node_id_column_name">
+<span class="sig-name descname"><span class="pre">node_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.node_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.process_network">
+<span class="sig-name descname"><span class="pre">process_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_wrapper.html#SnkitNetworkWrapper.process_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.process_network" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.snkit_network">
+<span class="sig-name descname"><span class="pre">snkit_network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.snkit_network" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.to_networkx">
+<span class="sig-name descname"><span class="pre">to_networkx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_network_wrapper.html#SnkitNetworkWrapper.to_networkx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.to_networkx" title="Link to this definition">#</a></dt>
+<dd><p>Converts the wrapped <cite>snkit_network</cite> into a corresponding <cite>networkx.Graph</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGraph</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>NxGraph: The converted graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification.snkit_to_nx_network_converter">
+<span id="ra2ce-network-network-simplification-snkit-to-nx-network-converter-module"></span><h2>ra2ce.network.network_simplification.snkit_to_nx_network_converter module<a class="headerlink" href="#module-ra2ce.network.network_simplification.snkit_to_nx_network_converter" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023-2026 Stichting Deltares
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SnkitToNxNetworkConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">snkit_network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_from_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'from_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_to_id_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'to_id'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_to_nx_network_converter.html#SnkitToNxNetworkConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class responsible to convert a <cite>snkit.network.Network</cite> into
+a matching <cite>networkx.MultiGraph</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snkit_network</strong> (<em>Network</em>)</p></li>
+<li><p><strong>node_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_from_id_column_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_to_id_column_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_simplification/snkit_to_nx_network_converter.html#SnkitToNxNetworkConverter.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.convert" title="Link to this definition">#</a></dt>
+<dd><p>Converts the given <cite>snkit.network.Network</cite> into a matching
+<cite>networkx.MultiGraph</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiDiGraph</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>snkit_network (SnkitNetwork): The snkit network to convert.</p>
+</dd>
+<dt>Returns:</dt><dd><p><cite>networkx.MultiDiGraph</cite>: The converted graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_from_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_from_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'from_id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_from_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_to_id_column_name">
+<span class="sig-name descname"><span class="pre">edge_to_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'to_id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_to_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.node_id_column_name">
+<span class="sig-name descname"><span class="pre">node_id_column_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'id'</span></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.node_id_column_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.snkit_network">
+<span class="sig-name descname"><span class="pre">snkit_network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></em><a class="headerlink" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.snkit_network" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_simplification">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.network.network_simplification" title="Link to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.network_graph_simplificator">ra2ce.network.network_simplification.network_graph_simplificator module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator"><code class="docutils literal notranslate"><span class="pre">NetworkGraphSimplificator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.attributes_to_exclude"><code class="docutils literal notranslate"><span class="pre">NetworkGraphSimplificator.attributes_to_exclude</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.graph_complex"><code class="docutils literal notranslate"><span class="pre">NetworkGraphSimplificator.graph_complex</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.new_id"><code class="docutils literal notranslate"><span class="pre">NetworkGraphSimplificator.new_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_graph_simplificator.NetworkGraphSimplificator.simplify"><code class="docutils literal notranslate"><span class="pre">NetworkGraphSimplificator.simplify()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion">ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithAttributeExclusion</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.attributes_to_exclude"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithAttributeExclusion.attributes_to_exclude</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.nx_graph"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithAttributeExclusion.nx_graph</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion.NetworkSimplificationWithAttributeExclusion.simplify_graph"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithAttributeExclusion.simplify_graph()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion">ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithoutAttributeExclusion</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.nx_graph"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithoutAttributeExclusion.nx_graph</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion.NetworkSimplificationWithoutAttributeExclusion.simplify_graph"><code class="docutils literal notranslate"><span class="pre">NetworkSimplificationWithoutAttributeExclusion.simplify_graph()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.nx_to_snkit_network_converter">ra2ce.network.network_simplification.nx_to_snkit_network_converter module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.convert"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter.convert()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_from_id_column_name"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter.edge_from_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.edge_to_id_column_name"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter.edge_to_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.networkx_graph"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter.networkx_graph</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.nx_to_snkit_network_converter.NxToSnkitNetworkConverter.node_id_column_name"><code class="docutils literal notranslate"><span class="pre">NxToSnkitNetworkConverter.node_id_column_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.snkit_network_merge_wrapper">ra2ce.network.network_simplification.snkit_network_merge_wrapper module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger"><code class="docutils literal notranslate"><span class="pre">GdfSnkitNetworkMerger</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.GdfSnkitNetworkMerger.merge"><code class="docutils literal notranslate"><span class="pre">GdfSnkitNetworkMerger.merge()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.NxGraph"><code class="docutils literal notranslate"><span class="pre">NxGraph</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_merge_wrapper.merge_edges"><code class="docutils literal notranslate"><span class="pre">merge_edges()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.snkit_network_wrapper">ra2ce.network.network_simplification.snkit_network_wrapper module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_from_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.edge_from_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.edge_to_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.edge_to_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.from_networkx"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.from_networkx()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.merge_edges"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.merge_edges()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.node_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.node_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.process_network"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.process_network()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.snkit_network"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.snkit_network</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_network_wrapper.SnkitNetworkWrapper.to_networkx"><code class="docutils literal notranslate"><span class="pre">SnkitNetworkWrapper.to_networkx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification.snkit_to_nx_network_converter">ra2ce.network.network_simplification.snkit_to_nx_network_converter module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.convert"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter.convert()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_from_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter.edge_from_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.edge_to_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter.edge_to_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.node_id_column_name"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter.node_id_column_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_simplification.snkit_to_nx_network_converter.SnkitToNxNetworkConverter.snkit_network"><code class="docutils literal notranslate"><span class="pre">SnkitToNxNetworkConverter.snkit_network</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_simplification">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.network.network_simplification.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.network.network_simplification.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,974 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Changelog &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=fc837d61"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changelog_wrapper';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Changelog</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="changelog">
+<span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
+<section id="v1-1-0-2026-02-04">
+<h2>v1.1.0 (2026-02-04)<a class="headerlink" href="#v1-1-0-2026-02-04" title="Link to this heading">#</a></h2>
+<section id="feat">
+<h3>Feat<a class="headerlink" href="#feat" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>create dataclass for <code class="docutils literal notranslate"><span class="pre">EquityConfigData</span></code> (#764)</p></li>
+<li><p>#757 normalize avg speed data (#761)</p></li>
+<li><p>create dataclass for <code class="docutils literal notranslate"><span class="pre">BaseOriginDestinationConfigData</span></code> (#758)</p></li>
+<li><p>Created new dataclass <code class="docutils literal notranslate"><span class="pre">MultiLinkRedundancyConfigData</span></code> (#756)</p></li>
+<li><p>Create dataclass for <code class="docutils literal notranslate"><span class="pre">BaseLinkLossesConfigData</span></code> (#755)</p></li>
+<li><p>735 create dataclass for <code class="docutils literal notranslate"><span class="pre">DamagesConfigData</span></code> (#746)</p></li>
+<li><p>Added new config data for single link redundancy  (#742)</p></li>
+<li><p>#722 origins file make the attribute id name origin destination optional (#728)</p></li>
+<li><p>#699 allow overwrite of output graph folder (#724)</p></li>
+<li><p>Added validation for analysis compatibility (#715)</p></li>
+<li><p>#581 origins file make the attribute origin count optional (#723)</p></li>
+<li><p>660 create an example to run damages and losses without input files (#661)</p></li>
+</ul>
+</section>
+<section id="fix">
+<h3>Fix<a class="headerlink" href="#fix" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>#769 investigate failures on master (#770)</p></li>
+<li><p>#752 adaptation analysis config not read correctly (#753)</p></li>
+<li><p>fix build issue (#747)</p></li>
+<li><p>#743 fix matching logic (#744)</p></li>
+<li><p>Corrected primary and diversion file property types to <code class="docutils literal notranslate"><span class="pre">Path</span></code> (#727)</p></li>
+<li><p>edited test with external branch (#707)</p></li>
+<li><p>Hazard overlay speed improvements (#698)</p></li>
+</ul>
+</section>
+</section>
+<section id="v1-0-0-2025-01-08">
+<h2>v1.0.0 (2025-01-08)<a class="headerlink" href="#v1-0-0-2025-01-08" title="Link to this heading">#</a></h2>
+<section id="id1">
+<h3>Feat<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>659 convert damage classes into dataclasses; add a reader for damage curves (#656)</p></li>
+<li><p>636 use same static and output folder of adaptation for dependent analyses (#652)</p></li>
+<li><p>646 write adaptation to file (#650)</p></li>
+<li><p>638 adaptation adaptation analysis should run with only damages or only losses (#642)</p></li>
+<li><p>Refactored both analyses to generate an <code class="docutils literal notranslate"><span class="pre">AnalysisResultWrapper</span></code></p></li>
+<li><p>618 adaptation add option to adaptation config to calculate cost based on fraction segment exposed (#639)</p></li>
+<li><p>Create adaptation runner (#634)</p></li>
+<li><p>597 adaptation calculate benefit (#628)</p></li>
+<li><p>457 refactor directanalysisrunner (#624)</p></li>
+<li><p>622 adaptation calculate full link cost (#623)</p></li>
+<li><p>595 adaptation run and combine losses and damages (#616)</p></li>
+<li><p>594 adaptation create and save result cost options (#614)</p></li>
+<li><p>593 calculate unit cost (#613)</p></li>
+<li><p>592 adaptation create class adaptation_option_collection (#609)</p></li>
+<li><p>605 upgrade python version to 311 (#610)</p></li>
+<li><p>604 adaptation extend analysis config dataclass and reader (#607)</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Fix<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>create _output_dir if non-existence</p></li>
+<li><p>Remove gdal as explicit dependency (#566)</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-9-2-2024-07-17">
+<h2>v0.9.2 (2024-07-17)<a class="headerlink" href="#v0-9-2-2024-07-17" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>Feat<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>470 refactor losses analysis structure</p></li>
+<li><p>321 skip overlay segmented graph</p></li>
+<li><p>462 docs and other changes</p></li>
+<li><p>It is now possible to run an analysis by simply providing dataclasses or ini files. (#461)</p></li>
+<li><p>455 rename runners</p></li>
+<li><p>453 adjust analysis direct</p></li>
+<li><p>451 adjust analysis\indirect</p></li>
+<li><p>449 adjust analysis config data</p></li>
+<li><p>gitignore updated</p></li>
+<li><p>gitignore updated</p></li>
+<li><p>gitignore updated</p></li>
+<li><p>representative_damage_percentile added and used to output a representative damage</p></li>
+<li><p>divisor added to accept %-based or less-than-one functionality losses in the resilience_curve file</p></li>
+<li><p>filter criticality_analysis based on the flood threshold.</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Fix<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>435 fix exception in case no lanes in any of the road types</p></li>
+<li><p>472 fix od analyses using weighing time</p></li>
+<li><p>488 fix weighing time redundancy analyses</p></li>
+<li><p>433 avg speed 0</p></li>
+<li><p>468 set hazard field name to str</p></li>
+<li><p>410 replace simplify graph with OSMNX</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-9-1-2024-04-12">
+<h2>v0.9.1 (2024-04-12)<a class="headerlink" href="#v0-9-1-2024-04-12" title="Link to this heading">#</a></h2>
+</section>
+<section id="v0-9-0-2024-04-11">
+<h2>v0.9.0 (2024-04-11)<a class="headerlink" href="#v0-9-0-2024-04-11" title="Link to this heading">#</a></h2>
+<section id="id5">
+<h3>Feat<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>389 allow an analysis run without files 2nd attempt</p></li>
+<li><p>network cleaning simplifying functions PR(#322) - Issue 144</p></li>
+<li><p>add hazard cost to the configuration (#406)</p></li>
+<li><p>added infrastructure and documentation to allow a cloud run (#398)</p></li>
+<li><p>Adapted losses class for <code class="docutils literal notranslate"><span class="pre">single_link_losses</span></code> and <code class="docutils literal notranslate"><span class="pre">single_link_redundancy</span></code>. Included jupyter notebook example. (#383)</p></li>
+<li><p>390 make sections optional (#391)</p></li>
+<li><p>Multi link redundancy - adjust calculating diff_time o -diff_length (#393)</p></li>
+<li><p>Add time to graph and network (#387)</p></li>
+<li><p>Integrated crosscade (#294)</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Fix<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>multi link losses document missing test data. (#415)</p></li>
+<li><p>running the binder environment examples results in a crash (#409)</p></li>
+<li><p>Removed parallel logic that could lead to memory issues (#397)</p></li>
+<li><p>Removed parallel logic that could lead to memory issues when running on the cloud or locally</p></li>
+<li><p>correct damage_curve field initialization</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-8-1-2024-03-20">
+<h2>v0.8.1 (2024-03-20)<a class="headerlink" href="#v0-8-1-2024-03-20" title="Link to this heading">#</a></h2>
+</section>
+<section id="v0-8-0-2024-03-20">
+<h2>v0.8.0 (2024-03-20)<a class="headerlink" href="#v0-8-0-2024-03-20" title="Link to this heading">#</a></h2>
+<section id="id7">
+<h3>Feat<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Added functionality to directly retrieve the MultiGraph and GeoDataFrame for a given geojson network</p></li>
+<li><p>Added static method to directly retrieve a network based on a polygon</p></li>
+<li><p>Added result wrapper exporter logic</p></li>
+<li><p>Added logic to wrap results of a ra2ce analysis</p></li>
+<li><p>partofday Enum is added</p></li>
+<li><p>Added logic so that exporting the intermediate results becomes dependent on the existance of the <code class="docutils literal notranslate"><span class="pre">output_graph_dir</span></code> property</p></li>
+<li><p>Added endpoint to generate an OsmNetworkWrapper with a fix polygon</p></li>
+<li><p>time calculated for the single link redundancy added to the link data</p></li>
+<li><p>time calculated for the single link redundancy</p></li>
+<li><p>if the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.</p></li>
+<li><p>add_missing_geometry improved to consider all ks of a multigraph edges</p></li>
+<li><p>tracing the origins that are mapped on two graph nodes for instance and have path in one but not in the other</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Fix<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>solve bug</p></li>
+<li><p>Corrected wrong unknown key to dictionary</p></li>
+<li><p>Added logic to callculate time only when strictly required</p></li>
+<li><p>minor formatting</p></li>
+<li><p>Enum typing added</p></li>
+<li><p>Enum is used</p></li>
+<li><p>Enum is used</p></li>
+<li><p>formatting updated</p></li>
+<li><p>Union removed</p></li>
+<li><p>deafaultdict list is used</p></li>
+<li><p>returning globals() fixed</p></li>
+<li><p>float instead of int</p></li>
+<li><p>alt_time and length are improved to correspond to the weight stated in the single and multi redundancy</p></li>
+<li><p>updated the weight to get correct alt_dist. time is also rounded.</p></li>
+<li><p>git ignore is updated to ignore all example outputs</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-7-0-2023-12-05">
+<h2>v0.7.0 (2023-12-05)<a class="headerlink" href="#v0-7-0-2023-12-05" title="Link to this heading">#</a></h2>
+<section id="id9">
+<h3>Feat<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>minor</p></li>
+<li><p>calc_vhl completed. case should be ran. analysis properties are added for Losses</p></li>
+<li><p>calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote</p></li>
+<li><p>calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote</p></li>
+<li><p>duration step attribute definition</p></li>
+<li><p>calc_vhl chanege started</p></li>
+<li><p>minor attribute hints</p></li>
+<li><p>minor changes to the Losses</p></li>
+<li><p>time and alt_time is added to multi-link redundancy</p></li>
+<li><p>time and alt_time is added to multi-link redundancy</p></li>
+<li><p>Example notebook is updated</p></li>
+<li><p>notebooks are added</p></li>
+<li><p>origin closest destination now can be ran without hazard infor in the network and analysis configs</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Fix<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>LineString is impoted from shapely.geometry</p></li>
+<li><p>docu typos</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">find_route_ods</span></code> now returns a geodataframe without duplicate entries or origin_nodes with multiple names</p></li>
+<li><p>Changed output suffix.</p></li>
+<li><p>save_shp is updated to the output export shapefile</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-6-0-2023-07-28">
+<h2>v0.6.0 (2023-07-28)<a class="headerlink" href="#v0-6-0-2023-07-28" title="Link to this heading">#</a></h2>
+<section id="id11">
+<h3>Feat<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Created network wrappers as a separate module</p></li>
+<li><p>Extracted logic to generate networks from different sources.</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-5-1-2023-07-26">
+<h2>v0.5.1 (2023-07-26)<a class="headerlink" href="#v0-5-1-2023-07-26" title="Link to this heading">#</a></h2>
+<section id="id12">
+<h3>Feat<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>osm_network_wrapper.py</strong>: Adde network wrapper to get a clean network from OSM source.</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-5-0-2023-07-24">
+<h2>v0.5.0 (2023-07-24)<a class="headerlink" href="#v0-5-0-2023-07-24" title="Link to this heading">#</a></h2>
+<section id="id13">
+<h3>Feat<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Added dataclass to represent the Network configuration input data (ini file)</p></li>
+<li><p>Created stand-alone class for equity analysis</p></li>
+<li><p>Implement multi-link isolated locations with distinction between flooded and isolated.</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Fix<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Modified validation to use by default indirect analysis</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-4-3-2023-02-10">
+<h2>v0.4.3 (2023-02-10)<a class="headerlink" href="#v0-4-3-2023-02-10" title="Link to this heading">#</a></h2>
+</section>
+<section id="v0-4-2-2023-02-10">
+<h2>v0.4.2 (2023-02-10)<a class="headerlink" href="#v0-4-2-2023-02-10" title="Link to this heading">#</a></h2>
+<section id="id15">
+<h3>Fix<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>README.rst</strong>: typo fixed, issue #80 thanks Anoek!</p></li>
+<li><p><strong>networks.py</strong>: fix bug #86, ensured the merged_lines object is a GeoDataFrame and not sometimes a Series. Updated related test.</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-4-1-2023-02-09">
+<h2>v0.4.1 (2023-02-09)<a class="headerlink" href="#v0-4-1-2023-02-09" title="Link to this heading">#</a></h2>
+<section id="id16">
+<h3>Fix<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>test_acceptance.py</strong>: fixed the test_1_1_given_only_network_shape_redundancy data and added assert statements to networks.py</p></li>
+<li><p><strong>networks_utils.py</strong>: Fixed function get_valid_mean, now it is tested.</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-4-0-2023-02-08">
+<h2>v0.4.0 (2023-02-08)<a class="headerlink" href="#v0-4-0-2023-02-08" title="Link to this heading">#</a></h2>
+<section id="id17">
+<h3>Feat<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>ra2ce/analyses/direct/damage_calculation/</strong>: Split previous file into files within a submodule</p></li>
+<li><p><strong>ra2ce/analyses/direct/damage/</strong>: Added damage functions for direct analysis</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Fix<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>networks_utils.py</strong>: Fixed one bug in networks_utils.py for the creation of a network from shp and related test (test_1_1_given_only_network_shape_redundancy).</p></li>
+<li><p><strong>analyses_direct.py;damage_network_base.py</strong>: Removed circular import</p></li>
+<li><p><strong>analyses_direct.py</strong>: Fixed some imports in the analyses_direct.py file</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-3-1-2022-09-26">
+<h2>v0.3.1 (2022-09-26)<a class="headerlink" href="#v0-3-1-2022-09-26" title="Link to this heading">#</a></h2>
+<section id="id19">
+<h3>Fix<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>analysis_indirect.py;network_utils.py</strong>: Fixed errors spotted by sonar cloud</p></li>
+<li><p><strong>networks.py;networks_utils.py</strong>: Fixed critical issues spotted by SonarCloud</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-3-0-2022-09-22">
+<h2>v0.3.0 (2022-09-22)<a class="headerlink" href="#v0-3-0-2022-09-22" title="Link to this heading">#</a></h2>
+<section id="id20">
+<h3>Feat<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>config_factory; analysis_config_factory</strong>: Split ConfigData creation from IniConfigDataReaders. Introduced factories to deal with the selection criteria for network / analysis and their concrete types</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-2-0-2022-09-21">
+<h2>v0.2.0 (2022-09-21)<a class="headerlink" href="#v0-2-0-2022-09-21" title="Link to this heading">#</a></h2>
+<section id="id21">
+<h3>Feat<a class="headerlink" href="#id21" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>config_reader_factory</strong>: Added factory to reduce responsibilities at a higher level</p></li>
+<li><p>Added IniConfigDataProtocol concept</p></li>
+<li><p><strong>ra2ce_handler.py</strong>: Applied Factory patter for analysis runner</p></li>
+<li><p><strong>main.py</strong>: Now we properly check input from comand line</p></li>
+<li><p>Moving ra2ce.py logic into class approach</p></li>
+</ul>
+</section>
+<section id="id22">
+<h3>Fix<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>IniConfigValidatorBase</strong>: Updated config_data parameter type so it’s properly casted</p></li>
+<li><p>Existen network files were not correctly mapped</p></li>
+<li><p>Introduced a small error on a previous refactoring when refering to the parent path of the ini files</p></li>
+<li><p>Now we generate networks when no analysis is required</p></li>
+<li><p>Network initializes now its own output directories</p></li>
+<li><p><strong>ra2ce.py;utils.py</strong>: Small code reworks to make sure the tests run correctly</p></li>
+<li><p>Changed a bit of the logic to ensure a log file is created if not present</p></li>
+</ul>
+</section>
+<section id="refactor">
+<h3>Refactor<a class="headerlink" href="#refactor" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>ra2ce/configuration</strong>: Made the config classes parameterless</p></li>
+<li><p><strong>ra2ce/io/readers</strong>: Extracted concrete readers for better readability</p></li>
+<li><p>Inversed logic so it properly respects Single Responsibiltity Principle</p></li>
+<li><p><strong>networks.py</strong>: Removed phased out save_network usages</p></li>
+<li><p><strong>hazard.py</strong>: Removed from hazard phased out save_network</p></li>
+<li><p><strong>network_exporter_factory</strong>: Moved saved_network into more OO aproach</p></li>
+<li><p><strong>json_exporter.py</strong>: Extracted json exporter into separate file / module</p></li>
+<li><p><strong>ra2ce/validation</strong>: Moved out general validation classes to separate module</p></li>
+<li><p>renamed and moved checks into proper module</p></li>
+<li><p>Removed utils and moved logic into reader for future further refactoring</p></li>
+<li><p><strong>ra2ce/io</strong>: Moved io into its own module</p></li>
+<li><p><strong>ra2ce/runners</strong>: Extracted runners logic into separate module</p></li>
+<li><p><strong>ra2ce/configuration</strong>: Extracted classes into separate m odule</p></li>
+<li><p>Replaced previous main with a more OO approach</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-1-1-2022-09-13">
+<h2>v0.1.1 (2022-09-13)<a class="headerlink" href="#v0-1-1-2022-09-13" title="Link to this heading">#</a></h2>
+<section id="id23">
+<h3>Fix<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>setup.py</strong>: Encoding for the rst files should be enforced</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-0-1-ra2ce-016-2023-07-24">
+<h2>v0.0.1-ra2ce_016 (2023-07-24)<a class="headerlink" href="#v0-0-1-ra2ce-016-2023-07-24" title="Link to this heading">#</a></h2>
+</section>
+<section id="v0-0-1-ra2ce-v1-2023-07-24">
+<h2>v0.0.1-ra2ce_v1 (2023-07-24)<a class="headerlink" href="#v0-0-1-ra2ce-v1-2023-07-24" title="Link to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v1-1-0-2026-02-04">v1.1.0 (2026-02-04)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feat">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fix">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v1-0-0-2025-01-08">v1.0.0 (2025-01-08)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-9-2-2024-07-17">v0.9.2 (2024-07-17)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-9-1-2024-04-12">v0.9.1 (2024-04-12)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-9-0-2024-04-11">v0.9.0 (2024-04-11)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-8-1-2024-03-20">v0.8.1 (2024-03-20)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-8-0-2024-03-20">v0.8.0 (2024-03-20)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-7-0-2023-12-05">v0.7.0 (2023-12-05)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-6-0-2023-07-28">v0.6.0 (2023-07-28)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Feat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-5-1-2023-07-26">v0.5.1 (2023-07-26)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Feat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-5-0-2023-07-24">v0.5.0 (2023-07-24)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-3-2023-02-10">v0.4.3 (2023-02-10)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-2-2023-02-10">v0.4.2 (2023-02-10)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-1-2023-02-09">v0.4.1 (2023-02-09)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-0-2023-02-08">v0.4.0 (2023-02-08)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-3-1-2022-09-26">v0.3.1 (2022-09-26)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-3-0-2022-09-22">v0.3.0 (2022-09-22)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Feat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-2-0-2022-09-21">v0.2.0 (2022-09-21)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Feat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Fix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#refactor">Refactor</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-1-1-2022-09-13">v0.1.1 (2022-09-13)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Fix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-0-1-ra2ce-016-2023-07-24">v0.0.1-ra2ce_016 (2023-07-24)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-0-1-ra2ce-v1-2023-07-24">v0.0.1-ra2ce_v1 (2023-07-24)</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/changelog_wrapper.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/changelog_wrapper.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

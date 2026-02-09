@@ -1,0 +1,962 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.analysis_config_data.analysis_config_data &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/analysis_config_data/analysis_config_data';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.analysis_config_data.analysis_config_data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                  Version 3, 29 June 2007</span>
+
+<span class="sd">Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">Copyright (C) 2023-2026 Stichting Deltares</span>
+
+<span class="sd">This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU General Public License as published by</span>
+<span class="sd">the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">This program is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU General Public License</span>
+<span class="sd">along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data_protocol</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisConfigDataProtocol</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisDamagesEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisLossesEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.damage_curve_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">DamageCurveEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.event_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RiskCalculationModeEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.traffic_period_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TrafficPeriodEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">TripPurposeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.weighing_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeighingEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.common.configuration.config_data_protocol</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigDataProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.aggregate_wl_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateWlEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NetworkSection</span><span class="p">,</span>
+    <span class="n">OriginsDestinationsSection</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">LossesAnalysisNameList</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">AnalysisLossesEnum</span><span class="o">.</span><span class="n">list_valid_options</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">DamagesAnalysisNameList</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">list_valid_options</span><span class="p">())</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="AnalysisSectionBase">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisSectionBase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflects all common settings that damages and losses analysis sections might contain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">save_gpkg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">save_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisEnum</span> <span class="o">|</span> <span class="n">AnalysisDamagesEnum</span> <span class="o">|</span> <span class="n">AnalysisLossesEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AnalysisEnum</span><span class="o">.</span><span class="n">INVALID</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisSectionLosses">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisSectionLosses</span><span class="p">(</span><span class="n">AnalysisSectionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents all configurable settings for a losses analysis section in RA2CE.</span>
+
+<span class="sd">    This class defines parameters for single link redundancy, accessibility,</span>
+<span class="sd">    and risk/loss analyses, including weighing, traffic, thresholds, and</span>
+<span class="sd">    output options.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    analysis</span>
+<span class="sd">        Specifies the type of losses/criticality analysis to perform.</span>
+
+<span class="sd">    weighing</span>
+<span class="sd">        Defines the weighing method for the analysis (e.g., length, travel time).</span>
+
+<span class="sd">    production_loss_per_capita_per_hour</span>
+<span class="sd">        Economic loss per capita per hour, if applicable. Required only for losses analysis type.</span>
+
+<span class="sd">    traffic_period</span>
+<span class="sd">        Traffic period for the analysis (e.g., day, peak). Required only for losses analysis type.</span>
+
+<span class="sd">    hours_per_traffic_period</span>
+<span class="sd">        Number of hours corresponding to the selected traffic period. Required only for losses analysis type.</span>
+
+<span class="sd">    trip_purposes</span>
+<span class="sd">        Trip purposes to include in the analysis. Required only for losses analysis type.</span>
+
+<span class="sd">    resilience_curves_file</span>
+<span class="sd">        Path to a file containing resilience curves for losses analysis. Required only for losses analysis type.</span>
+
+<span class="sd">    traffic_intensities_file</span>
+<span class="sd">        Path to a file containing the traffic intensities information. Required only for losses analysis type.</span>
+
+<span class="sd">    values_of_time_file</span>
+<span class="sd">        Path to a file containing value-of-time data. Required only for losses analysis type.</span>
+
+<span class="sd">    threshold</span>
+<span class="sd">        Threshold value used for redundancy or accessibility analyses</span>
+<span class="sd">        (e.g., maximum tolerable disruption).</span>
+
+<span class="sd">    threshold_destinations</span>
+<span class="sd">        Threshold specifically for destination accessibility.</span>
+
+<span class="sd">    equity_weight</span>
+<span class="sd">        Field name or identifier to apply equity weighting in the analysis.</span>
+
+<span class="sd">    calculate_route_without_disruption</span>
+<span class="sd">        If True, calculates baseline routes without any disruptions for comparison.</span>
+
+<span class="sd">    buffer_meters</span>
+<span class="sd">        Buffer distance in meters to consider around network elements, e.g., for exposure or accessibility.</span>
+
+<span class="sd">    category_field_name</span>
+<span class="sd">        Field name used to categorize links or nodes in the analysis.</span>
+
+<span class="sd">    save_traffic</span>
+<span class="sd">        If True, saves intermediate traffic results during the analysis.</span>
+
+<span class="sd">    event_type : EventTypeEnum</span>
+<span class="sd">        Specifies the type of event or hazard for risk/loss calculations.</span>
+
+<span class="sd">    risk_calculation_mode</span>
+<span class="sd">        Defines the mode of risk calculation (e.g., expected annual loss, scenario-based).</span>
+
+<span class="sd">    risk_calculation_year</span>
+<span class="sd">        Year used for risk or estimated annual loss calculations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisLossesEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AnalysisLossesEnum</span><span class="o">.</span><span class="n">INVALID</span>
+    <span class="p">)</span>
+    <span class="c1"># general</span>
+    <span class="n">weighing</span><span class="p">:</span> <span class="n">WeighingEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">WeighingEnum</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
+
+    <span class="c1"># losses</span>
+    <span class="n">production_loss_per_capita_per_hour</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">traffic_period</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrafficPeriodEnum</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">TrafficPeriodEnum</span><span class="o">.</span><span class="n">DAY</span>
+    <span class="p">)</span>
+    <span class="n">hours_per_traffic_period</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">trip_purposes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">TripPurposeEnum</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">TripPurposeEnum</span><span class="o">.</span><span class="n">NONE</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">resilience_curves_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">traffic_intensities_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">values_of_time_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># the redundancy analysis) and the intensities</span>
+    <span class="c1"># accessibility analyses</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">threshold_destinations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">equity_weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">calculate_route_without_disruption</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">buffer_meters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">category_field_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">save_traffic</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># risk or estimated annual losses related</span>
+    <span class="n">event_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventTypeEnum</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">NONE</span>
+    <span class="p">)</span>
+    <span class="n">risk_calculation_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RiskCalculationModeEnum</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">RiskCalculationModeEnum</span><span class="o">.</span><span class="n">NONE</span>
+    <span class="p">)</span>
+    <span class="n">risk_calculation_year</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisSectionDamages">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisSectionDamages</span><span class="p">(</span><span class="n">AnalysisSectionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration for a damages analysis section.</span>
+
+<span class="sd">    This dataclass reflects all possible settings for performing</span>
+<span class="sd">    a damages-related analysis. It defines parameters for how road</span>
+<span class="sd">    damages, risks, and associated outputs should be calculated</span>
+<span class="sd">    and represented.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    analysis : AnalysisDamagesEnum</span>
+<span class="sd">        Type of damages analysis to perform. Defaults to ``AnalysisDamagesEnum.INVALID``.</span>
+<span class="sd">    representative_damage_percentage : float, optional</span>
+<span class="sd">        Percentage of representative damage to apply in the analysis</span>
+<span class="sd">        (default is 100).</span>
+<span class="sd">    event_type : EventTypeEnum</span>
+<span class="sd">        Choose if the damages must be calculated from an event perspective (``EventTypeEnum.EVENT``) or a risk perspective (``EventTypeEnum.RETURN_PERIOD``).</span>
+<span class="sd">        Defaults to ``EventTypeEnum.NONE``.</span>
+<span class="sd">    damage_curve : DamageCurveEnum</span>
+<span class="sd">        Type of damage curves to be used: Huizinga (``DamageCurveEnum.HZ``), OSD (``DamageCurveEnum.OSD``), or manual (``DamageCurveEnum.MAN``).</span>
+<span class="sd">        Defaults to ``DamageCurveEnum.INVALID``.</span>
+<span class="sd">    risk_calculation_mode : RiskCalculationModeEnum, optional</span>
+<span class="sd">        Mode used for risk calculation (e.g., deterministic, probabilistic).</span>
+<span class="sd">        Defaults to ``RiskCalculationModeEnum.NONE``.</span>
+<span class="sd">    risk_calculation_year : int, optional</span>
+<span class="sd">        Year used for risk calculation scenarios. Required if risk_calculation_mode is set to ``RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR`` Defaults to 0 (unspecified).</span>
+<span class="sd">    create_table : bool, optional</span>
+
+<span class="sd">    file_name : Path or None</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This section is typically part of a larger analysis pipeline and</span>
+<span class="sd">    defines only the configuration parameters, not the computational logic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisDamagesEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">INVALID</span>
+    <span class="p">)</span>
+    <span class="c1"># road damage</span>
+    <span class="n">representative_damage_percentage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">event_type</span><span class="p">:</span> <span class="n">EventTypeEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
+    <span class="n">damage_curve</span><span class="p">:</span> <span class="n">DamageCurveEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DamageCurveEnum</span><span class="o">.</span><span class="n">INVALID</span>
+    <span class="p">)</span>
+    <span class="n">risk_calculation_mode</span><span class="p">:</span> <span class="n">RiskCalculationModeEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">RiskCalculationModeEnum</span><span class="o">.</span><span class="n">NONE</span>
+    <span class="p">)</span>
+    <span class="n">risk_calculation_year</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">create_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisSectionAdaptation">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisSectionAdaptation</span><span class="p">(</span><span class="n">AnalysisSectionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflects all possible settings that an adaptation analysis section might contain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisEnum</span> <span class="o">=</span> <span class="n">AnalysisEnum</span><span class="o">.</span><span class="n">ADAPTATION</span>
+    <span class="n">losses_analysis</span><span class="p">:</span> <span class="n">AnalysisLossesEnum</span> <span class="o">=</span> <span class="n">AnalysisLossesEnum</span><span class="o">.</span><span class="n">SINGLE_LINK_LOSSES</span>
+    <span class="c1"># Economical settings</span>
+    <span class="n">time_horizon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">discount_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="c1"># Hazard settings</span>
+    <span class="n">initial_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">climate_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">hazard_fraction_cost</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># First option is the no adaptation option</span>
+    <span class="n">adaptation_options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnalysisSectionAdaptationOption</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisSectionAdaptationOption">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisSectionAdaptationOption</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflects all possible settings that an adaptation option might contain.</span>
+<span class="sd">    The id should be unique and is used to determine the location of the input and output files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">construction_cost</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">construction_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">maintenance_cost</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">maintenance_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1000.0</span></div>
+
+
+
+<div class="viewcode-block" id="ProjectSection">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProjectSection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflects all possible settings that a project section might contain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisConfigData">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisConfigData</span><span class="p">(</span><span class="n">ConfigDataProtocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents all configuration data for analyses in RA2CE, including defaults from analysis.ini.</span>
+
+<span class="sd">    This class consolidates analysis configuration settings and integrates relevant network attributes</span>
+<span class="sd">    (e.g., network, origins/destinations, hazard names) for convenience.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ANALYSIS_SECTION</span>
+<span class="sd">        Union type for analysis sections (damages, losses, adaptation).</span>
+
+<span class="sd">    root_path</span>
+<span class="sd">        Root directory path for the project.</span>
+
+<span class="sd">    input_path</span>
+<span class="sd">        Input directory path for the project.</span>
+
+<span class="sd">    output_path</span>
+<span class="sd">        Output directory path where results will be saved.</span>
+
+<span class="sd">    static_path</span>
+<span class="sd">        Path to static project files.</span>
+
+<span class="sd">    project</span>
+<span class="sd">        Section containing project metadata.</span>
+
+<span class="sd">    analyses</span>
+<span class="sd">        List of all analysis to run consecutively.</span>
+
+<span class="sd">    origins_destinations</span>
+<span class="sd">        Section containing origins and destinations data.</span>
+
+<span class="sd">    network</span>
+<span class="sd">        Section containing network configuration data.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ANALYSIS_SECTION</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">AnalysisSectionDamages</span>
+        <span class="o">|</span> <span class="n">AnalysisSectionLosses</span>
+        <span class="o">|</span> <span class="n">AnalysisSectionAdaptation</span>
+        <span class="o">|</span> <span class="n">AnalysisConfigDataProtocol</span>
+    <span class="p">)</span>
+    <span class="n">root_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">input_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">output_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">static_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">project</span><span class="p">:</span> <span class="n">ProjectSection</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ProjectSection</span><span class="p">)</span>
+    <span class="n">analyses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+        <span class="n">AnalysisSectionDamages</span> <span class="o">|</span> <span class="n">AnalysisSectionLosses</span> <span class="o">|</span> <span class="n">AnalysisSectionAdaptation</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">origins_destinations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OriginsDestinationsSection</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">OriginsDestinationsSection</span>
+    <span class="p">)</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">NetworkSection</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">NetworkSection</span><span class="p">)</span>
+    <span class="n">aggregate_wl</span><span class="p">:</span> <span class="n">AggregateWlEnum</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AggregateWlEnum</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AnalysisConfigData.reroot_analysis_config">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.reroot_analysis_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reroot_analysis_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis_type</span><span class="p">:</span> <span class="n">AnalysisDamagesEnum</span> <span class="o">|</span> <span class="n">AnalysisLossesEnum</span><span class="p">,</span>
+        <span class="n">new_root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisConfigData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reroot dependent analysis in config data to the input of another analysis.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AnalysisConfigData: The rerooted config data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">reroot_path</span><span class="p">(</span><span class="n">orig_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+            <span class="c1"># Rewrite the path to the new root</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">orig_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">_orig_parts</span> <span class="o">=</span> <span class="n">orig_path</span><span class="o">.</span><span class="n">parts</span>
+            <span class="n">_rel_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">_orig_parts</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_path</span><span class="o">.</span><span class="n">parts</span><span class="p">)</span> <span class="p">:])</span>
+            <span class="k">return</span> <span class="n">new_root</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">analysis_type</span><span class="o">.</span><span class="n">config_value</span><span class="p">,</span> <span class="n">_rel_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">reroot_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
+
+        <span class="c1"># Rewrite the paths of the input files in the analysis config</span>
+        <span class="n">_analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_analysis</span><span class="p">(</span><span class="n">analysis_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_analysis</span><span class="p">,</span> <span class="n">AnalysisSectionDamages</span><span class="p">):</span>
+            <span class="n">_analysis</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">reroot_path</span><span class="p">(</span><span class="n">_analysis</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_analysis</span><span class="p">,</span> <span class="n">AnalysisSectionLosses</span><span class="p">):</span>
+            <span class="n">_analysis</span><span class="o">.</span><span class="n">resilience_curves_file</span> <span class="o">=</span> <span class="n">reroot_path</span><span class="p">(</span>
+                <span class="n">_analysis</span><span class="o">.</span><span class="n">resilience_curves_file</span>
+            <span class="p">)</span>
+            <span class="n">_analysis</span><span class="o">.</span><span class="n">traffic_intensities_file</span> <span class="o">=</span> <span class="n">reroot_path</span><span class="p">(</span>
+                <span class="n">_analysis</span><span class="o">.</span><span class="n">traffic_intensities_file</span>
+            <span class="p">)</span>
+            <span class="n">_analysis</span><span class="o">.</span><span class="n">values_of_time_file</span> <span class="o">=</span> <span class="n">reroot_path</span><span class="p">(</span><span class="n">_analysis</span><span class="o">.</span><span class="n">values_of_time_file</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span> <span class="o">=</span> <span class="n">new_root</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">damages_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnalysisSectionDamages</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all damages analyses from config.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[AnalysisSectionDamages]: List of all damages analyses.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">AnalysisSectionDamages</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">losses_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnalysisSectionLosses</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all losses analyses from config.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[AnalysisSectionLosses]: List of all losses analyses.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">AnalysisSectionLosses</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adaptation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisSectionAdaptation</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the adaptation analysis from config.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AnalysisSectionAdaptation: Adaptation analysis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">AnalysisSectionAdaptation</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">),</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="AnalysisConfigData.get_analysis">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_analysis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_analysis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisEnum</span> <span class="o">|</span> <span class="n">AnalysisDamagesEnum</span> <span class="o">|</span> <span class="n">AnalysisLossesEnum</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ANALYSIS_SECTION</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a certain analysis from config.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation:</span>
+<span class="sd">                The analysis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">analysis</span> <span class="o">==</span> <span class="n">analysis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AnalysisConfigData.get_data_output">
+<a class="viewcode-back" href="../../../../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_data_output">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_output</span><span class="p">(</span><span class="n">ini_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ini_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

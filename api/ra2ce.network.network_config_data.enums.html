@@ -1,0 +1,1322 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ra2ce.network.network_config_data.enums package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.network.network_config_data.enums';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ra2ce.analysis package" href="analysis.html" />
+    <link rel="prev" title="ra2ce.network.network_config_data package" href="ra2ce.network.network_config_data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../showcases/index.html">Showcases</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/network.html">Network</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/network_from_shapefile.html">Network from shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/network_from_OSM.html">Network from OSM download</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/hazard.html">Hazard</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/hazard.html">Hazard Overlay</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/criticality.html">Criticality Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/criticality_single_link_redundancy.html">Single Link Redundancy Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/criticality_multi_link_redundancy.html">Multi Link Redundancy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/accessibility.html">Accessibility Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/accessibility.prepare_data_origin_destinations.html">Origins and Destinations Data Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_all_pairs_origin_destinations.html">Defined Origin–Destination Pairs Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_closest_origin_destinations.html">Origins to Closest Destinations Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/damages.html">Damages Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_reference_damage_curves.html">Reference Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_manual_curves.html">Manual Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_EAD.html">Expected Annual Damage (EAD) Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/losses.html">Losses Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/losses_multi_link_redundancy_losses.html">Losses Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/adaptation.html">Adaptation Tutorial</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/equity.html">Equity Tutorial</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Docstrings Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="network.html">ra2ce.network package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="analysis.html">ra2ce.analysis package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.handler.html">ra2ce.handler package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="ra2ce.network.network_config_data.html" class="nav-link">ra2ce.network.network_config_data package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-network-network-config-data-enums-package">
+<h1>ra2ce.network.network_config_data.enums package<a class="headerlink" href="#ra2ce-network-network-config-data-enums-package" title="Link to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.network.network_config_data.enums.aggregate_wl_enum">
+<span id="ra2ce-network-network-config-data-enums-aggregate-wl-enum-module"></span><h2>ra2ce.network.network_config_data.enums.aggregate_wl_enum module<a class="headerlink" href="#module-ra2ce.network.network_config_data.enums.aggregate_wl_enum" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AggregateWlEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/aggregate_wl_enum.html#AggregateWlEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.configuration.html#ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase" title="ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceEnumBase</span></code></a></p>
+<p>Enumeration for methods to aggregate hazard intensity levels during hazard overlay for network links intersecting multiple hazard map cells.
+Options include:</p>
+<ul class="simple">
+<li><p>MIN: Use the minimum hazard intensity level.</p></li>
+<li><p>MAX: Use the maximum hazard intensity level.</p></li>
+<li><p>MEAN: Use the mean hazard intensity level.</p></li>
+<li><p>INVALID: Invalid option, used for error handling.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">99</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.INVALID" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MAX">
+<span class="sig-name descname"><span class="pre">MAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MAX" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MEAN">
+<span class="sig-name descname"><span class="pre">MEAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MEAN" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MIN">
+<span class="sig-name descname"><span class="pre">MIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MIN" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.NONE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.get_wl_abbreviation">
+<span class="sig-name descname"><span class="pre">get_wl_abbreviation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/aggregate_wl_enum.html#AggregateWlEnum.get_wl_abbreviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.get_wl_abbreviation" title="Link to this definition">#</a></dt>
+<dd><p>gets the first two letters of the Enum.name used in hazard overlay, damages and losses analysis.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.enums.network_type_enum">
+<span id="ra2ce-network-network-config-data-enums-network-type-enum-module"></span><h2>ra2ce.network.network_config_data.enums.network_type_enum module<a class="headerlink" href="#module-ra2ce.network.network_config_data.enums.network_type_enum" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkTypeEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/network_type_enum.html#NetworkTypeEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.configuration.html#ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase" title="ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceEnumBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.ALL">
+<span class="sig-name descname"><span class="pre">ALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.ALL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.BIKE">
+<span class="sig-name descname"><span class="pre">BIKE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.BIKE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE">
+<span class="sig-name descname"><span class="pre">DRIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE_SERVICE">
+<span class="sig-name descname"><span class="pre">DRIVE_SERVICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE_SERVICE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">99</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.INVALID" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.NONE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.WALK">
+<span class="sig-name descname"><span class="pre">WALK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.WALK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.get_enum">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/network_type_enum.html#NetworkTypeEnum.get_enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.get_enum" title="Link to this definition">#</a></dt>
+<dd><p>Create an enum from a given input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum" title="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkTypeEnum</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>input_str</strong> (<em>str</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input (str): Value from config.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Ra2ceEnumBase: Enumeration instance.
+NONE: This entry is used if the config is missing.
+INVALID: This entry is used if the config value is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.enums.road_type_enum">
+<span id="ra2ce-network-network-config-data-enums-road-type-enum-module"></span><h2>ra2ce.network.network_config_data.enums.road_type_enum module<a class="headerlink" href="#module-ra2ce.network.network_config_data.enums.road_type_enum" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RoadTypeEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/road_type_enum.html#RoadTypeEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.configuration.html#ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase" title="ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceEnumBase</span></code></a></p>
+<p>Enumeration of OpenStreetMap (OSM) road types.</p>
+<p>This enum provides integer identifiers for road types as defined by
+OpenStreetMap (OSM) tagging conventions. These types are commonly
+used in routing, navigation, and map rendering.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.NONE" title="Link to this definition">#</a></dt>
+<dd><p>No road type (0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY">
+<span class="sig-name descname"><span class="pre">MOTORWAY</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=motorway</span></code> — major highway, usually with controlled access (1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY_LINK">
+<span class="sig-name descname"><span class="pre">MOTORWAY_LINK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY_LINK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=motorway_link</span></code> — link roads (on/off ramps) connecting to a motorway (2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK">
+<span class="sig-name descname"><span class="pre">TRUNK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=trunk</span></code> — important roads, typically linking cities or regions (3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK_LINK">
+<span class="sig-name descname"><span class="pre">TRUNK_LINK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK_LINK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=trunk_link</span></code> — link roads connecting to a trunk road (4).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY">
+<span class="sig-name descname"><span class="pre">PRIMARY</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=primary</span></code> — major roads between towns or districts (5).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY_LINK">
+<span class="sig-name descname"><span class="pre">PRIMARY_LINK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY_LINK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=primary_link</span></code> — link roads connecting to a primary road (6).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY">
+<span class="sig-name descname"><span class="pre">SECONDARY</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=secondary</span></code> — roads connecting smaller towns and settlements (7).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY_LINK">
+<span class="sig-name descname"><span class="pre">SECONDARY_LINK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY_LINK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=secondary_link</span></code> — link roads connecting to a secondary road (8).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY">
+<span class="sig-name descname"><span class="pre">TERTIARY</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=tertiary</span></code> — local connector roads within regions (9).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY_LINK">
+<span class="sig-name descname"><span class="pre">TERTIARY_LINK</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY_LINK" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=tertiary_link</span></code> — link roads connecting to a tertiary road (10).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RESIDENTIAL">
+<span class="sig-name descname"><span class="pre">RESIDENTIAL</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RESIDENTIAL" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=residential</span></code> — roads serving residential areas (11).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.ROAD">
+<span class="sig-name descname"><span class="pre">ROAD</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.ROAD" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=road</span></code> — generic, unclassified road type (12).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TUNNEL">
+<span class="sig-name descname"><span class="pre">TUNNEL</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TUNNEL" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">tunnel=yes</span></code> — road passing underground (13).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.BRIDGE">
+<span class="sig-name descname"><span class="pre">BRIDGE</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.BRIDGE" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">bridge=yes</span></code> — road passing over an obstacle (14).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.CULVERT">
+<span class="sig-name descname"><span class="pre">CULVERT</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.CULVERT" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">culvert=yes</span></code> — small passage under a road, often for water flow (15).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RAIL">
+<span class="sig-name descname"><span class="pre">RAIL</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RAIL" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">railway=*</span></code> — railway tracks (16).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.UNCLASSIFIED">
+<span class="sig-name descname"><span class="pre">UNCLASSIFIED</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.UNCLASSIFIED" title="Link to this definition">#</a></dt>
+<dd><p>OSM <code class="docutils literal notranslate"><span class="pre">highway=unclassified</span></code> — minor public road, less important than tertiary (98).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.INVALID" title="Link to this definition">#</a></dt>
+<dd><p>Invalid or unsupported OSM road type (99).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>These identifiers are based on OSM tagging conventions.
+See: <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Key:highway">https://wiki.openstreetmap.org/wiki/Key:highway</a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">BRIDGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">CULVERT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">99</span></em><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">MOTORWAY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id3" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">MOTORWAY_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#id4" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#id5" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">PRIMARY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#id6" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">PRIMARY_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#id7" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">RAIL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#id8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">RESIDENTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#id9" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">ROAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#id10" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">SECONDARY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#id11" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">SECONDARY_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#id12" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">TERTIARY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#id13" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">TERTIARY_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#id14" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">TRUNK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#id15" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">TRUNK_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#id16" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">TUNNEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#id17" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">98</span></em><a class="headerlink" href="#id18" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.get_enum">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/road_type_enum.html#RoadTypeEnum.get_enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.get_enum" title="Link to this definition">#</a></dt>
+<dd><p>Create an enum from a given input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum" title="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">RoadTypeEnum</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>input_str</strong> (<em>str</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input (str): Value from config.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Ra2ceEnumBase: Enumeration instance.
+NONE: This entry is used if the config is missing.
+INVALID: This entry is used if the config value is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.enums.source_enum">
+<span id="ra2ce-network-network-config-data-enums-source-enum-module"></span><h2>ra2ce.network.network_config_data.enums.source_enum module<a class="headerlink" href="#module-ra2ce.network.network_config_data.enums.source_enum" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SourceEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/source_enum.html#SourceEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.configuration.html#ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase" title="ra2ce.configuration.ra2ce_enum_base.Ra2ceEnumBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceEnumBase</span></code></a></p>
+<p>Enumeration of data source types.</p>
+<p>This enum defines identifiers for different input data formats or
+sources used for the network definition.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSB_BPF">
+<span class="sig-name descname"><span class="pre">OSB_BPF</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSB_BPF" title="Link to this definition">#</a></dt>
+<dd><p>Binary Packed File (BPF) format from OSB pipeline (1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSM_DOWNLOAD">
+<span class="sig-name descname"><span class="pre">OSM_DOWNLOAD</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSM_DOWNLOAD" title="Link to this definition">#</a></dt>
+<dd><p>Data downloaded directly from OpenStreetMap (OSM) (2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.SHAPEFILE">
+<span class="sig-name descname"><span class="pre">SHAPEFILE</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.SHAPEFILE" title="Link to this definition">#</a></dt>
+<dd><p>ESRI Shapefile format (3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.PICKLE">
+<span class="sig-name descname"><span class="pre">PICKLE</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.PICKLE" title="Link to this definition">#</a></dt>
+<dd><p>Python Pickle serialized object (4).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.INVALID" title="Link to this definition">#</a></dt>
+<dd><p>Invalid or unsupported data source (99).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">99</span></em><a class="headerlink" href="#id19" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id20">
+<span class="sig-name descname"><span class="pre">OSB_BPF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id20" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">OSM_DOWNLOAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#id21" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">PICKLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#id22" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id23">
+<span class="sig-name descname"><span class="pre">SHAPEFILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#id23" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.config_value">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.config_value" title="Link to this definition">#</a></dt>
+<dd><p>Reconstruct the name as it is known in the config.
+This could entail replacement of “ “ by “_” and lower() operations.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Value as known in the config.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.enums.source_enum.SourceEnum.get_enum">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/enums/source_enum.html#SourceEnum.get_enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.get_enum" title="Link to this definition">#</a></dt>
+<dd><p>Create an enum from a given input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum" title="ra2ce.network.network_config_data.enums.source_enum.SourceEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceEnum</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>input_str</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input (str): Value from config.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Ra2ceEnumBase: Enumeration instance.
+NONE: This entry is used if the config is missing.
+INVALID: This entry is used if the config value is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.enums">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.network.network_config_data.enums" title="Link to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ra2ce.network.network_config_data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ra2ce.network.network_config_data package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="analysis.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ra2ce.analysis package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.enums.aggregate_wl_enum">ra2ce.network.network_config_data.enums.aggregate_wl_enum module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MAX"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MAX</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MEAN"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MEAN</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MIN"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MIN</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.NONE"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.NONE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.get_wl_abbreviation"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.get_wl_abbreviation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.enums.network_type_enum">ra2ce.network.network_config_data.enums.network_type_enum module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.ALL"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.ALL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.BIKE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.BIKE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.DRIVE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE_SERVICE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.DRIVE_SERVICE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.NONE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.WALK"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.WALK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.get_enum"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.get_enum()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.enums.road_type_enum">ra2ce.network.network_config_data.enums.road_type_enum module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.NONE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RESIDENTIAL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RESIDENTIAL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.ROAD"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.ROAD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TUNNEL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TUNNEL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.BRIDGE"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.BRIDGE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.CULVERT"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.CULVERT</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RAIL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RAIL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.UNCLASSIFIED"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.UNCLASSIFIED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.BRIDGE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.CULVERT</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.NONE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RAIL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id9"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RESIDENTIAL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.ROAD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id11"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id13"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id15"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id16"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK_LINK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id17"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TUNNEL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id18"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.UNCLASSIFIED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.get_enum"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.get_enum()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.enums.source_enum">ra2ce.network.network_config_data.enums.source_enum module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum"><code class="docutils literal notranslate"><span class="pre">SourceEnum</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSB_BPF"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSB_BPF</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSM_DOWNLOAD"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSM_DOWNLOAD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.SHAPEFILE"><code class="docutils literal notranslate"><span class="pre">SourceEnum.SHAPEFILE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.PICKLE"><code class="docutils literal notranslate"><span class="pre">SourceEnum.PICKLE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">SourceEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id19"><code class="docutils literal notranslate"><span class="pre">SourceEnum.INVALID</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id20"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSB_BPF</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id21"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSM_DOWNLOAD</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id22"><code class="docutils literal notranslate"><span class="pre">SourceEnum.PICKLE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id23"><code class="docutils literal notranslate"><span class="pre">SourceEnum.SHAPEFILE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.config_value"><code class="docutils literal notranslate"><span class="pre">SourceEnum.config_value</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.get_enum"><code class="docutils literal notranslate"><span class="pre">SourceEnum.get_enum()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.enums">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.network.network_config_data.enums.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.network.network_config_data.enums.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

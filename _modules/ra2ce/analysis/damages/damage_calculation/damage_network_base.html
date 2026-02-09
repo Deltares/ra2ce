@@ -1,0 +1,982 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.damages.damage_calculation.damage_network_base &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base';</script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.damages.damage_calculation.damage_network_base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023-2026 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoDataFrame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.damage_curve_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">DamageCurveEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damage_functions.manual_damage_functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ManualDamageFunctions</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damages_lookup</span><span class="w"> </span><span class="kn">import</span> <span class="n">LookUp</span> <span class="k">as</span> <span class="n">lookup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damages_lookup</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataframe_lookup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damages_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clean_lane_data</span><span class="p">,</span>
+    <span class="n">create_summary_statistics</span><span class="p">,</span>
+    <span class="n">scale_damage_using_lanes</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="DamageNetworkBase">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DamageNetworkBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A road network gdf with hazard data stored in it, and for which damages can be calculated&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">road_gdf</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">val_cols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">representative_damage_percentage</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the Data&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_cols</span> <span class="o">=</span> <span class="n">val_cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="n">road_gdf</span>
+        <span class="c1"># set of hazard info per event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val_cols</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">representative_damage_percentage</span> <span class="o">=</span> <span class="n">representative_damage_percentage</span>
+        <span class="c1"># TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module</span>
+        <span class="c1"># TODO: also create constructors of the children of this class</span>
+
+<div class="viewcode-block" id="DamageNetworkBase.main">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.main">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">damage_function</span><span class="p">:</span> <span class="n">DamageCurveEnum</span><span class="p">,</span>
+        <span class="n">manual_damage_functions</span><span class="p">:</span> <span class="n">ManualDamageFunctions</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controller for doing the EAD calculation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            damage_function (DamageCurveEnum): damage function key name that is to be used</span>
+<span class="sd">            manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Needs to be implemented in concrete child class.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># events is missing</span>
+<div class="viewcode-block" id="DamageNetworkBase.do_cleanup_and_mask_creation">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.do_cleanup_and_mask_creation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_cleanup_and_mask_creation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Call all cleanup and mask functions, because this is a standard procedure in most calculations&quot;&quot;&quot;</span>
+        <span class="c1"># CLEANUPS (on the original gdf)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remap_road_types_to_fewer_classes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_and_interpolate_missing_lane_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fix_extraordinary_lanes</span><span class="p">()</span>
+
+        <span class="c1"># Mask creation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_mask</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_unclassified_road_types_from_mask</span><span class="p">()</span></div>
+
+
+    <span class="c1">### Generic cleanup functionality</span>
+<div class="viewcode-block" id="DamageNetworkBase.fix_extraordinary_lanes">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.fix_extraordinary_lanes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fix_extraordinary_lanes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove exceptionally high/low lane numbers in self.gdf&quot;&quot;&quot;</span>
+        <span class="c1"># fixing lanes</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes_copy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes_copy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes_copy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes_copy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes_copy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">6.0</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="mf">6.0</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.clean_and_interpolate_missing_lane_data">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.clean_and_interpolate_missing_lane_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_and_interpolate_missing_lane_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># cleanup and complete the lane data.</span>
+        <span class="c1">### Try to convert all data to floats</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="s2">&quot;float&quot;</span>
+            <span class="p">)</span>  <span class="c1"># floats instead of ints because ints cannot be nan.</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span> <span class="o">=</span> <span class="n">clean_lane_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="p">)</span>
+
+        <span class="c1"># round to nearest integer, but save as float format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># boolean with trues for all nans, i.e. all road segements without lane data</span>
+        <span class="n">nans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nans</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Of the {} road segments, only {} had lane data, so for {} the &#39;</span>
+<span class="sd">                                    lane data will be interpolated from the existing data&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="p">),</span> <span class="p">(</span><span class="o">~</span><span class="n">nans</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">nans</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">lane_stats</span> <span class="o">=</span> <span class="n">create_summary_statistics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">)</span>
+
+            <span class="c1"># Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)</span>
+            <span class="n">lane_nans_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lane_nans_mask</span><span class="p">,</span> <span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">lane_nans_mask</span><span class="p">,</span> <span class="s2">&quot;road_type&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lane_stats</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Interpolated the missing lane data as follows: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lane_stats</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># all nans should be replaced</span>
+            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+        <span class="c1"># TODO: think about if this is the best option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.remap_road_types_to_fewer_classes">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remap_road_types_to_fewer_classes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_road_types_to_fewer_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new new column road_types, which has a fewer number of road type categories</span>
+<span class="sd">        e.g. -&gt; &#39;motorway_junction&#39; -&gt; &#39;motorway&#39;</span>
+<span class="sd">        (Renames highway column to infra_type)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># reduce the number of road types (col &#39;infra_type&#39;) to smaller number of road_types for which damage curves exist</span>
+        <span class="n">road_mapping_dict</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">lookup</span><span class="o">.</span><span class="n">road_mapping</span><span class="p">()</span>
+        <span class="p">)</span>  <span class="c1"># The lookup class contains all kinds of data</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;highway&quot;</span><span class="p">:</span> <span class="s2">&quot;infra_type&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>  <span class="c1"># Todo: this should probably not be done here</span>
+        <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;infra_type&quot;</span><span class="p">]</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s2">&quot;road_type&quot;</span><span class="p">:</span> <span class="n">road_mapping_dict</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.remove_unclassified_road_types_from_mask">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remove_unclassified_road_types_from_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_unclassified_road_types_from_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drop all rows with road types classified as &#39;none&#39; from the self._gdf_mask</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span>
+        <span class="k">if</span> <span class="s2">&quot;none&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">to_drop</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;We will drop </span><span class="si">{}</span><span class="s2"> rows for which the road_type is unrecognized&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">to_drop</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">)]</span></div>
+
+
+    <span class="c1">### Damage handlers</span>
+<div class="viewcode-block" id="DamageNetworkBase.calculate_damage_manual_functions">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_manual_functions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_damage_manual_functions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">manual_damage_functions</span><span class="p">:</span> <span class="n">ManualDamageFunctions</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the damage using the manual damage functions</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            events (list[str]): list of events (or return periods) to iterate over, these should match the hazard column names</span>
+<span class="sd">            manual_damage_functions (ManualDamageFunctions): The manual damage functions object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Todo: Dirty fixes, these should be read from the init</span>
+        <span class="n">hazard_prefix</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span>
+
+        <span class="c1"># dataframe to carry out the damage calculation #todo: this is a bit dirty</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span>
+
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">manual_damage_functions</span><span class="o">.</span><span class="n">damage_functions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">&quot;No damage functions were loaded&quot;</span>
+
+        <span class="k">for</span> <span class="n">_damage_func</span> <span class="ow">in</span> <span class="n">manual_damage_functions</span><span class="o">.</span><span class="n">damage_functions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c1"># Add max damage values to df</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">_damage_func</span><span class="o">.</span><span class="n">add_max_damage</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">_damage_func</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                <span class="c1"># Add apply interpolator objects</span>
+                <span class="n">event_prefix</span> <span class="o">=</span> <span class="n">event</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">_damage_func</span><span class="o">.</span><span class="n">calculate_damage</span><span class="p">(</span>
+                    <span class="n">df</span><span class="p">,</span> <span class="n">_damage_func</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">hazard_prefix</span><span class="p">,</span> <span class="n">event_prefix</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Only transfer the final results to the damage column</span>
+        <span class="n">dam_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dam_&quot;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Damage calculation with the manual damage functions was succesfull.&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.calculate_damage_HZ">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_HZ">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_damage_HZ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">           *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Damage calculations with Huizinga curves are based on Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro&#39;s.</span>
+<span class="sd">                            To convert to local currency, these need to be:</span>
+<span class="sd">                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)</span>
+<span class="sd">                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          </span>
+<span class="sd">                            EU-28-2015-GDP_per_capita = 39.200 euro</span>
+<span class="sd">                        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Todo: Dirty fixes, these should be read from the init</span>
+        <span class="n">hazard_prefix</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;me&quot;</span>  <span class="c1"># indicate that you want to use the mean</span>
+
+        <span class="c1"># Load the Huizinga damage functions</span>
+        <span class="n">curve_name</span> <span class="o">=</span> <span class="s2">&quot;HZ&quot;</span>
+
+        <span class="n">df_max_damages_huizinga</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="n">lookup</span><span class="o">.</span><span class="n">get_max_damages_huizinga</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">interpolator</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_flood_curves</span><span class="p">()[</span>
+            <span class="s2">&quot;HZ&quot;</span>
+        <span class="p">]</span>  <span class="c1"># input: water depth (cm); output: damage (fraction road construction costs)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;max_dam_hz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="n">dataframe_lookup</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">df_max_damages_huizinga</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">,</span> <span class="s2">&quot;road_type&quot;</span><span class="p">]),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">curve_name</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;max_dam_hz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># max damage (euro/m)</span>
+                <span class="o">*</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hazard_prefix</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">end</span><span class="p">)])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                    <span class="nb">float</span>
+                <span class="p">)</span>  <span class="c1"># damage curve  (-)</span>
+                <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hazard_prefix</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="s2">&quot;fr&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                    <span class="nb">float</span>
+                <span class="p">)</span>  <span class="c1"># inundated fraction (-)</span>
+                <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">],</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>  <span class="c1"># length segment (m)</span>
+
+        <span class="c1"># Add the new columns add the right location to the df</span>
+        <span class="n">dam_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dam_&quot;</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was successful&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.calculate_damage_OSdaMage">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_OSdaMage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_damage_OSdaMage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Damage calculation with the OSdaMage functions&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">interpolate_damage</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">representative_damage_percentage</span><span class="p">):</span>
+            <span class="c1"># Extract the tuple of damage values from the row</span>
+            <span class="n">damage_values</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;dam_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_quartiles&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)]</span>
+
+            <span class="c1"># Quantile values corresponding to the damage values</span>
+            <span class="n">percentages</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+
+            <span class="c1"># Perform linear interpolation using interp1d from scipy</span>
+            <span class="n">_interpolator</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">percentages</span><span class="p">,</span> <span class="n">damage_values</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;extrapolate&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Interpolate the damage value for the given representative_damage_percentage</span>
+            <span class="n">interpolated_damage</span> <span class="o">=</span> <span class="n">_interpolator</span><span class="p">(</span><span class="n">representative_damage_percentage</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">interpolated_damage</span>
+
+        <span class="c1"># These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Damage calculations with OSdaMage functions are based on </span>
+<span class="sd">            Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro&#39;s.</span>
+<span class="sd">                            To convert to local currency, these need to be:</span>
+<span class="sd">                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)</span>
+<span class="sd">                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          </span>
+<span class="sd">                            EU-28-2015-GDP_per_capita = 39.200 euro</span>
+<span class="sd">                        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Todo: Dirty fixes, these should be read from the configuration file</span>
+        <span class="n">hazard_prefix</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;me&quot;</span>  <span class="c1"># indicate that you want to use the mean</span>
+
+        <span class="c1"># Load the OSdaMage functions</span>
+        <span class="n">max_damages</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_max_damages_osd</span><span class="p">()</span>
+        <span class="n">interpolators</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_flood_curves</span><span class="p">()</span>
+        <span class="n">interpolators</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="s2">&quot;HZ&quot;</span>
+        <span class="p">)</span>  <span class="c1"># input: water depth (cm); output: damage (fraction road construction costs)</span>
+        <span class="n">lane_scale_factors</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_lane_number_damage_correction</span><span class="p">()</span>
+
+        <span class="c1"># Prepare the output files</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;tuple&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lanes&quot;</span><span class="p">])</span>
+
+        <span class="c1"># CALCULATE MINIMUM AND MAXIMUM CONSTRUCTION COST PER ROAD TYPE</span>
+        <span class="c1"># pre-calculation of max damages per percentage (same for each C1-C6 category)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lower_damage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">max_damages</span><span class="p">[</span><span class="s2">&quot;Lower&quot;</span><span class="p">])</span>
+        <span class="p">)</span>  <span class="c1"># i.e. min construction costs</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;upper_damage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">max_damages</span><span class="p">[</span><span class="s2">&quot;Upper&quot;</span><span class="p">])</span>
+        <span class="p">)</span>  <span class="c1"># i.e. max construction costs</span>
+
+        <span class="c1"># apply damage correction for lanes</span>
+        <span class="n">cols_to_scale</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lower_damage&quot;</span><span class="p">,</span> <span class="s2">&quot;upper_damage&quot;</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">scale_damage_using_lanes</span><span class="p">(</span><span class="n">lane_scale_factors</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols_to_scale</span><span class="p">)</span>
+
+        <span class="c1"># create separate column for each percentage of construction costs (is faster then tuple)</span>
+        <span class="k">for</span> <span class="n">percentage</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">25</span><span class="p">,</span>
+            <span class="mi">50</span><span class="p">,</span>
+            <span class="mi">75</span><span class="p">,</span>
+            <span class="mi">100</span><span class="p">,</span>
+        <span class="p">]:</span>  <span class="c1"># So this interpolates the min to the max damage</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;damage_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percentage</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;upper_damage&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">percentage</span> <span class="o">/</span> <span class="mi">100</span>
+            <span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lower_damage&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="n">percentage</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">curve_name</span><span class="p">,</span> <span class="n">interpolator</span> <span class="ow">in</span> <span class="n">interpolators</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># print(curve_name, interpolator)</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">percentage</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percentage</span><span class="p">,</span> <span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;damage_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percentage</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                            <span class="nb">float</span>
+                        <span class="p">)</span>  <span class="c1"># max damage (in euro/m)</span>
+                        <span class="o">*</span> <span class="n">interpolator</span><span class="p">(</span>
+                            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hazard_prefix</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">end</span><span class="p">)]</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                            <span class="nb">float</span>
+                        <span class="p">)</span>  <span class="c1"># damage curve: fraction f(depth-cm) #Todo check units</span>
+                        <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hazard_prefix</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="s2">&quot;fr&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                            <span class="nb">float</span>
+                        <span class="p">)</span>  <span class="c1"># inundated fraction of the segment should be in km. because max damage (in euro/km)</span>
+                        <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+                        <span class="mi">3</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># This wraps it all in tuple again</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_quartiles&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                    <span class="nb">zip</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_0_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)],</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_25_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)],</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_50_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)],</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_75_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)],</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dam_100_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)],</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;dam_</span><span class="si">{</span><span class="n">curve_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2">_representative&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">interpolate_damage</span><span class="p">(</span>
+                            <span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">representative_damage_percentage</span>
+                        <span class="p">),</span>
+                        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+                <span class="c1"># And throw way all intermediate results (that are not in the tuple)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                        <span class="s2">&quot;dam_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percentage</span><span class="p">,</span> <span class="n">curve_name</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">percentage</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;damage_&quot;</span><span class="p">)])</span>
+
+        <span class="c1"># drop invalid combinations of damage curves and road types (C1-C4 for motorways; C5,C6 for other)</span>
+        <span class="n">all_dam_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dam_&quot;</span><span class="p">)]</span>
+        <span class="n">motorway_curves</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_dam_cols</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">4</span>
+        <span class="p">]</span>  <span class="c1"># C1-C4</span>
+        <span class="n">other_curves</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_dam_cols</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">4</span>
+        <span class="p">]</span>  <span class="c1"># C5, C6</span>
+
+        <span class="n">is_motorway_mask</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;road_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="s2">&quot;trunk&quot;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">curve</span> <span class="ow">in</span> <span class="n">other_curves</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">is_motorway_mask</span><span class="p">,</span> <span class="n">curve</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="k">for</span> <span class="n">curve</span> <span class="ow">in</span> <span class="n">motorway_curves</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">is_motorway_mask</span><span class="p">,</span> <span class="n">curve</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># Add the new columns add the right location to the df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">all_dam_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">all_dam_cols</span><span class="p">]</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1">### Utils handlers</span>
+<div class="viewcode-block" id="DamageNetworkBase.create_mask">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.create_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)</span>
+<span class="sd">        effect: *self._gdf_mask* = mask of only the rows with hazard data</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># because the fractions are often 0 (also if the rest is nan, this messes up the .isna)</span>
+        <span class="n">val_cols_temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_cols</span> <span class="k">if</span> <span class="s2">&quot;_fr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+        <span class="n">gdf_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">val_cols_temp</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span> <span class="o">=</span> <span class="n">gdf_mask</span>  <span class="c1"># todo: not sure if we need to store the mask</span>
+
+        <span class="c1"># Also remove the geometries from the mask</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
+            <span class="n">column_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gdf_mask</span><span class="p">[</span><span class="n">column_names</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DamageNetworkBase.replace_none_with_nan">
+<a class="viewcode-back" href="../../../../../api/ra2ce.analysis.damages.damage_calculation.html#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.replace_none_with_nan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replace_none_with_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dam_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dam_&quot;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">dam_cols</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,838 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Origins and Destinations Data Preparation &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cdad26c3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/accessibility.prepare_data_origin_destinations';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Defined Origin–Destination Pairs Tutorial" href="../_examples/accessibility_all_pairs_origin_destinations.html" />
+    <link rel="prev" title="Accessibility Analysis" href="accessibility.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../showcases/index.html">Showcases</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="network.html">Network</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/network_from_shapefile.html">Network from shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/network_from_OSM.html">Network from OSM download</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="hazard.html">Hazard</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/hazard.html">Hazard Overlay</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="criticality.html">Criticality Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/criticality_single_link_redundancy.html">Single Link Redundancy Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/criticality_multi_link_redundancy.html">Multi Link Redundancy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="accessibility.html">Accessibility Analysis</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Origins and Destinations Data Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_all_pairs_origin_destinations.html">Defined Origin–Destination Pairs Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_closest_origin_destinations.html">Origins to Closest Destinations Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="damages.html">Damages Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_reference_damage_curves.html">Reference Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_manual_curves.html">Manual Damage Curves Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/damages_EAD.html">Expected Annual Damage (EAD) Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="losses.html">Losses Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/losses_multi_link_redundancy_losses.html">Losses Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="adaptation.html">Adaptation Tutorial</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="equity.html">Equity Tutorial</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/accessibility_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">Docstrings Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/network.html">ra2ce.network package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/analysis.html">ra2ce.analysis package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/ra2ce.handler.html">ra2ce.handler package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="accessibility.html" class="nav-link">Accessibility Analysis</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Origins and...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="origins-and-destinations-data-preparation">
+<h1>Origins and Destinations Data Preparation<a class="headerlink" href="#origins-and-destinations-data-preparation" title="Link to this heading">#</a></h1>
+<p>Before running any accessibility analysis in RA2CE, you must prepare two input
+shapefiles:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">origins.shp</span></code> → represents the <strong>starting locations</strong> (e.g. households, neighborhoods, schools).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destinations.shp</span></code> → represents the <strong>end locations</strong> (e.g. hospitals, shelters, workplaces).</p></li>
+</ul>
+<p>Both files must follow a consistent structure so that RA2CE can correctly
+recognize them and compute optimal routes.</p>
+<hr class="docutils" />
+<section id="coordinate-reference-system-crs">
+<h2>Coordinate Reference System (CRS)<a class="headerlink" href="#coordinate-reference-system-crs" title="Link to this heading">#</a></h2>
+<p>Both shapefiles must:</p>
+<ul class="simple">
+<li><p>Be in a <strong>projected coordinate system</strong> (e.g preferably EPSG:4326).</p></li>
+<li><p>Use the <strong>same CRS</strong> for origins, destinations, and the network.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If origins and destinations use a different CRS than the network,
+RA2CE will not run. Always check and reproject your data beforehand.</p>
+</div>
+<p>You can reproject your shapefiles using QGIS, ArcGIS, or GeoPandas:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;origins.shp&quot;</span><span class="p">)</span>
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+<span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;origins_projected.shp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="required-attributes">
+<h2>Required Attributes<a class="headerlink" href="#required-attributes" title="Link to this heading">#</a></h2>
+<p>Each shapefile must include specific attributes. Make sure that the geometry is of type Point (not MultiPoint).</p>
+<p><strong>Origins shapefile (origins.shp):</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBJECTID</span></code> → unique identifier for each origin point.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POPULATION</span></code> → number of people represented at the origin
+(used to assess impact when access is lost).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry</span></code> → point geometry (as Point, not MultiPoint).</p></li>
+</ul>
+<p><strong>Destinations shapefile (destinations.shp):</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBJECTID</span></code> → unique identifier for each destination point.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">category</span></code> <em>(optional)</em> → groups destinations by type, e.g.:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">hospital</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">school</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shelter</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry</span></code> → point geometry (as Point, not MultiPoint).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="creating-origins-and-destinations">
+<h2>Creating Origins and Destinations<a class="headerlink" href="#creating-origins-and-destinations" title="Link to this heading">#</a></h2>
+<p>There are several ways to create <code class="docutils literal notranslate"><span class="pre">origins.shp</span></code> and <code class="docutils literal notranslate"><span class="pre">destinations.shp</span></code> depending on your data.</p>
+<section id="manual-preparation-in-qgis">
+<h3>Manual Preparation in QGIS<a class="headerlink" href="#manual-preparation-in-qgis" title="Link to this heading">#</a></h3>
+<p>You can create the shapefiles manually in QGIS:</p>
+<ol class="arabic simple">
+<li><p>Open QGIS and create a <strong>new point layer</strong> (shapefile or GeoPackage).</p></li>
+<li><p>Set the CRS to match your network (e.g. EPSG:4326).</p></li>
+<li><p>Add the required fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBJECTID</span></code> (integer, unique)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POPULATION</span></code> (integer, only for origins)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">category</span></code> (string, only for destinations)</p></li>
+</ul>
+</li>
+<li><p>Use the <strong>Add Point Feature</strong> tool to place points at the desired locations.
+- For origins: place them at households, neighborhood centroids, or village centers.
+- For destinations: place them at hospitals, schools, shelters, or other facilities.</p></li>
+<li><p>Save the layer as <code class="docutils literal notranslate"><span class="pre">origins.shp</span></code> or <code class="docutils literal notranslate"><span class="pre">destinations.shp</span></code>.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="generating-origins-from-osm-buildings">
+<h3>Generating Origins from OSM Buildings<a class="headerlink" href="#generating-origins-from-osm-buildings" title="Link to this heading">#</a></h3>
+<p>Instead of creating a grid or manually digitizing origins, you can also derive
+them directly from <strong>OpenStreetMap (OSM) building footprints</strong>. This approach is
+useful when:</p>
+<ul class="simple">
+<li><p>You want a realistic distribution of population across actual buildings.</p></li>
+<li><p>Census population totals are available, but not at building level.</p></li>
+<li><p>You prefer to avoid assumptions about evenly spaced origins (as in a grid).</p></li>
+</ul>
+<p>The workflow is as follows:</p>
+<ol class="arabic simple">
+<li><p>Download building footprints from OSM within your study area polygon.</p></li>
+<li><p>Compute the building footprint areas.</p></li>
+<li><p>Redistribute the total population of your case study proportionally
+to the footprint area of each building.</p></li>
+<li><p>Convert each building polygon into a representative point
+(for OD analysis).</p></li>
+</ol>
+<p>Example Python script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">shape</span>
+
+<span class="c1"># Define paths</span>
+
+<span class="n">buffer_polygon_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;buffer_polygon_OD.geojson&quot;</span><span class="p">)</span>
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">buffer_od</span><span class="p">)</span>
+<span class="n">OD_polygon</span> <span class="o">=</span> <span class="n">shape</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Download OSM building footprints</span>
+<span class="n">tags_basic_needs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;building&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;yes&#39;</span><span class="p">]}</span>
+<span class="n">features</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">features_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="n">OD_polygon</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">tags_basic_needs</span><span class="p">)</span>
+
+<span class="c1"># Assign IDs</span>
+<span class="n">features</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">features</span><span class="p">[[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+
+<span class="c1"># Define total population for case study (to redistribute)</span>
+<span class="n">population</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Beira&quot;</span><span class="p">:</span> <span class="mi">533825</span><span class="p">}</span>
+<span class="n">case_study</span> <span class="o">=</span> <span class="s2">&quot;Beira&quot;</span>
+
+<span class="c1"># Compute building areas (in projected CRS)</span>
+<span class="n">crs</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>   <span class="c1"># example UTM zone, adjust for your area</span>
+<span class="n">origins</span><span class="p">[</span><span class="s2">&quot;Area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">area</span>
+
+<span class="c1"># Get total residential area to use as weight</span>
+<span class="n">tot_res_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">origins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">origins</span><span class="p">[</span><span class="s2">&quot;building&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;Area&quot;</span><span class="p">])</span>
+
+<span class="c1"># Redistribute population proportionally to building footprint area</span>
+<span class="n">people</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">origins</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;building&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
+        <span class="n">people</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;Area&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">tot_res_area</span> <span class="o">*</span> <span class="n">population</span><span class="p">[</span><span class="n">case_study</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">people</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">origins</span><span class="p">[</span><span class="s2">&quot;POPULATION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">people</span>
+
+<span class="c1"># Convert polygons to points (representative points inside buildings)</span>
+<span class="n">origins</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">geom</span><span class="p">:</span> <span class="n">geom</span><span class="o">.</span><span class="n">representative_point</span><span class="p">())</span>
+
+<span class="c1"># Save as shapefile</span>
+<span class="n">origins</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">network_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;origins_OSM.shp&quot;</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;ESRI Shapefile&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This script generates an <code class="docutils literal notranslate"><span class="pre">origins.shp</span></code> file where:</p>
+<ul class="simple">
+<li><p>Each origin represents one <strong>building</strong> (represented as a point).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">POPULATION</span></code> attribute corresponds to the share of the total population
+allocated to that building.</p></li>
+<li><p>The total population in the shapefile matches the census total you defined.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Adjust the CRS (<code class="docutils literal notranslate"><span class="pre">EPSG</span></code> code) to your study area before computing areas.</p></li>
+<li><p>The redistribution assumes that population is evenly distributed by
+building area, which is a simplification. If detailed population data
+is available, you should use it instead.</p></li>
+</ul>
+</div>
+</section>
+<section id="generating-origins-from-worldpop-raster-data">
+<h3>Generating Origins from WorldPop raster data<a class="headerlink" href="#generating-origins-from-worldpop-raster-data" title="Link to this heading">#</a></h3>
+<p>Work in Progress</p>
+</section>
+</section>
+<section id="checklist">
+<h2>Checklist<a class="headerlink" href="#checklist" title="Link to this heading">#</a></h2>
+<p>✅ Both files use the same <strong>projected CRS</strong>
+✅ <code class="docutils literal notranslate"><span class="pre">OBJECTID</span></code> present and unique
+✅ <code class="docutils literal notranslate"><span class="pre">POPULATION</span></code> present in origins
+✅ <code class="docutils literal notranslate"><span class="pre">category</span></code> optional in destinations
+✅ Points fall <strong>inside the study area polygon</strong></p>
+</section>
+<hr class="docutils" />
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>Once your origins and destinations are ready, you can continue with one of the tutorials:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../_examples/accessibility_all_pairs_origin_destinations.html"><span class="doc">Defined Origin–Destination Pairs</span></a></p></li>
+<li><p><a class="reference internal" href="../_examples/accessibility_closest_origin_destinations.html"><span class="doc">Origins to Closest Destinations</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="accessibility.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Accessibility Analysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../_examples/accessibility_all_pairs_origin_destinations.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Defined Origin–Destination Pairs Tutorial</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coordinate-reference-system-crs">Coordinate Reference System (CRS)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#required-attributes">Required Attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-origins-and-destinations">Creating Origins and Destinations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-preparation-in-qgis">Manual Preparation in QGIS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-origins-from-osm-buildings">Generating Origins from OSM Buildings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-origins-from-worldpop-raster-data">Generating Origins from WorldPop raster data</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checklist">Checklist</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/tutorials/accessibility.prepare_data_origin_destinations.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/tutorials/accessibility.prepare_data_origin_destinations.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

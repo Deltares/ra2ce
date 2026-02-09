@@ -1,0 +1,315 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## RA2CE Feature: adaptation measures"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This notebook explains how users can create different adaptation options that will influence the calculated damages and losses on roads. It also performs a Cost-Benefit Analysis (CBA) for each of the adaptation option to explore the cost effectiveness of these options."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pathlib import Path\n",
+    "from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum\n",
+    "from ra2ce.ra2ce_handler import Ra2ceHandler\n",
+    "from ra2ce.network.network_config_data.enums.source_enum import SourceEnum\n",
+    "from ra2ce.analysis.analysis_config_data.analysis_config_data import (\n",
+    "    AnalysisConfigData,\n",
+    "    AnalysisSectionAdaptation,\n",
+    "    AnalysisSectionAdaptationOption,\n",
+    "    AnalysisSectionDamages,\n",
+    ")\n",
+    "from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (\n",
+    "    AnalysisDamagesEnum,\n",
+    ")\n",
+    "from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum\n",
+    "from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (\n",
+    "    AnalysisLossesEnum,\n",
+    ")\n",
+    "from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum\n",
+    "from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum\n",
+    "\n",
+    "from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum\n",
+    "from ra2ce.network.network_config_data.network_config_data import (\n",
+    "    HazardSection,\n",
+    "    NetworkConfigData,\n",
+    "    NetworkSection,\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "root_dir = Path(\"data\", \"adaptation\")\n",
+    "\n",
+    "static_path = root_dir.joinpath(\"static\")\n",
+    "hazard_path =static_path.joinpath(\"hazard\")\n",
+    "network_path = static_path.joinpath(\"network\")\n",
+    "output_path=root_dir.joinpath(\"output\")\n",
+    "\n",
+    "input_path = root_dir.joinpath(\"input\") # path of the data files for all adaptation options and reference option"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Network config\n",
+    "\n",
+    "The network must first be configured and overlaid with a hazard map. The current workflow only supports the following configurations:\n",
+    "\n",
+    "- AggregateWlENum: only MEAN \n",
+    "- SourceEnum must be set to SHAPEFILE. This is because we are running Losses which requires information about the traffic intensities, \n",
+    "- Adaptation is for now only event-based for a single hazard map. Therefore the name of the hazard map should not start with \"RP\" and should start the risk-based damage workflow will be triggered. The hazard name should start with a letter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "_network_section = NetworkSection(\n",
+    "    source= SourceEnum.OSM_DOWNLOAD,\n",
+    "    polygon= network_path.joinpath(\"polygon_jacksonvill_beach.shp\"),\n",
+    "    road_types=[      \n",
+    "        RoadTypeEnum.SECONDARY,\n",
+    "        RoadTypeEnum.SECONDARY_LINK,\n",
+    "        RoadTypeEnum.PRIMARY,\n",
+    "        RoadTypeEnum.PRIMARY_LINK,\n",
+    "        RoadTypeEnum.TRUNK,\n",
+    "        RoadTypeEnum.MOTORWAY,\n",
+    "        RoadTypeEnum.MOTORWAY_LINK,\n",
+    "        RoadTypeEnum.RESIDENTIAL,\n",
+    "        RoadTypeEnum.UNCLASSIFIED,\n",
+    "    ],\n",
+    "    save_gpkg=True,\n",
+    "    reuse_network_output=True,\n",
+    ")\n",
+    "\n",
+    "_hazard = HazardSection(\n",
+    "    hazard_map=[Path(file) for file in hazard_path.glob(\"*.tif\")],\n",
+    "    hazard_field_name= [\"waterdepth\"],\n",
+    "    aggregate_wl = AggregateWlEnum.MEAN,\n",
+    "    hazard_crs = \"EPSG:4326\",\n",
+    ")\n",
+    "\n",
+    "\n",
+    "_network_config_data = NetworkConfigData(\n",
+    "    root_path=root_dir,\n",
+    "    static_path=static_path,\n",
+    "    network=_network_section,\n",
+    "    hazard=_hazard\n",
+    "    )"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "handler = Ra2ceHandler.from_config(_network_config_data, None)\n",
+    "\n",
+    "handler.configure()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Damages configuration\n",
+    "\n",
+    "The configuration for the damages analysis must be defined here. The general configurations of damages are shared for all adaptation options!\n",
+    "\n",
+    "\n",
+    "### Damages:\n",
+    "\n",
+    "- Since we are simulating the adaptation effects by modifying the hazard curves, only the Manual damage curve type is allowed: `DamageCurveEnum.MAN`\n",
+    "- `EventTypeEnum.EVENT` is mandatory since we are dealing with an event-base adaptation."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "_damages_section = AnalysisSectionDamages(\n",
+    "        analysis=AnalysisDamagesEnum.DAMAGES,\n",
+    "        event_type=EventTypeEnum.EVENT,\n",
+    "        damage_curve=DamageCurveEnum.MAN,\n",
+    "        save_gpkg=True,\n",
+    "        save_csv=True,\n",
+    "    )"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Adaptation options:\n",
+    "\n",
+    "The adaptation options can now be defined. \n",
+    "\n",
+    "1. The `AnalysisSectionAdaptation` must be filled with general inputs applicable to all adaptation options:\n",
+    "    - discount rate: to account for inflation\n",
+    "    - initial_frequency: this the frequency of occurence of the considered hazard map at year 0\n",
+    "    - climate factor: accounting for the increase of likelihood over time fo the hazard map\n",
+    "    - time horizon: numbers of years for the CBA\n",
+    "2. A collection of adaptation options is to be specified:\n",
+    "    - Each adaptation option has an `id` which must match the input data structure in order to assign the input files correctly\n",
+    "    - The first adaptation option represents the initial situation (Business As Usual) and only requires a `name` and `id`.\n",
+    "    - The following adaptation options have extra required attributes to calculate the cost: `construction_cost`, `construction_interval`, 'maintenance_cost', 'maintenance_interval'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "# - adaptation\n",
+    "_adaptation_options = [\n",
+    "    AnalysisSectionAdaptationOption(\n",
+    "            id=\"AO0\",\n",
+    "            name=\"No adaptation\",\n",
+    "        ),\n",
+    "        AnalysisSectionAdaptationOption(\n",
+    "            id=\"AO1\",\n",
+    "            name=\"Cheap construction, expensive maintenance\",\n",
+    "            construction_cost=1000.0,  # this is the cost per meter\n",
+    "            construction_interval=20.0,\n",
+    "            maintenance_cost=0.0,  # this is cost per meter per year\n",
+    "            maintenance_interval=0.0,\n",
+    "        ),\n",
+    "]\n",
+    "\n",
+    "_adaptation_section = AnalysisSectionAdaptation(\n",
+    "        analysis=AnalysisEnum.ADAPTATION,\n",
+    "        adaptation_options=_adaptation_options,\n",
+    "        discount_rate=0.025,  # correcting inflation 0.025 = 2.5%\n",
+    "        initial_frequency=0.05,  # yearly frequency of occurrence of the event (hazard map)\n",
+    "        climate_factor=0.007, # factor to correct for the positive increase of the frequency of occurrence of the event\n",
+    "        time_horizon=20,  # time horizon in years for the CBA analysis\n",
+    "        save_gpkg=True,\n",
+    "        save_csv=True,\n",
+    "    )\n",
+    "\n",
+    "_analysis_config_data = AnalysisConfigData(\n",
+    "        input_path=input_path,\n",
+    "        static_path=static_path,\n",
+    "        output_path=output_path,\n",
+    "        analyses=[\n",
+    "            _damages_section,\n",
+    "            _adaptation_section,\n",
+    "        ],\n",
+    "        aggregate_wl=AggregateWlEnum.MEAN,\n",
+    "    )\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For this example. There is 1 adaptation option defined `AO1`, in addition to the reference case 'AO0'. The corresponding files structure should then be the following (assuming MultiLinkLosses and damages based on all road types)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- root_dir/\n",
+    "  - input/\n",
+    "    - A00/\n",
+    "      - damages/\n",
+    "        - input/\n",
+    "          - damages_function/\n",
+    "            - all_road_types/\n",
+    "              - hazard_severity_damage_fraction.csv\n",
+    "              - max_damage_road_types.csv\n",
+    "    - A01/\n",
+    "  - static/\n",
+    "    - hazard/\n",
+    "    - network/\n",
+    "    - output_graph/\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "_network_config_data.network.reuse_network_output = True\n",
+    "handler = Ra2ceHandler.from_config(_network_config_data, _analysis_config_data)\n",
+    "\n",
+    "handler.configure()\n",
+    "handler.run_analysis()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import geopandas as gpd\n",
+    "output_gdf = gpd.read_file(output_path.joinpath(\"adaptation.gpkg\"))\n",
+    "output_gdf.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "output_gdf.explore(\"AO1_bc_ratio\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "ra2ce_env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
