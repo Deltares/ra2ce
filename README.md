@@ -3,6 +3,7 @@
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/release/python-31110/)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-31212/)
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/release/python-31311/)
+[![Python 3.13](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/downloads/release/python-3143/)
 
 ![PyPI](https://img.shields.io/pypi/v/ra2ce?label=pypi%20package)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ra2ce)
