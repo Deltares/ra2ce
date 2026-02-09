@@ -1,6 +1,6 @@
 [project]
 name = "ra2ce"
-version = "1.1.0"
+version = "1.2.0"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = [
   {name = "Margreet van Marle", email = "Margreet.vanMarle@deltares.nl"},
@@ -93,6 +93,7 @@ flake8 = ">=5.0.4"
 mypy = ">=0.971"
 black = ">=22.8.0"
 urllib3 = "=1.26.15"
+twine = ">=6.2.0,<7"
 
 [tool.pixi.feature.dev.tasks]
 isort = "isort"
@@ -194,8 +195,7 @@ skip = [".git", ".github", ".pixi", ".env", ".venv", ".devcontainer", ".pytest_c
 [tool.commitizen]
 name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
-update_changelog_on_bump = true
-version = "1.1.0"
+version = "1.2.0"
 tag_format = "v$major.$minor.$patch"
 version_files= [
     "ra2ce/__init__.py",

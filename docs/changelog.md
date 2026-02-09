@@ -1,28 +1,36 @@
+## v1.2.0 (2026-02-09)
+
+### Feat
+
+- Added Python 3.14 support (#786)
+- Added Python 3.13 support (#783)
+- Added Python 3.12 support (#783)
+
 ## v1.1.0 (2026-02-04)
 
 ### Feat
 
-- create dataclass for `EquityConfigData` (#764)
-- #757 normalize avg speed data (#761)
-- create dataclass for `BaseOriginDestinationConfigData` (#758)
+- Create dataclass for `EquityConfigData` (#764)
+- Normalize avg speed data (#761)
+- Create dataclass for `BaseOriginDestinationConfigData` (#758)
 - Created new dataclass `MultiLinkRedundancyConfigData` (#756)
 - Create dataclass for `BaseLinkLossesConfigData` (#755)
-- 735 create dataclass for `DamagesConfigData` (#746)
+- Create dataclass for `DamagesConfigData` (#746)
 - Added new config data for single link redundancy  (#742)
-- #722 origins file make the attribute id name origin destination optional (#728)
-- #699 allow overwrite of output graph folder (#724)
+- Origins file make the attribute id name origin destination optional (#728)
+- Allow overwrite of output graph folder (#724)
 - Added validation for analysis compatibility (#715)
-- #581 origins file make the attribute origin count optional (#723)
-- 660 create an example to run damages and losses without input files (#661)
+- Origins file make the attribute origin count optional (#723)
+- Create an example to run damages and losses without input files (#661)
 
 ### Fix
 
-- #769 investigate failures on master (#770)
-- #752 adaptation analysis config not read correctly (#753)
-- fix build issue (#747)
-- #743 fix matching logic (#744)
+- Investigate failures on master (#770)
+- Adaptation analysis config not read correctly (#753)
+- Fix build issue (#747)
+- Fix matching logic (#744)
 - Corrected primary and diversion file property types to `Path` (#727)
-- edited test with external branch (#707)
+- Edited test with external branch (#707)
 - Hazard overlay speed improvements (#698)
 
 ## v1.0.0 (2025-01-08)
@@ -32,8 +40,8 @@
 - 659 convert damage classes into dataclasses; add a reader for damage curves (#656)
 - 636 use same static and output folder of adaptation for dependent analyses (#652)
 - 646 write adaptation to file (#650)
-- 638 adaptation adaptation analysis should run with only damages or only losses (#642)
 - Refactored both analyses to generate an `AnalysisResultWrapper`
+- 638 adaptation adaptation analysis should run with only damages or only losses (#642)
 - 618 adaptation add option to adaptation config to calculate cost based on fraction segment exposed (#639)
 - Create adaptation runner (#634)
 - 597 adaptation calculate benefit (#628)
@@ -64,17 +72,17 @@
 - 451 adjust analysis\indirect
 - 449 adjust analysis config data
 - gitignore updated
-- gitignore updated
-- gitignore updated
 - representative_damage_percentile added and used to output a representative damage
+- gitignore updated
 - divisor added to accept %-based or less-than-one functionality losses in the resilience_curve file
 - filter criticality_analysis based on the flood threshold.
+- gitignore updated
 
 ### Fix
 
 - 435 fix exception in case no lanes in any of the road types
-- 472 fix od analyses using weighing time
 - 488 fix weighing time redundancy analyses
+- 472 fix od analyses using weighing time
 - 433 avg speed 0
 - 468 set hazard field name to str
 - 410 replace simplify graph with OSMNX
@@ -113,9 +121,9 @@
 - Added static method to directly retrieve a network based on a polygon
 - Added result wrapper exporter logic
 - Added logic to wrap results of a ra2ce analysis
-- partofday Enum is added
 - Added logic so that exporting the intermediate results becomes dependent on the existance of the `output_graph_dir` property
 - Added endpoint to generate an OsmNetworkWrapper with a fix polygon
+- partofday Enum is added
 - time calculated for the single link redundancy added to the link data
 - time calculated for the single link redundancy
 - if the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.
@@ -139,6 +147,7 @@
 - alt_time and length are improved to correspond to the weight stated in the single and multi redundancy
 - updated the weight to get correct alt_dist. time is also rounded.
 - git ignore is updated to ignore all example outputs
+- LineString is impoted from shapely.geometry
 
 ## v0.7.0 (2023-12-05)
 
@@ -160,9 +169,8 @@
 
 ### Fix
 
-- LineString is impoted from shapely.geometry
-- docu typos
 - `find_route_ods` now returns a geodataframe without duplicate entries or origin_nodes with multiple names
+- docu typos
 - Changed output suffix.
 - save_shp is updated to the output export shapefile
 
@@ -177,6 +185,7 @@
 
 ### Feat
 
+- Implement multi-link isolated locations with distinction between flooded and isolated.
 - **osm_network_wrapper.py**: Adde network wrapper to get a clean network from OSM source.
 
 ## v0.5.0 (2023-07-24)
@@ -185,7 +194,6 @@
 
 - Added dataclass to represent the Network configuration input data (ini file)
 - Created stand-alone class for equity analysis
-- Implement multi-link isolated locations with distinction between flooded and isolated.
 
 ### Fix
 
@@ -195,17 +203,14 @@
 
 ## v0.4.2 (2023-02-10)
 
-### Fix
-
-- **README.rst**: typo fixed, issue #80 thanks Anoek!
-- **networks.py**: fix bug #86, ensured the merged_lines object is a GeoDataFrame and not sometimes a Series. Updated related test.
-
 ## v0.4.1 (2023-02-09)
 
 ### Fix
 
 - **test_acceptance.py**: fixed the test_1_1_given_only_network_shape_redundancy data and added assert statements to networks.py
 - **networks_utils.py**: Fixed function get_valid_mean, now it is tested.
+- **README.rst**: typo fixed, issue #80 thanks Anoek!
+- **networks.py**: fix bug #86, ensured the merged_lines object is a GeoDataFrame and not sometimes a Series. Updated related test.
 
 ## v0.4.0 (2023-02-08)
 
@@ -276,6 +281,4 @@
 
 - **setup.py**: Encoding for the rst files should be enforced
 
-## v0.0.1-ra2ce_016 (2023-07-24)
-
-## v0.0.1-ra2ce_v1 (2023-07-24)
+## v0.0.1 (2021-07-19)
