@@ -27,7 +27,7 @@ classifiers = [
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: 3.13'
 ]
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11,<3.15"
 dependencies = ["affine", "click", "numpy", "networkx", "pandas", "pyarrow", "rasterio", "rasterstats", "rtree", "seaborn", "openpyxl", "xlrd", "xarray", "scipy", "momepy", "geopandas", "osmnx", "tqdm", "geopy", "joblib", "snkit", "shapely", "pyogrio", "altgraph"]
 
 [project.urls]
@@ -59,7 +59,7 @@ run_ra2ce = "ra2ce.run:main"
 update-example-references = "examples.data.update_reference:run"
 
 [tool.pixi.dependencies]
-python = ">=3.11, <3.14"
+python = ">=3.11, <3.15"
 affine = ">=2.3.1"
 click = ">=8.1.3"
 numpy = ">=1.23.3"
@@ -143,6 +143,8 @@ python = "3.12.*"
 [tool.pixi.feature.py313.dependencies]
 python = "3.13.*"
 
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
@@ -153,9 +155,11 @@ dev = { features = ["dev", "test", "docs", "jupyter"], solve-group = "default" }
 py311 = ["py311", "default"]
 py312 = ["py312", "default"]
 py313 = ["py313", "default"]
+py314 = ["py314", "default"]
 testpy311 = { features = ["test", "jupyter"], solve-group = "py311"}
 testpy312 = { features = ["test", "jupyter"], solve-group = "py312"}
 testpy313 = { features = ["test", "jupyter"], solve-group = "py313"}
+testpy314 = { features = ["test", "jupyter"], solve-group = "py314"}
 
 [tool.black]
 line-length = 88
