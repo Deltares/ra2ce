@@ -1,6 +1,6 @@
 [project]
 name = "ra2ce"
-version = "1.2.1"
+version = "1.2.2"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = [
   {name = "Margreet van Marle", email = "Margreet.vanMarle@deltares.nl"},
@@ -224,7 +224,7 @@ skip = [".git", ".github", ".pixi", ".env", ".venv", ".devcontainer", ".pytest_c
 [tool.commitizen]
 name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
-version = "1.2.1"
+version = "1.2.2"
 tag_format = "v$major.$minor.$patch"
 version_files= [
     "ra2ce/__init__.py",
