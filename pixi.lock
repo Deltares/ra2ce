@@ -31334,32 +31334,32 @@ packages:
 - pypi: ./
   name: ra2ce
   version: 1.2.1
-  sha256: e38a38446e1d0b6d18e7708f8941bcc6793fb5b77040bc6cca029b6cb7514b5f
+  sha256: bd67d416fc82e2fa1806b030e8b675575fd73435da0d504a19c58e1f0cc5bd69
   requires_dist:
-  - affine
-  - click
-  - numpy
-  - networkx
-  - pandas
-  - pyarrow
-  - rasterio
-  - rasterstats
-  - rtree
-  - seaborn
-  - openpyxl
-  - xlrd
-  - xarray
-  - scipy
-  - momepy
-  - geopandas
-  - osmnx
-  - tqdm
-  - geopy
-  - joblib
-  - snkit
-  - shapely
-  - pyogrio
-  - altgraph
+  - affine>=2.3.1
+  - click>=8.1.3,<9.0
+  - numpy>=2.0.0
+  - networkx>=3.2.0
+  - pandas>=2.0.0,<3
+  - rasterio>=1.3.2
+  - rasterstats==0.17.0
+  - rtree>=1.0.0
+  - seaborn>=0.12.0
+  - openpyxl>=3.0.10
+  - xlrd>=2.0.1
+  - xarray>=2022.6.0
+  - scipy>=1.9.1
+  - momepy>=0.10.0
+  - geopandas>=1.1.1
+  - osmnx>=2.0.0
+  - tqdm>=4.66.1
+  - geopy>=2.4.0
+  - joblib>=1.3.2
+  - snkit>=1.9.0
+  - shapely>=2.1.2,<3
+  - pyogrio>=0.12.1,<0.13
+  - altgraph>=0.17.5,<0.18
+  - pyarrow==23.0.0
   requires_python: '>=3.11,<3.15'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/rasterio-1.4.4-py311hf34719e_2.conda
