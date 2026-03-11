@@ -1,0 +1,195 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "0875d8ca",
+   "metadata": {},
+   "source": [
+    "# Multi Link Redundancy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "74529aa4",
+   "metadata": {},
+   "source": [
+    "The multi-link redundancy analysis returns the same types of results as the single-link redundancy analysis, but it considers multiple links failing simultaneously. This is particularly useful for assessing the resilience of a network to natural disasters that may affect several links at once."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "766d5fd3",
+   "metadata": {},
+   "source": [
+    "## Run Multi-Link Redundancy Analysis\n",
+    "\n",
+    "The workflow is therefore very similar to the single-link redundancy analysis, with the difference being that a hazard map must be specified. See the [Single Link Redundancy](../tutorials/criticality_single_link_redundancy.html) tutorial for more details on the workflow.\n",
+    "\n",
+    "We select the analysis type as [AnalysisLossesEnum.MULTI_LINK_REDUNDANCY](../api/ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_REDUNDANCY){.api-ref}, for which we can also set a threshold for the water depth. The threshold defines the hazard value above which a link is considered impassable/disrupted."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5ac3816",
+   "metadata": {},
+   "source": [
+    "## Step 1: Import Libraries and Set Paths\n",
+    "\n",
+    "We start by importing the required libraries and defining the root directory and network path."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "180a1ba9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pathlib import Path\n",
+    "import geopandas as gpd\n",
+    "from IPython.core.display_functions import display\n",
+    "\n",
+    "from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionLosses, AnalysisConfigData\n",
+    "from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import AnalysisLossesEnum\n",
+    "from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum\n",
+    "from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum\n",
+    "from ra2ce.network.network_config_data.network_config_data import NetworkSection, NetworkConfigData, HazardSection\n",
+    "from ra2ce.network.network_config_data.enums.source_enum import SourceEnum\n",
+    "from ra2ce.ra2ce_handler import Ra2ceHandler\n",
+    "\n",
+    "root_dir = Path('data', 'multi_link_redundancy')\n",
+    "\n",
+    "network_path = root_dir / \"network\"\n",
+    "hazard_path = root_dir / \"hazard\"\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "71052422",
+   "metadata": {},
+   "source": [
+    "## Step 2: Define Network and Analysis Configuration"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "12f15770",
+   "metadata": {},
+   "source": [
+    "Next, we define the [AnalysisSectionLosses](../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses){.api-ref} and [AnalysisConfigData](../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData){.api-ref}  sections of the configuration. We select the analysis type as [AnalysisLossesEnum.MULTI_LINK_REDUNDANCY](../api/ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum){.api-ref} and the weighing method as [WeighingEnum.LENGTH](../api/ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.weighing_enum){.api-ref}. We also specify that we want to save the results in both CSV and GPKG formats."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6c1c6143",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "network_section = NetworkSection(\n",
+    "    source=SourceEnum.SHAPEFILE,\n",
+    "    primary_file=network_path.joinpath(\"base_shapefile.shp\"),\n",
+    "    file_id=\"ID\",\n",
+    "    save_gpkg=True,\n",
+    "    reuse_network_output=True,\n",
+    "    )\n",
+    "\n",
+    "hazard_section = HazardSection(\n",
+    "    hazard_map=[hazard_path.joinpath(\"max_flood_depth.tif\")],\n",
+    "    hazard_id='Flood',\n",
+    "    hazard_field_name=\"waterdepthtt\",\n",
+    "    aggregate_wl=AggregateWlEnum.MIN,\n",
+    "    hazard_crs=\"EPSG:32736\",\n",
+    "    )\n",
+    "\n",
+    "network_config_data = NetworkConfigData(\n",
+    "    root_path= root_dir,\n",
+    "    static_path=root_dir.joinpath('static'),\n",
+    "    network=network_section,\n",
+    "    hazard=hazard_section,\n",
+    "    )\n",
+    "\n",
+    "analyse_section = AnalysisSectionLosses(\n",
+    "    name=\"tutorial_multi_link_redundancy\",\n",
+    "    analysis=AnalysisLossesEnum.MULTI_LINK_REDUNDANCY,\n",
+    "    threshold=0.3,  # roads with a flood depth above this value are considered impassable\n",
+    "    weighing=WeighingEnum.LENGTH,\n",
+    "    save_csv=True,\n",
+    "    save_gpkg=True,\n",
+    ")\n",
+    "\n",
+    "analysis_config_data = AnalysisConfigData(\n",
+    "    output_path=root_dir.joinpath(\"output\"),\n",
+    "    static_path=root_dir.joinpath('static'),\n",
+    "    analyses=[analyse_section],\n",
+    "    aggregate_wl=AggregateWlEnum.MIN,\n",
+    ")\n",
+    "\n",
+    "handler = Ra2ceHandler.from_config(network=network_config_data, analysis=analysis_config_data)\n",
+    "handler.configure()\n",
+    "handler.run_analysis()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ede5df12",
+   "metadata": {},
+   "source": [
+    "## Inspect Results\n",
+    "\n",
+    "The results are stored in the folder `output` within the root directory. The results include a CSV file and a GPKG file containing the redundancy analysis results for each link in the network."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fabde810",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "analysis_output_folder = root_dir.joinpath(\"output\", \"multi_link_redundancy\")\n",
+    "redundancy_gdf = gpd.read_file(analysis_output_folder/\"tutorial_multi_link_redundancy.gpkg\") # specify the name of the geopackage holding your results (can be found in the analysis output folder)\n",
+    "redundancy_gdf.head() # display the attributes of the file\n",
+    "\n",
+    "import matplotlib.pyplot as plt\n",
+    "\n",
+    "fig, ax = plt.subplots(figsize=(10, 10))\n",
+    "redundancy_gdf.plot(column='alt_length', ax=ax, legend=False, cmap='viridis')\n",
+    "plt.title('Multi Link Redundancy Analysis Results')\n",
+    "plt.xlabel('Longitude')\n",
+    "plt.ylabel('Latitude')\n",
+    "plt.grid(True)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d35966ea",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "ra2ce_env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
