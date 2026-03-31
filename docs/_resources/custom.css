@@ -2,6 +2,210 @@
    Custom Style modifications
    ========================= */
 
+/* -----------------------------------------------------------------------
+   LANDING PAGE – Hero Banner
+   ----------------------------------------------------------------------- */
+
+.ra2ce-hero {
+  background: linear-gradient(135deg, #080c80 0%, #003a8c 100%);
+  border-radius: 8px;
+  padding: 36px 40px 32px;
+  margin: 0 0 32px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.ra2ce-hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+.ra2ce-hero-tagline {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.ra2ce-hero-accent {
+  color: #a8d4f5;
+  font-style: italic;
+}
+
+.ra2ce-hero-sub {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 560px;
+  margin-bottom: 22px;
+  line-height: 1.65;
+}
+
+.ra2ce-hero-sub em { font-style: italic; }
+.ra2ce-hero-sub strong { color: #fff; }
+
+.ra2ce-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ra2ce-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: all 0.18s;
+  cursor: pointer;
+  border: none;
+}
+
+.ra2ce-btn-primary {
+  background: #fff;
+  color: #080c80 !important;
+}
+
+.ra2ce-btn-primary:hover {
+  background: #e8eeff;
+}
+
+.ra2ce-btn-secondary {
+  background: #1a8fe3;
+  color: #fff !important;
+}
+
+.ra2ce-btn-secondary:hover {
+  background: #1277c5;
+}
+
+.ra2ce-btn-outline {
+  background: transparent;
+  color: #fff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+}
+
+.ra2ce-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
+/* -----------------------------------------------------------------------
+   LANDING PAGE – Feature Row
+   ----------------------------------------------------------------------- */
+
+.ra2ce-feature-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--pst-color-border, #dee2e6);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 8px 0 28px;
+}
+
+.ra2ce-feature-cell {
+  padding: 18px 20px;
+  border-right: 1px solid var(--pst-color-border, #dee2e6);
+}
+
+.ra2ce-feature-cell:last-child {
+  border-right: none;
+}
+
+.ra2ce-feature-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.ra2ce-feature-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.ra2ce-feature-text {
+  font-size: 0.83rem;
+  color: var(--pst-color-muted, #6c757d);
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .ra2ce-feature-row { grid-template-columns: 1fr; }
+  .ra2ce-feature-cell { border-right: none; border-bottom: 1px solid var(--pst-color-border, #dee2e6); }
+  .ra2ce-feature-cell:last-child { border-bottom: none; }
+}
+
+/* -----------------------------------------------------------------------
+   TUTORIALS PAGE – Card styling (left accent border per module)
+   ----------------------------------------------------------------------- */
+
+.ra2ce-card-network      { border-left: 4px solid #4a6fa5 !important; }
+.ra2ce-card-hazard       { border-left: 4px solid #0072b2 !important; }
+.ra2ce-card-criticality  { border-left: 4px solid #d55e00 !important; }
+.ra2ce-card-accessibility{ border-left: 4px solid #009e73 !important; }
+.ra2ce-card-damages      { border-left: 4px solid #cc3333 !important; }
+.ra2ce-card-losses       { border-left: 4px solid #8b2fc9 !important; }
+.ra2ce-card-adaptation   { border-left: 4px solid #0b6b3a !important; }
+.ra2ce-card-equity       { border-left: 4px solid #c87000 !important; }
+
+/* -----------------------------------------------------------------------
+   TUTORIALS PAGE – Question list inside cards
+   ----------------------------------------------------------------------- */
+
+ul.ra2ce-q-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+ul.ra2ce-q-list li {
+  padding: 4px 0 4px 20px;
+  font-size: 0.875rem;
+  color: var(--pst-color-text, #1a1a1a);
+  line-height: 1.5;
+  position: relative;
+}
+
+ul.ra2ce-q-list li::before {
+  content: '?';
+  position: absolute;
+  left: 1px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--pst-color-primary, #080c80);
+  opacity: 0.55;
+}
+
+/* -----------------------------------------------------------------------
+   TUTORIALS PAGE – Tag chips in card footer
+   ----------------------------------------------------------------------- */
+
+.ra2ce-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: #fff;
+}
+
+.ra2ce-tag-setup        { background: #4a6fa5; }
+.ra2ce-tag-exposure     { background: #0072b2; }
+.ra2ce-tag-risk         { background: #cc3333; }
+.ra2ce-tag-action       { background: #0b6b3a; }
+
 /* Modifies the style of external clickable links (also to links to the docstrings ref) */
 
 
