@@ -278,50 +278,54 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         edge_attributes_to_include: list,
     ) -> nx.Graph | nx.DiGraph:
         """
-        Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
-
-        Args:
-            gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
-                Allow both LineString and MultiLineString.
-            edge_attributes_to_include (List[str], optional): Additional attributes to include from the GeoDataFrame in the graph.
-
-        Returns:
-            nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
+        Same as original but preserves intermediate vertices by creating nodes
+        for each coordinate in the geometry. No new imports required.
         """
-        _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
+
+        if self.directed:
+            G = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
+        else:
+            G = nx.Graph(crs=geo_dataframe.crs, approach="primal")
 
         for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
             link_type = row.get(self.link_type_column, None)
 
-            from_node = row.geometry.coords[0]
-            to_node = row.geometry.coords[-1]
-            _edge_attributes = {
-                f"{self.file_id}": link_id,
-                f"{self.link_type_column}": link_type,
-                "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
-                "geometry": row.pop("geometry"),
-            }
-            _networkx_graph.add_node(from_node, geometry=Point(from_node))
-            _networkx_graph.add_node(to_node, geometry=Point(to_node))
-            _networkx_graph.add_edge(
-                from_node,
-                to_node,
-                link_id=link_id,
-                **_edge_attributes,
-            )
-            if edge_attributes_to_include:
-                for edge_attribute_to_include in edge_attributes_to_include:
-                    edge_attribute = (
-                        row[edge_attribute_to_include]
-                        if edge_attribute_to_include in row
-                        else None
-                    )
-                    if edge_attribute:
-                        edge_data = _networkx_graph[from_node][to_node]
-                        edge_data[edge_attribute_to_include] = edge_attribute
+            geom = row.geometry
 
-        return _networkx_graph
+            # Handle MultiLineString exactly like original code intended
+            if geom.geom_type == "MultiLineString":
+                lines = list(geom.geoms)
+            else:
+                lines = [geom]
+
+            for line in lines:
+                coords = list(line.coords)
+
+                # ✅ Add nodes for ALL coordinates instead of only first/last
+                for c in coords:
+                    if c not in G:
+                        G.add_node(c, geometry=Point(c))
+
+                # ✅ Add edges between consecutive coordinates
+                for u, v in zip(coords[:-1], coords[1:]):
+
+                    edge_attrs = {
+                        f"{self.file_id}": link_id,
+                        f"{self.link_type_column}": link_type,
+                        # ✅ Keep original FULL geometry stored
+                        "geometry": row.geometry,
+                    }
+
+                    # Preserve your original optional attributes
+                    for attr in edge_attributes_to_include:
+                        if attr in row:
+                            edge_attrs[attr] = row[attr]
+
+                    G.add_edge(u, v, **edge_attrs)
+
+        return G
+
 
     def _get_direct_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
