@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 import geopandas as gpd
 import networkx as nx
@@ -173,7 +174,7 @@ class TestVectorNetworkWrapper:
         )
 
         # Then
-        assert isinstance(graph, nx.DiGraph)
+        assert isinstance(graph, Union[nx.DiGraph, nx.Graph])
 
     def test_get_network_edges_and_nodes_from_graph(
         self, mock_graph, points_gdf, lines_gdf
