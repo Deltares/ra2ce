@@ -20,6 +20,7 @@ Or navigate directly to another section:
    overview.rst
    getting_started/index.rst
    showcases/index.rst
+   webinars/index.rst
    tutorials/index.rst
    api/index.rst
    technical_documentation/technical_documentation.rst
