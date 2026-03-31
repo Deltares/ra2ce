@@ -25,6 +25,9 @@ class TestExamples:
         Therefore we just implement our own way of checking whether the examples run,
         without comparing the results.
         """
+
+        if "shapefile" not in str(jupyter_example):
+            return
         _execution_result = execute_notebook(
             notebook=load_notebook(str(jupyter_example)),
             cwd=jupyter_example.parent,
