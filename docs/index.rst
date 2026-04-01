@@ -5,24 +5,19 @@ Welcome to RA2CE's documentation!
 
    <div class="ra2ce-hero">
      <div class="ra2ce-hero-text">
-       <div class="ra2ce-hero-tagline">Quantify resilience. <span class="ra2ce-hero-accent">Prioritise action.</span></div>
+       <div class="ra2ce-hero-tagline">Resilience Assessment and Adaptation for <span class="ra2ce-hero-accent">Critical infrastructurE</span></div>
        <p class="ra2ce-hero-sub">
-         RA2CE (<em>just say race!</em>) is a Python toolkit by <strong>Deltares</strong> for assessing the resilience
-         of critical infrastructure networks — from hazard exposure to economic risk and adaptation planning.
+         Quantify network vulnerability, prioritize interventions, and support adaptation decisions.
+         For transport infrastructure exposed to natural hazards and future climate conditions.
+         Built by <strong>Deltares</strong>.
        </p>
        <div class="ra2ce-hero-actions">
          <a class="ra2ce-btn ra2ce-btn-primary" href="getting_started/index.html">🚀 Get Started</a>
-         <a class="ra2ce-btn ra2ce-btn-secondary" href="tutorials/index.html">📓 Tutorials</a>
+         <a class="ra2ce-btn ra2ce-btn-secondary" href="tutorials/index.html">📓 Browse tutorials</a>
          <a class="ra2ce-btn ra2ce-btn-outline" href="https://github.com/Deltares/ra2ce" target="_blank">⭐ GitHub</a>
        </div>
      </div>
    </div>
-
-This is the documentation of ``ra2ce`` — the **Resilience Assessment and Adaptation for Critical
-infrastructurE** Toolkit, developed by `Deltares <https://www.deltares.nl/en/>`_.
-RA2CE helps to quantify resilience of critical infrastructure networks, prioritize
-interventions and adaptation measures, and select the most appropriate action perspective
-to increase resilience considering future conditions.
 
 .. raw:: html
 
@@ -30,7 +25,7 @@ to increase resilience considering future conditions.
      <div class="ra2ce-feature-cell">
        <div class="ra2ce-feature-icon">🌊</div>
        <div class="ra2ce-feature-title">Assess hazard exposure</div>
-       <div class="ra2ce-feature-text">Overlay flood depths and other hazard maps onto road networks to identify exposed segments across return periods.</div>
+       <div class="ra2ce-feature-text">Overlay flood depths and other hazard maps onto networks to identify exposed segments across return periods.</div>
      </div>
      <div class="ra2ce-feature-cell">
        <div class="ra2ce-feature-icon">🔗</div>
@@ -41,6 +36,73 @@ to increase resilience considering future conditions.
        <div class="ra2ce-feature-icon">💰</div>
        <div class="ra2ce-feature-title">Estimate economic risk</div>
        <div class="ra2ce-feature-text">Compute direct damages (EAD) and indirect economic losses (EAL), and compare adaptation strategies side-by-side.</div>
+     </div>
+   </div>
+
+Who uses RA2CE
+--------------
+
+.. raw:: html
+
+   <div class="ra2ce-audience-grid">
+     <a class="ra2ce-aud-card" href="tutorials/index.html">
+       <div class="ra2ce-aud-icon">📐</div>
+       <div class="ra2ce-aud-title">Consultants</div>
+       <div class="ra2ce-aud-desc">Run flood impact analyses and generate risk metrics for infrastructure projects. Plug RA2CE into your workflow without proprietary tooling or licensing costs.</div>
+       <div class="ra2ce-aud-cta">Start with the tutorials →</div>
+     </a>
+     <a class="ra2ce-aud-card" href="api/index.html">
+       <div class="ra2ce-aud-icon">🔬</div>
+       <div class="ra2ce-aud-title">Researchers</div>
+       <div class="ra2ce-aud-desc">Extend the methodology, integrate custom damage curves, and contribute back. Full API reference and modular architecture included alongside peer-reviewed publications.</div>
+       <div class="ra2ce-aud-cta">Browse the API reference →</div>
+     </a>
+     <a class="ra2ce-aud-card" href="showcases/index.html">
+       <div class="ra2ce-aud-icon">🏛️</div>
+       <div class="ra2ce-aud-title">Decision makers</div>
+       <div class="ra2ce-aud-desc">Review real case studies with interpretable outputs before asking your team to adopt the tool. Understand what RA2CE produces and what data inputs it needs.</div>
+       <div class="ra2ce-aud-cta">View showcases →</div>
+     </a>
+   </div>
+
+Typical analysis workflow
+--------------------------
+
+Each module builds on the previous. Network and Hazard are required foundations;
+the analysis modules can be combined depending on your objectives.
+
+.. raw:: html
+
+   <div class="ra2ce-workflow">
+     <div class="ra2ce-wf-step">
+       <div class="ra2ce-wf-num">01</div>
+       <div class="ra2ce-wf-icon">🗺️</div>
+       <div class="ra2ce-wf-title">Network</div>
+       <div class="ra2ce-wf-sub">OSM or shapefile</div>
+     </div>
+     <div class="ra2ce-wf-step">
+       <div class="ra2ce-wf-num">02</div>
+       <div class="ra2ce-wf-icon">🌊</div>
+       <div class="ra2ce-wf-title">Hazard</div>
+       <div class="ra2ce-wf-sub">Overlay raster data</div>
+     </div>
+     <div class="ra2ce-wf-step">
+       <div class="ra2ce-wf-num">03</div>
+       <div class="ra2ce-wf-icon">🔗</div>
+       <div class="ra2ce-wf-title">Criticality</div>
+       <div class="ra2ce-wf-sub">Redundancy &amp; detours</div>
+     </div>
+     <div class="ra2ce-wf-step">
+       <div class="ra2ce-wf-num">04</div>
+       <div class="ra2ce-wf-icon">💰</div>
+       <div class="ra2ce-wf-title">Damages / Losses</div>
+       <div class="ra2ce-wf-sub">EAD &amp; EAL metrics</div>
+     </div>
+     <div class="ra2ce-wf-step">
+       <div class="ra2ce-wf-num">05</div>
+       <div class="ra2ce-wf-icon">🛡️</div>
+       <div class="ra2ce-wf-title">Adaptation</div>
+       <div class="ra2ce-wf-sub">Compare strategies</div>
      </div>
    </div>
 
@@ -71,7 +133,7 @@ Navigate directly to a section
 
       :octicon:`globe;2.5em`
 
-      Real-world case studies from Myanmar and beyond.
+      Real-world case studies.
 
    .. grid-item-card:: Tutorials
       :link: tutorials/index
