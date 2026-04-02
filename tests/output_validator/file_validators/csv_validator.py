@@ -25,8 +25,8 @@ class CsvValidator(FileValidatorProtocol, PandasValidatorBase):
 
         _df_ref = self._get_normalized_content(self.reference_file)
         _df_res = self._get_normalized_content(self.result_file)
-        print(self.reference_file)
-        print(self.result_file)
+        print(_df_ref)
+        print(_df_res)
 
         if len(_df_ref) != len(_df_res):
             raise AssertionError(
