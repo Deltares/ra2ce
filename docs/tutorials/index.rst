@@ -57,6 +57,13 @@ answer, pick the right analysis, and follow an executable notebook to results.
          </div>
          <div class="ra2ce-feat-title">Build your network</div>
          <div class="ra2ce-feat-desc">Import or download a graph representation of your transport network. All subsequent analyses depend on this foundation step.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>How do I create a new (road) network?</li>
+             <li>How do I import a pre-defined shapefile network?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-net"></span>
@@ -113,6 +120,14 @@ answer, pick the right analysis, and follow an executable notebook to results.
          </div>
          <div class="ra2ce-feat-title">Overlay hazard data</div>
          <div class="ra2ce-feat-desc">Map flood, earthquake, or other hazard intensity onto each network link. Produces per-segment exposure attributes used in all downstream risk analyses.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>How do I overlay hazard data onto my network?</li>
+             <li>How is the hazard intensity in my network?</li>
+             <li>How much water is expected at each (road) segment?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-haz"></span>
@@ -177,6 +192,14 @@ answer, pick the right analysis, and follow an executable notebook to results.
          </div>
          <div class="ra2ce-feat-title">Network redundancy &amp; detour analysis</div>
          <div class="ra2ce-feat-desc">Identify which links, when disrupted, cause the greatest impact to network connectivity. Compute detour times and quantify the cost of losing any road segment.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>How redundant is my network?</li>
+             <li>Are there alternative routes?</li>
+             <li>What is the detour time during a disaster?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-crit"></span>
@@ -238,7 +261,15 @@ answer, pick the right analysis, and follow an executable notebook to results.
            Accessibility <span class="ra2ce-feat-step">analysis</span>
          </div>
          <div class="ra2ce-feat-title">Origin–destination reachability</div>
-         <div class="ra2ce-feat-desc">Measure travel times from origin zones to critical destinations — hospitals, shelters, emergency services — under normal and disrupted network conditions.</div>
+         <div class="ra2ce-feat-desc">Measure travel times from origin zones to critical destinations: hospitals, shelters, emergency services. Under normal and disrupted network conditions.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>What is the shortest evacuation route in emergency conditions?</li>
+             <li>Are critical services reachable during a disaster?</li>
+             <li>Which districts are isolated from essential services in emergency conditions?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-acc"></span>
@@ -291,7 +322,15 @@ answer, pick the right analysis, and follow an executable notebook to results.
            Damages <span class="ra2ce-feat-step">analysis</span>
          </div>
          <div class="ra2ce-feat-title">Physical damage &amp; EAD estimation</div>
-         <div class="ra2ce-feat-desc">Apply depth–damage functions to exposed road segments to estimate repair costs per event, then integrate across return periods to compute Expected Annual Damage.</div>
+         <div class="ra2ce-feat-desc">Apply intensity–damage functions to exposed road segments to estimate repair costs per event, then integrate across return periods to compute Expected Annual Damage.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>What is the estimated physical (direct) damage to my infrastructure for an event?</li>
+             <li>What is the EAD (Expected Annual Damage) to my infrastructure?</li>
+             <li>How much should be saved/invested to cover future repair costs?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-dmg"></span>
@@ -351,7 +390,14 @@ answer, pick the right analysis, and follow an executable notebook to results.
            Losses <span class="ra2ce-feat-step">analysis</span>
          </div>
          <div class="ra2ce-feat-title">Economic losses &amp; EAL estimation</div>
-         <div class="ra2ce-feat-desc">Translate network disruption into indirect economic losses — value of lost travel time, freight delays — and integrate across return periods to derive Expected Annual Loss.</div>
+         <div class="ra2ce-feat-desc">Translate network disruption into indirect economic losses: value of lost travel time, freight delays and integrate across return periods to derive Expected Annual Loss.</div>
+         <div class="ra2ce-feat-questions">
+           <div class="ra2ce-feat-questions-label">User questions</div>
+           <ul>
+             <li>What is the estimated economic (indirect) loss from a service disruption of the infrastructure due to an event?</li>
+             <li>What is the EAL (Expected Annual Loss) to my infrastructure?</li>
+           </ul>
+         </div>
          <div class="ra2ce-feat-notebooks">
            <span class="ra2ce-feat-nb">
              <span class="ra2ce-feat-nb-dot ra2ce-feat-nb-dot-loss"></span>
