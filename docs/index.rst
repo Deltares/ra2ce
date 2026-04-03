@@ -39,6 +39,26 @@ Welcome to RA2CE's documentation!
      </div>
    </div>
 
+About RA2CE
+-----------
+
+RA2CE (*just say "race"!*) is an open-source Python package developed by `Deltares <https://www.deltares.nl>`_
+for assessing the resilience of critical infrastructure networks under natural hazard conditions.
+
+Given a network sourced from OpenStreetMap or a shapefile, and one or more hazard maps (e.g. flood
+depth rasters), RA2CE lets you:
+
+- **Overlay hazard data** onto network edges to identify exposed segments across multiple return periods.
+- **Quantify criticality** by measuring redundancy, computing detour lengths, and identifying links whose
+  failure would most disrupt connectivity.
+- **Estimate economic risk** through direct damage functions (EAD) and indirect loss models (EAL).
+- **Compare adaptation strategies** side-by-side to support investment and policy decisions under
+  present and future climate conditions.
+
+The package is fully scriptable via Python and ships with a suite of Jupyter Notebook tutorials.
+It is available on `PyPI <https://pypi.org/project/ra2ce/>`_ and licensed under
+`GPL-3.0 <https://www.gnu.org/licenses/gpl-3.0.en.html>`_.
+
 Who uses RA2CE
 --------------
 
@@ -65,46 +85,6 @@ Who uses RA2CE
      </a>
    </div>
 
-Typical analysis workflow
---------------------------
-
-Each module builds on the previous. Network and Hazard are required foundations;
-the analysis modules can be combined depending on your objectives.
-
-.. raw:: html
-
-   <div class="ra2ce-workflow">
-     <div class="ra2ce-wf-step">
-       <div class="ra2ce-wf-num">01</div>
-       <div class="ra2ce-wf-icon">🗺️</div>
-       <div class="ra2ce-wf-title">Network</div>
-       <div class="ra2ce-wf-sub">OSM or shapefile</div>
-     </div>
-     <div class="ra2ce-wf-step">
-       <div class="ra2ce-wf-num">02</div>
-       <div class="ra2ce-wf-icon">🌊</div>
-       <div class="ra2ce-wf-title">Hazard</div>
-       <div class="ra2ce-wf-sub">Overlay raster data</div>
-     </div>
-     <div class="ra2ce-wf-step">
-       <div class="ra2ce-wf-num">03</div>
-       <div class="ra2ce-wf-icon">🔗</div>
-       <div class="ra2ce-wf-title">Criticality</div>
-       <div class="ra2ce-wf-sub">Redundancy &amp; detours</div>
-     </div>
-     <div class="ra2ce-wf-step">
-       <div class="ra2ce-wf-num">04</div>
-       <div class="ra2ce-wf-icon">💰</div>
-       <div class="ra2ce-wf-title">Damages / Losses</div>
-       <div class="ra2ce-wf-sub">EAD &amp; EAL metrics</div>
-     </div>
-     <div class="ra2ce-wf-step">
-       <div class="ra2ce-wf-num">05</div>
-       <div class="ra2ce-wf-icon">🛡️</div>
-       <div class="ra2ce-wf-title">Adaptation</div>
-       <div class="ra2ce-wf-sub">Compare strategies</div>
-     </div>
-   </div>
 
 .. admonition:: 💡 New to RA2CE?
 
