@@ -71,6 +71,14 @@ _examples_dir = Path("_examples")
 _examples_dir.joinpath("README.md").unlink()
 remove_extra_files_from_dir(_examples_dir.joinpath("hackathons"))
 
+# -- Bundle webinar materials as a downloadable zip --------------------
+_webinar_src = Path("../examples/webinar")
+_webinar_zip_dst = Path("_resources/webinar")
+if _webinar_src.exists():
+    if _webinar_zip_dst.with_suffix(".zip").exists():
+        _webinar_zip_dst.with_suffix(".zip").unlink()
+    shutil.make_archive(str(_webinar_zip_dst), "zip", str(_webinar_src.parent), _webinar_src.name)
+
 
 if os.path.isdir("docs"):
     remove_dir_content("docs")

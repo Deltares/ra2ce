@@ -77,8 +77,7 @@ More webinars will be scheduled in the future, so stay tuned for announcements o
        for download so you can follow along at your own pace.
      </p>
 
-     <!-- Replace the href below with the actual download URL once materials are hosted -->
-     <a class="webinar-download-btn" href="#REPLACE_WITH_DOWNLOAD_URL">
+     <a class="webinar-download-btn" href="../_static/webinar.zip" download>
        ⬇ Download notebooks &amp; data
      </a>
 

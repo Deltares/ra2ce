@@ -180,6 +180,15 @@ Navigate directly to a section
 
       Frequently asked questions and troubleshooting tips.
 
+   .. grid-item-card:: Webinars
+      :link: webinars/index
+      :link-type: doc
+      :text-align: center
+
+      :octicon:`video;2.5em`
+
+      Recorded webinars and presentation materials.
+
 Lost? Try the :ref:`search`.
 
 .. toctree::
