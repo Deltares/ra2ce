@@ -1,9 +1,7 @@
 Showcases
 =========
 
-Real-world applications of RA2CE demonstrating how hazard exposure, network criticality,
-and economic risk estimation can be combined in a single integrated workflow.
-
+Real-world applications of RA2CE demonstrating how hazard exposure, network criticality, accessibility, and damage assessments can be integrated to inform climate-resilient infrastructure planning and adaptation strategies (non-exhaustive).  
 .. raw:: html
 
     <!-- Load Leaflet with AMD detection disabled so window.L is always set globally.
@@ -497,9 +495,3 @@ and economic risk estimation can be combined in a single integrated workflow.
     }());
     </script>
 
-
-`NRT Flood Impact Analysis on Road Networks <https://arcg.is/1uGm5W0>`__ — A case study in the Mandalay region, Myanmar.
-Near-real-time flood impact analysis using RA2CE to identify affected road segments and communities losing access to services.
-
-`Cascading impacts of flooded infrastructure <https://arcg.is/1iC1rX>`__ — Evaluate and quantify economic impacts of cascading risks and adaptation solutions.
-End-to-end demonstration linking hazard scenarios to EAD/EAL metrics and comparing adaptation interventions.

@@ -103,7 +103,7 @@ for _img_file in os.listdir(_src_diagrams):
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2024, Deltares"
+copyright = "2026, Deltares"
 author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
 
 
