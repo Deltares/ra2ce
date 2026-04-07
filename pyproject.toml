@@ -226,6 +226,7 @@ name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
 version = "1.2.2"
 tag_format = "v$major.$minor.$patch"
+pre_bump_hooks = ["pixi lock"]
 version_files= [
     "ra2ce/__init__.py",
     "pyproject.toml:version",]
