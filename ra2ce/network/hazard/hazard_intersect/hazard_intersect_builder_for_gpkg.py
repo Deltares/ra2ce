@@ -101,12 +101,12 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
         """
         gdf_crs_original = hazard_overlay.crs
 
-        def geodataframe_overlay(hazard_shp_file: Path, ra2ce_name: str):
-            gdf_hazard = read_file(str(hazard_shp_file))
-
+        for ra2ce_name, hazard_gpkg_file in zip(
+            self.ra2ce_names, self.hazard_gpkg_files
+        ):
+            gdf_hazard = read_file(str(hazard_gpkg_file))
             if hazard_overlay.crs != gdf_hazard.crs:
                 hazard_overlay = hazard_overlay.to_crs(gdf_hazard.crs)
-
             hazard_overlay = sjoin(
                 hazard_overlay,
                 gdf_hazard[[self.hazard_field_name, "geometry"]],
@@ -120,8 +120,6 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
                 },
                 inplace=True,
             )
-
-        self._overlay_hazard_files(geodataframe_overlay)
 
         if hazard_overlay.crs != gdf_crs_original:
             hazard_overlay = hazard_overlay.to_crs(gdf_crs_original)
