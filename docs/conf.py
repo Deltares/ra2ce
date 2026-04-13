@@ -103,7 +103,7 @@ for _img_file in os.listdir(_src_diagrams):
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2024, Deltares"
+copyright = "2026, Deltares"
 author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
 
 
@@ -238,7 +238,14 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
-html_css_files = ["theme-deltares.css", "python-code-block-style.css", "custom.css"]
+html_css_files = ["theme-deltares.css", "python-code-block-style.css", "custom.css",
+                  ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", {"crossorigin": ""})]
+html_js_files = []
+
+# Remove both sidebars on the Showcases page so the map/panel layout is full-width
+html_sidebars = {
+    "showcases/index": []
+}
 
 
 # -- Options for HTMLHelp output ---------------------------------------
