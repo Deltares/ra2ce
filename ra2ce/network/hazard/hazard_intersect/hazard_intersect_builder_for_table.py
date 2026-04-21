@@ -38,7 +38,7 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
     hazard_id: str = ""
     ra2ce_name_key: str = "RA2CE name"
 
-    def _from_network_x(self, hazard_overlay: Graph) -> Graph:
+    def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
         gdf, gdf_nodes = graph_to_gdf(hazard_overlay, save_nodes=True)
         gdf = self._from_geodataframe(gdf)
