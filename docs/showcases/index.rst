@@ -2,6 +2,7 @@ Showcases
 =========
 
 Real-world applications of RA2CE demonstrating how hazard exposure, network criticality, accessibility, and damage assessments can be integrated to inform climate-resilient infrastructure planning and adaptation strategies (non-exhaustive).  
+
 .. raw:: html
 
     <!-- Load Leaflet with AMD detection disabled so window.L is always set globally.
