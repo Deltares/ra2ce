@@ -19,7 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 
 from geopandas import GeoDataFrame
 from networkx import Graph
@@ -37,6 +38,7 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
     network_file_id: str = ""
     hazard_id: str = ""
     ra2ce_name_key: str = "RA2CE name"
+    table_files: list[Path] = field(default_factory=list)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
@@ -49,7 +51,7 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
-        for haz in self.hazard_files.table:
+        for haz in self.table_files:
             if haz.suffix in [".csv"]:
                 hazard_overlay = self._join_table(hazard_overlay, haz)
         return hazard_overlay

@@ -324,6 +324,7 @@ class HazardOverlay:
                 network_file_id=self._network_file_id,
                 hazard_id=self._hazard_id,
                 ra2ce_name_key=self._ra2ce_name_key,
+                table_files=self.hazard_files.table,
             ).get_intersection(to_overlay)
 
         raise ValueError(
