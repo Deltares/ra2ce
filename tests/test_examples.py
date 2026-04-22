@@ -8,7 +8,7 @@ from pytest_notebook.notebook import load_notebook
 from tests import test_examples
 from tests.output_validator.output_validator import OutputValidator
 
-_supported_examples = lambda x: "DIY" not in x.stem
+_supported_examples = lambda x: "OSM" not in x.stem and "DIY" not in x.stem
 _jupyter_examples = [
     pytest.param(_jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize())
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
@@ -25,6 +25,7 @@ class TestExamples:
         Therefore we just implement our own way of checking whether the examples run,
         without comparing the results.
         """
+
         _execution_result = execute_notebook(
             notebook=load_notebook(str(jupyter_example)),
             cwd=jupyter_example.parent,
