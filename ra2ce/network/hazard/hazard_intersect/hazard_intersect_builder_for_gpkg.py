@@ -218,16 +218,3 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
         exploded_gdf = gdf.explode(index_parts=False).reset_index(drop=True)
         exploded_gdf["polygon_id"] = range(1, len(exploded_gdf) + 1)
         return exploded_gdf
-
-    def _explode_multigeometries(self, gdf: GeoDataFrame) -> GeoDataFrame:
-        """Convert MultiPolygon geometries in a GeoDataFrame to individual Polygon geometries.
-
-        Args:
-            gdf (GeoDataFrame): The input GeoDataFrame with MultiPolygon geometries.
-
-        Returns:
-            GeoDataFrame: A new GeoDataFrame with individual Polygon geometries.
-        """
-        exploded_gdf = gdf.explode(index_parts=False).reset_index(drop=True)
-        exploded_gdf["polygon_id"] = range(1, len(exploded_gdf) + 1)
-        return exploded_gdf
