@@ -1,0 +1,389 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Manual Damage Curves Tutorial\n",
+    "\n",
+    "This tutorial demonstrates how to perform a **damage analysis using custom/manual damage curves** in RA2CE.  \n",
+    "Manual curves allow you to define site-specific or locally calibrated hazard–damage relationships rather than relying on generic reference curves.\n",
+    "\n",
+    "This is particularly useful when:\n",
+    "\n",
+    "- You have local historical damage data.\n",
+    "- You want to account for specific infrastructure types.\n",
+    "- You need to test alternative vulnerability scenarios."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "\n",
+    "## Step 1: Define project paths\n",
+    "\n",
+    "As usual, define your project folder and subdirectories:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pathlib import Path\n",
+    "\n",
+    "root_dir = Path(\"data\", \"damage_manual\")\n",
+    "static_path = root_dir.joinpath(\"static\")\n",
+    "hazard_path = static_path.joinpath(\"hazard\")\n",
+    "network_path = static_path.joinpath(\"network\")\n",
+    "output_path = root_dir.joinpath(\"output\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "## Step 2: Configure the road network and hazard\n",
+    "\n",
+    "The network is downloaded from **OpenStreetMap (OSM)**, clipped to a region polygon (`polygon.geojson`).  \n",
+    "We specify which **road types** should be included in the analysis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum\n",
+    "from ra2ce.network.network_config_data.enums.source_enum import SourceEnum\n",
+    "from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum\n",
+    "from ra2ce.network.network_config_data.network_config_data import NetworkSection\n",
+    "from ra2ce.ra2ce_handler import Ra2ceHandler\n",
+    "\n",
+    "\n",
+    "network_section = NetworkSection(\n",
+    "    network_type=NetworkTypeEnum.DRIVE,\n",
+    "    source=SourceEnum.OSM_DOWNLOAD,\n",
+    "    polygon=static_path.joinpath(\"polygon.geojson\"),\n",
+    "    save_gpkg=True,\n",
+    "    road_types=[\n",
+    "        RoadTypeEnum.SECONDARY,\n",
+    "        RoadTypeEnum.SECONDARY_LINK,\n",
+    "        RoadTypeEnum.PRIMARY,\n",
+    "        RoadTypeEnum.PRIMARY_LINK,\n",
+    "        RoadTypeEnum.TRUNK,\n",
+    "        RoadTypeEnum.MOTORWAY,\n",
+    "        RoadTypeEnum.MOTORWAY_LINK,\n",
+    "    ],\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4642081f",
+   "metadata": {},
+   "source": [
+    "\n",
+    "> **Note**: The damage analysis requires two attributes from the network file: highway (for the type of roads) and lanes (number of lanes). These attributes are present by default from OSM. Make sure these are also present if you are using your own shapefile."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We provide hazard input in the form of **GeoTIFF raster files** (e.g., flood depth maps).  \n",
+    "RA2CE will overlay these rasters with the road network to compute hazard intensities for each asset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum\n",
+    "from ra2ce.network.network_config_data.network_config_data import HazardSection\n",
+    "\n",
+    "hazard_section = HazardSection(\n",
+    "    hazard_map=[Path(file) for file in hazard_path.glob(\"*.tif\")],\n",
+    "    aggregate_wl=AggregateWlEnum.MEAN,  # mean water depth used in analysis\n",
+    "    hazard_crs=\"EPSG:4326\",  # ensure hazard map is in EPSG:4326 projection\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We combine the network and hazard information into a single configuration object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from ra2ce.network.network_config_data.network_config_data import NetworkConfigData\n",
+    "\n",
+    "network_config_data = NetworkConfigData(\n",
+    "    root_path=root_dir,\n",
+    "    static_path=static_path,\n",
+    "    network=network_section,\n",
+    "    hazard=hazard_section\n",
+    ")\n",
+    "network_config_data.network.save_gpkg = True\n",
+    "network_config_data.network.reuse_network_output = True"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d2728108",
+   "metadata": {},
+   "source": [
+    "The network is segment by default into 100m segments. This can be modified using the attribute `segmentation_length` from [CleanupSection](../api/ra2ce.network.network_config_data.html#ra2ce.network.network_config_data.network_config_data.CleanupSection){.api-ref}."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "## Step 3: Define the damage analysis\n",
+    "\n",
+    "Here, we specify that RA2CE should perform a **damage analysis** using **manual damage curves (MAN)** with the class [AnalysisSectionDamages](../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages){.api-ref} and the attribute `damage_curve` set to [DamageCurveEnum.MAN](../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.MAN){.api-ref}\n",
+    "For manual damage curves, it is important to also specify the input data in the folder path in the config `input_path`. This is the location where the custom manual curves will be defined and placed (see next step).\n",
+    "\n",
+    "The event type can be set to EVENT if damages are to be calculated for the hazard maps only (example below), or to RETURN_PERIOD if the analysis should estimate risk over a specified return period (see tutorial )."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3dc2947b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from ra2ce.analysis.damages.damages import AnalysisSectionDamages\n",
+    "from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import AnalysisDamagesEnum\n",
+    "from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum\n",
+    "from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum\n",
+    "from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData\n",
+    "\n",
+    "damages_analysis = [AnalysisSectionDamages(\n",
+    "    name='damages_reference_curve_manual',\n",
+    "    analysis=AnalysisDamagesEnum.DAMAGES,\n",
+    "    event_type=EventTypeEnum.EVENT,\n",
+    "    damage_curve=DamageCurveEnum.MAN,  # use manual damage curve\n",
+    "    save_csv=True,\n",
+    "    save_gpkg=True\n",
+    ")]\n",
+    "\n",
+    "analysis_config_data = AnalysisConfigData(\n",
+    "    analyses=damages_analysis,\n",
+    "    output_path=output_path,\n",
+    "    input_path=root_dir.joinpath(\"input_data\")\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "## Step 4: Create damage curve files\n",
+    "\n",
+    "In the manual situation, two input files are expected:\n",
+    "\n",
+    "1. A file that specifies the **shape of the vulnerability curve**:\n",
+    "   - x-axis = hazard intensity (e.g. water depth in cm)\n",
+    "   - y-axis = damage fraction (0–1, representing the % of total construction cost)\n",
+    "\n",
+    "2. A file that specifies the **construction costs** per road type and number of lanes.\n",
+    "\n",
+    "Both files should be placed in the folder `input_data/damage_functions/all_road_types/`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Vulnerability curve (hazard severity vs. damage fraction)\n",
+    "\n",
+    "The file `hazard_severity_damage_fraction.csv` looks like:\n",
+    "```text\n",
+    "depth;damage\n",
+    "cm;% of total construction costs\n",
+    "0;0\n",
+    "100;0.1\n",
+    "200;0.2\n",
+    "400;0.4\n",
+    "800;0.8\n",
+    "12000;1\n",
+    "```\n",
+    "\n",
+    "Where:\n",
+    "- `depth` = water depth in **cm**\n",
+    "- `damage` = damage fraction (0–1, relative to construction cost)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import pandas as pd\n",
+    "\n",
+    "input_data_path = root_dir.joinpath(\"input_data\")\n",
+    "vuln_curves = pd.read_csv(input_data_path.joinpath(\"damage_functions\", \"all_road_types\",\"hazard_severity_damage_fraction.csv\"), delimiter=\";\")\n",
+    "\n",
+    "plt.plot(vuln_curves[\"depth\"], vuln_curves[\"damage\"], marker=\"o\")\n",
+    "plt.xlabel(\"Depth [cm]\")\n",
+    "plt.ylabel(\"Damage fraction\")\n",
+    "plt.title(\"Manual vulnerability curve\")\n",
+    "plt.grid(True)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![Manual vulnerability curve](/_resources/figures/manual_vuln_curve.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Maximum construction costs per road type and lanes\n",
+    "\n",
+    "The file `max_damage_road_types.csv` looks like:\n",
+    "```text\n",
+    "Road_type \\ lanes;1;2;3;4;5;6;7;8\n",
+    "unit;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m;euro/m\n",
+    "tertiary_link;110;120;130;140;150;130;140;150\n",
+    "tertiary;110;120;130;140;150;130;140;150\n",
+    "trunk;110;120;130;140;150;130;140;150\n",
+    "trunk_link;110;120;130;140;150;130;140;150\n",
+    "secondary_link;11;12;13;14;15;13;14;15\n",
+    "secondary;11;12;13;14;15;13;14;15\n",
+    "primary_link;11;12;13;14;15;13;14;15\n",
+    "primary;11;12;13;14;15;13;14;15\n",
+    "residential;1100;1200;1300;1400;1500;1300;1400;1500\n",
+    "['tertiary', 'residential'];510;520;530;540;550;530;540;550\n",
+    "motorway;1100;1200;1300;1400;1500;1300;1400;1500\n",
+    "motorway_link;510;520;530;540;550;530;540;550\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "> **Note**\n",
+    ">\n",
+    "> - The *first file* defines the shape of the damage curve (hazard → damage fraction).\n",
+    "> - The *second file* defines the maximum construction costs per road type and lane count.\n",
+    "> - Together, they allow RA2CE to estimate damages in absolute currency units."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "059effee",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "## Step 5: Run the analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b6e0c6ca",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Ra2ceHandler.run_with_config_data(network_config_data, analysis_config_data)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "----\n",
+    "## Output\n",
+    "\n",
+    "The results of the manual damage analysis are provided in **two GeoPackage (GPKG) files**:\n",
+    "\n",
+    "- `damages_reference_curve_manual_link_based.gpkg`: damage estimates per **network link**\n",
+    "- `damages_reference_curve_manual_segment.gpkg`: damage estimates per **100m segment**\n",
+    "\n",
+    "Key attributes of interest (in currency):\n",
+    "\n",
+    "- `dam_EV1_al` : estimated damage for the first flood map (manual method).\n",
+    "- `dam_EV2_al` : estimated damage for the second flood map (manual method).\n",
+    "\n",
+    "You can open these files in GIS software (QGIS, ArcGIS) or load them in Python with GeoPandas:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import geopandas as gpd\n",
+    "output_path = root_dir / \"output\" / 'damages'\n",
+    "link_based = gpd.read_file(output_path / \"damages_reference_curve_manual_link_based.gpkg\")\n",
+    "segment_based = gpd.read_file(output_path / \"damages_reference_curve_manual_segmented.gpkg\")\n",
+    "\n",
+    "# Inspect the first rows\n",
+    "print(link_based.head())\n",
+    "print(segment_based.head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can open the results in GIS software to visualize which road segments are most affected by the hazard."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "ra2ce_env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

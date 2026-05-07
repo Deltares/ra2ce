@@ -1,0 +1,1104 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Long term adaptation planning - Physical damages &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.2.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nbsphinx-code-cells.css?v=4b0575c0" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=5518e742" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/python-code-block-style.css?v=5dd8df80" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=d16d3a24" />
+    <link crossorigin="" rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=fd7cadf9"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_examples/webinar/damages/damages_analysis_custom_curves';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../webinars/index.html">
+    Webinars
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases/index.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../webinars/index.html">
+    Webinars
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Docstrings Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Long term...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Long-term-adaptation-planning---Physical-damages">
+<h1>Long term adaptation planning - Physical damages<a class="headerlink" href="#Long-term-adaptation-planning---Physical-damages" title="Link to this heading">#</a></h1>
+<p>The Damages module in RA2CE estimates the physical (direct) damage to infrastructure caused by natural hazards such as floods, cyclones, or earthquakes. This provides a critical step in risk assessment: quantifying how exposed assets will be affected when hazard intensities exceed certain thresholds.</p>
+<section id="🚑-What-is-the-direct-cost-of-physical-damages-from-hazard-on-infrastructures-?">
+<h2>🚑 What is the direct cost of physical damages from hazard on infrastructures ?<a class="headerlink" href="#🚑-What-is-the-direct-cost-of-physical-damages-from-hazard-on-infrastructures-?" title="Link to this heading">#</a></h2>
+<p>Two main types of questions can be addressed:</p>
+<ul class="simple">
+<li><p>Event-based damages – What is the expected physical damage to my infrastructure for a specific hazard event?</p></li>
+<li><p>Risk-based damages – What is the <em>Expected Annual Damage (EAD)</em> to my infrastructure, based on hazard probability distributions?</p></li>
+</ul>
+</section>
+<section id="Initialize-and-import-RA2CE-functions-for-the-analysis">
+<h2>Initialize and import RA2CE functions for the analysis<a class="headerlink" href="#Initialize-and-import-RA2CE-functions-for-the-analysis" title="Link to this heading">#</a></h2>
+<p>General imports</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#python imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">folium</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span><span class="p">,</span><span class="n">LineString</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">box</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">shape</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.warp</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_default_transform</span><span class="p">,</span> <span class="n">reproject</span><span class="p">,</span> <span class="n">Resampling</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">folium.raster_layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageOverlay</span>
+</pre></div>
+</div>
+</div>
+<p>RA2CE-specific imports from the RA2CE python package</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.road_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoadTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.source_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.network_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkSection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.aggregate_wl_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateWlEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">HazardSection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkConfigData</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.damages.damages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisSectionDamages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">RiskCalculationModeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisDamagesEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.event_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.damage_curve_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">DamageCurveEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisConfigData</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.ra2ce_handler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ra2ceHandler</span>
+</pre></div>
+</div>
+</div>
+<p>Set your working directories according to the RA2CE folder structure</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;C:/RA2CE_Launch/data&#39;</span><span class="p">)</span> <span class="c1"># Adapt this path to your local directory where you have the data stored.</span>
+<span class="n">static_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;static&quot;</span><span class="p">)</span>
+<span class="n">network_path</span><span class="o">=</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">)</span>
+<span class="n">hazard_path</span><span class="o">=</span><span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;hazard&quot;</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Our working directory is :&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Step-1-Data-preparation">
+<h1>Step 1 Data preparation<a class="headerlink" href="#Step-1-Data-preparation" title="Link to this heading">#</a></h1>
+<section id="Area-of-interest">
+<h2>Area of interest<a class="headerlink" href="#Area-of-interest" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="c1">#Determine the extent:</span>
+<span class="n">AOI</span> <span class="o">=</span> <span class="n">network_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;polygon_miami_beach.shp&quot;</span><span class="p">)</span>
+<span class="n">AOI_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">AOI</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">AOI_gdf</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">OD_polygon</span> <span class="o">=</span> <span class="n">shape</span><span class="p">(</span><span class="n">AOI_gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;div style=&quot;display:flex; justify-content:center; width:100%;&quot;&gt;</span>
+<span class="s2">  &lt;div style=&quot;width:700px; height:500px; overflow:hidden;&quot;&gt;</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">  &lt;/div&gt;</span>
+<span class="s2">&lt;/div&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Vulnerability-curve-(hazard-severity-vs.-damage-fraction)">
+<h2>Vulnerability curve (hazard severity vs. damage fraction)<a class="headerlink" href="#Vulnerability-curve-(hazard-severity-vs.-damage-fraction)" title="Link to this heading">#</a></h2>
+<p>In the manual situation, two input files are expected:</p>
+<ol class="arabic simple">
+<li><p>A file that specifies the <strong>shape of the vulnerability curve</strong>:</p>
+<ul class="simple">
+<li><p>x-axis = hazard intensity (e.g. water depth in cm)</p></li>
+<li><p>y-axis = damage fraction (0–1, representing the % of total construction cost)</p></li>
+</ul>
+</li>
+<li><p>A file that specifies the <strong>construction costs</strong> per road type and number of lanes.</p></li>
+</ol>
+<p>Both files should be placed in the folder <code class="docutils literal notranslate"><span class="pre">input_data/damage_functions/all_road_types/</span></code>.</p>
+<p>The file <code class="docutils literal notranslate"><span class="pre">hazard_severity_damage_fraction.csv</span></code> looks like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>depth;damage
+cm;%
+0.0;0.0
+50;0.12
+100;0.2
+200;0.28
+600;0.35
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code> = water depth in <strong>cm</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">damage</span></code> = damage fraction (0–1, relative to construction cost)</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_data_path</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_data&quot;</span><span class="p">)</span>
+
+<span class="n">vuln_curves</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">input_data_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;damage_functions&quot;</span><span class="p">,</span> <span class="s2">&quot;all_road_types&quot;</span><span class="p">,</span><span class="s2">&quot;hazard_severity_damage_fraction.csv&quot;</span><span class="p">),</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">,</span>
+    <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># skip units row (cm;%)</span>
+<span class="p">)</span>
+
+<span class="c1"># Ensure numeric values</span>
+<span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">])</span>
+<span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;damage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;damage&quot;</span><span class="p">])</span>
+
+<span class="c1"># Sort values (important for interpolation)</span>
+<span class="n">vuln_curves</span> <span class="o">=</span> <span class="n">vuln_curves</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">)</span>
+
+<span class="c1"># Original data</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">damage</span> <span class="o">=</span> <span class="n">vuln_curves</span><span class="p">[</span><span class="s2">&quot;damage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="c1"># Create smooth depth range for interpolation</span>
+<span class="n">depth_interp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">depth</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">depth</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Linear interpolation</span>
+<span class="n">damage_interp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">depth_interp</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">damage</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Original points</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">damage</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original data&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Interpolated curve</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">depth_interp</span><span class="p">,</span> <span class="n">damage_interp</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Interpolated curve&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Water Depth [cm]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Damage fraction&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Interpolated vulnerability curve&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="Maximum-construction-costs-per-road-type-and-lanes">
+<h3>Maximum construction costs per road type and lanes<a class="headerlink" href="#Maximum-construction-costs-per-road-type-and-lanes" title="Link to this heading">#</a></h3>
+<p>The file <code class="docutils literal notranslate"><span class="pre">max_damage_road_types.csv</span></code> looks like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Road_type \ lanes;1;2;3;4;5;6;7;8
+unit;$/m;$/m;$/m;$/m;$/m;$/m;$/m;$/m
+tertiary_link;110;120;130;140;150;130;140;150
+tertiary;110;120;130;140;150;130;140;150
+trunk;110;120;130;140;150;130;140;150
+trunk_link;110;120;130;140;150;130;140;150
+secondary_link;11;12;13;14;15;13;14;15
+secondary;11;12;13;14;15;13;14;15
+primary_link;11;12;13;14;15;13;14;15
+primary;11;12;13;14;15;13;14;15
+residential;1100;1200;1300;1400;1500;1300;1400;1500
+motorway;1100;1200;1300;1400;1500;1300;1400;1500
+motorway_link;510;520;530;540;550;530;540;550
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="Step-2:-Configure-the-road-network-and-hazard">
+<h2>Step 2: Configure the road network and hazard<a class="headerlink" href="#Step-2:-Configure-the-road-network-and-hazard" title="Link to this heading">#</a></h2>
+<div class="line-block">
+<div class="line">The network is downloaded from <strong>OpenStreetMap (OSM)</strong>, clipped to a region polygon (<code class="docutils literal notranslate"><span class="pre">polygon_miami_beach.shp</span></code>).</div>
+<div class="line">We specify which <strong>road types</strong> should be included in the analysis.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">network_section</span> <span class="o">=</span> <span class="n">NetworkSection</span><span class="p">(</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">SourceEnum</span><span class="o">.</span><span class="n">OSM_DOWNLOAD</span><span class="p">,</span>
+    <span class="n">polygon</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span>
+    <span class="n">road_types</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">SECONDARY_LINK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY_LINK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">TRUNK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY_LINK</span><span class="p">,</span>
+        <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">RESIDENTIAL</span>
+    <span class="p">],</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">hazard_section</span> <span class="o">=</span> <span class="n">HazardSection</span><span class="p">(</span>
+    <span class="n">hazard_map</span><span class="o">=</span><span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">hazard_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tif&quot;</span><span class="p">)],</span>
+    <span class="n">aggregate_wl</span><span class="o">=</span><span class="n">AggregateWlEnum</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>  <span class="c1">#we take the mean water depth on road segments that intersect with the flood map</span>
+    <span class="n">hazard_crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>  <span class="c1"># ensure hazard map is in EPSG:4326 projection</span>
+<span class="p">)</span>
+
+<span class="n">network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span>
+    <span class="n">root_path</span><span class="o">=</span><span class="n">root_dir</span><span class="p">,</span>
+    <span class="n">static_path</span><span class="o">=</span><span class="n">static_path</span><span class="p">,</span>
+    <span class="n">network</span><span class="o">=</span><span class="n">network_section</span><span class="p">,</span>
+    <span class="n">hazard</span><span class="o">=</span><span class="n">hazard_section</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong>: The damage analysis requires two attributes from the network file: highway (for the type of roads) and lanes (number of lanes). These attributes are present by default from OSM. Make sure these are also present if you are using your own shapefile.</p>
+</div></blockquote>
+</section>
+<hr class="docutils" />
+<section id="Step-3:-Define-the-damage-analysis---event-based">
+<h2>Step 3: Define the damage analysis - event based<a class="headerlink" href="#Step-3:-Define-the-damage-analysis---event-based" title="Link to this heading">#</a></h2>
+<p>Here, we specify that RA2CE should perform a <strong>damage analysis</strong> using <strong>manual damage curves (MAN)</strong> with the class <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.html#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages">AnalysisSectionDamages</a> and the attribute <code class="docutils literal notranslate"><span class="pre">damage_curve</span></code> set to <a class="reference external" href="../api/ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.MAN">DamageCurveEnum.MAN</a> For manual damage
+curves, it is important to also specify the input data in the folder path in the config <code class="docutils literal notranslate"><span class="pre">input_path</span></code>. This is the location where the custom manual curves will be defined and placed (see next step).</p>
+<p>The event type can be set to EVENT if damages are to be calculated for the hazard maps only (example below), or to RETURN_PERIOD if the analysis should estimate risk over a specified return period (see tutorial ).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">damages_analysis</span> <span class="o">=</span> <span class="p">[</span><span class="n">AnalysisSectionDamages</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;damages_case_florida_event_based&#39;</span><span class="p">,</span>
+    <span class="n">analysis</span><span class="o">=</span><span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">DAMAGES</span><span class="p">,</span>
+    <span class="n">event_type</span><span class="o">=</span><span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span>
+    <span class="n">damage_curve</span><span class="o">=</span><span class="n">DamageCurveEnum</span><span class="o">.</span><span class="n">MAN</span><span class="p">,</span>  <span class="c1"># use manual damage curve</span>
+    <span class="n">save_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)]</span>
+
+<span class="n">analysis_config_data</span> <span class="o">=</span> <span class="n">AnalysisConfigData</span><span class="p">(</span>
+    <span class="n">analyses</span><span class="o">=</span><span class="n">damages_analysis</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+    <span class="n">input_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_data&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># network_config_data.network.reuse_network_output = True</span>
+<span class="n">Ra2ceHandler</span><span class="o">.</span><span class="n">run_with_config_data</span><span class="p">(</span><span class="n">network_config_data</span><span class="p">,</span> <span class="n">analysis_config_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="Output">
+<h2>Output<a class="headerlink" href="#Output" title="Link to this heading">#</a></h2>
+<p>The results of the manual damage analysis are provided in <strong>two GeoPackage (GPKG) files</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">damages_reference_florida_event_based_link_based.gpkg</span></code>: damage estimates per <strong>network link</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">damages_reference_florida_event_based_segment.gpkg</span></code>: damage estimates per <strong>100m segment</strong></p></li>
+</ul>
+<p>Key attributes of interest (in currency):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dam_RP20_al</span></code> : estimated damage for the first flood map (manual method).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dam_RP20_al</span></code> : estimated damage for the second flood map (manual method).</p></li>
+</ul>
+<p>You can open these files in GIS software (QGIS, ArcGIS) or load them in Python with GeoPandas:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpkg_path</span> <span class="o">=</span> <span class="n">static_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;output_graph&#39;</span><span class="p">,</span> <span class="s2">&quot;base_network_hazard.gpkg&quot;</span><span class="p">)</span>
+
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gpkg_path</span><span class="p">)</span>
+
+<span class="nb">map</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;RP20_ma&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB Positron&quot;</span><span class="p">)</span>
+<span class="nb">map</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;output&quot;</span> <span class="o">/</span> <span class="s1">&#39;damages&#39;</span>
+<span class="n">link_based</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;damages_case_florida_event_based_link_based.gpkg&quot;</span><span class="p">)</span>
+<span class="n">segment_based</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">&quot;damages_case_florida_event_based_segmented.gpkg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Inspect the first rows</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">segment_based</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">branca.colormap</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cm</span>
+<span class="n">gpkg_path</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;damages&quot;</span><span class="p">,</span> <span class="s2">&quot;damages_case_florida_event_based_segmented.gpkg&quot;</span><span class="p">)</span>
+<span class="n">value_column</span> <span class="o">=</span> <span class="s2">&quot;dam_RP20_al&quot;</span>
+
+
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gpkg_path</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">value_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column &#39;</span><span class="si">{</span><span class="n">value_column</span><span class="si">}</span><span class="s2">&#39; not found. Available columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input GeoPackage has no CRS defined.&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">4326</span><span class="p">:</span>
+    <span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">])</span>
+
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50000</span>
+<span class="n">tick_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50001</span><span class="p">,</span> <span class="mi">2000</span><span class="p">))</span>
+
+<span class="n">m_dam_ev4</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()],</span>
+    <span class="n">zoom_start</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB Positron&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">colormap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">LinearColormap</span><span class="p">(</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">YlOrRd_09</span><span class="o">.</span><span class="n">colors</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+    <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;Direct damage $&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_step</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">tick_values</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">style_function</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value_column</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#bdbdbd&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">}</span>
+
+<span class="n">folium</span><span class="o">.</span><span class="n">GeoJson</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
+    <span class="n">style_function</span><span class="o">=</span><span class="n">style_function</span><span class="p">,</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="n">folium</span><span class="o">.</span><span class="n">GeoJsonTooltip</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cost $:&quot;</span><span class="p">]),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+
+<span class="n">colormap</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+<span class="n">m_dam_ev4</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">branca.colormap</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cm</span>
+
+<span class="n">gpkg_path</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;damages&quot;</span><span class="p">,</span> <span class="s2">&quot;damages_case_florida_event_based_link_based.gpkg&quot;</span><span class="p">)</span>
+<span class="n">value_column</span> <span class="o">=</span> <span class="s2">&quot;dam_RP20_al&quot;</span>
+
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gpkg_path</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">value_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column &#39;</span><span class="si">{</span><span class="n">value_column</span><span class="si">}</span><span class="s2">&#39; not found. Available columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input GeoPackage has no CRS defined.&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">4326</span><span class="p">:</span>
+    <span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">])</span>
+
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200000</span>
+<span class="n">tick_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200001</span><span class="p">,</span> <span class="mi">20000</span><span class="p">))</span>
+
+<span class="n">m_dam_ev4</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()],</span>
+    <span class="n">zoom_start</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB Positron&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">colormap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">LinearColormap</span><span class="p">(</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">YlOrRd_09</span><span class="o">.</span><span class="n">colors</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+    <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;Direct damage $&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_step</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">tick_values</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">style_function</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value_column</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#bdbdbd&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">}</span>
+
+<span class="n">folium</span><span class="o">.</span><span class="n">GeoJson</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
+    <span class="n">style_function</span><span class="o">=</span><span class="n">style_function</span><span class="p">,</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="n">folium</span><span class="o">.</span><span class="n">GeoJsonTooltip</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cost $:&quot;</span><span class="p">]),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+
+<span class="n">colormap</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+<span class="n">m_dam_ev4</span>
+</pre></div>
+</div>
+</div>
+<p>You can open the results in GIS software to visualize which road segments are most affected by the hazard.</p>
+</section>
+<hr class="docutils" />
+<section id="Step-4:-Define-the-damage-analysis---risk-based">
+<h2>Step 4: Define the damage analysis - risk based<a class="headerlink" href="#Step-4:-Define-the-damage-analysis---risk-based" title="Link to this heading">#</a></h2>
+<p>The event type can be set to EVENT if damages are to be calculated for the hazard maps only (example below), or to RETURN_PERIOD if the analysis should estimate risk over a specified return period (see tutorial ).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">damages_analysis</span> <span class="o">=</span> <span class="p">[</span><span class="n">AnalysisSectionDamages</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;damages_case_florida_risk&#39;</span><span class="p">,</span>
+    <span class="n">analysis</span><span class="o">=</span><span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">DAMAGES</span><span class="p">,</span>
+    <span class="n">event_type</span><span class="o">=</span><span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">RETURN_PERIOD</span><span class="p">,</span>
+    <span class="n">damage_curve</span><span class="o">=</span><span class="n">DamageCurveEnum</span><span class="o">.</span><span class="n">MAN</span><span class="p">,</span>  <span class="c1"># use manual damage curve</span>
+    <span class="n">risk_calculation_mode</span><span class="o">=</span><span class="n">RiskCalculationModeEnum</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span>
+    <span class="n">save_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_gpkg</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)]</span>
+
+<span class="n">analysis_config_data</span> <span class="o">=</span> <span class="n">AnalysisConfigData</span><span class="p">(</span>
+    <span class="n">analyses</span><span class="o">=</span><span class="n">damages_analysis</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+    <span class="n">input_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;input_data&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Ra2ceHandler</span><span class="o">.</span><span class="n">run_with_config_data</span><span class="p">(</span><span class="n">network_config_data</span><span class="p">,</span> <span class="n">analysis_config_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">branca.colormap</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cm</span>
+
+<span class="n">gpkg_path</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;damages&quot;</span><span class="p">,</span> <span class="s2">&quot;damages_case_florida_risk_segmented.gpkg&quot;</span><span class="p">)</span>
+<span class="n">value_column</span> <span class="o">=</span> <span class="s2">&quot;risk_al&quot;</span> <span class="c1">## This is the column with the risk values, change if you want to plot a different column</span>
+
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gpkg_path</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">value_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column &#39;</span><span class="si">{</span><span class="n">value_column</span><span class="si">}</span><span class="s2">&#39; not found. Available columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input GeoPackage has no CRS defined.&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">4326</span><span class="p">:</span>
+    <span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+<span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">gdf_plot</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+<span class="n">gdf_plot</span> <span class="o">=</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">])</span>
+
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50000</span>
+<span class="n">tick_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50001</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+
+<span class="n">m_dam_ev4</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">gdf_plot</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()],</span>
+    <span class="n">zoom_start</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;OpenStreetMap&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">colormap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">LinearColormap</span><span class="p">(</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">YlOrRd_09</span><span class="o">.</span><span class="n">colors</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+    <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;cost $&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_step</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">tick_values</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">style_function</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value_column</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#bdbdbd&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">}</span>
+
+<span class="n">folium</span><span class="o">.</span><span class="n">GeoJson</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">gdf_plot</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
+    <span class="n">style_function</span><span class="o">=</span><span class="n">style_function</span><span class="p">,</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="n">folium</span><span class="o">.</span><span class="n">GeoJsonTooltip</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">value_column</span><span class="p">],</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cost $:&quot;</span><span class="p">]),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+
+<span class="n">colormap</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m_dam_ev4</span><span class="p">)</span>
+<span class="n">m_dam_ev4</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Long term adaptation planning - Physical damages</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#🚑-What-is-the-direct-cost-of-physical-damages-from-hazard-on-infrastructures-?">🚑 What is the direct cost of physical damages from hazard on infrastructures ?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Initialize-and-import-RA2CE-functions-for-the-analysis">Initialize and import RA2CE functions for the analysis</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-1-Data-preparation">Step 1 Data preparation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Area-of-interest">Area of interest</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Vulnerability-curve-(hazard-severity-vs.-damage-fraction)">Vulnerability curve (hazard severity vs. damage fraction)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Maximum-construction-costs-per-road-type-and-lanes">Maximum construction costs per road type and lanes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-2:-Configure-the-road-network-and-hazard">Step 2: Configure the road network and hazard</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-3:-Define-the-damage-analysis---event-based">Step 3: Define the damage analysis - event based</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Output">Output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Step-4:-Define-the-damage-analysis---risk-based">Step 4: Define the damage analysis - risk based</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/_examples/webinar/damages/damages_analysis_custom_curves.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/_examples/webinar/damages/damages_analysis_custom_curves.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
