@@ -1094,10 +1094,13 @@ def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
     """
     for _, data in graph.nodes(data=True):
         if "x" not in data or "y" not in data:
-            # Use 'geometry' or provide default values if it's not present
-            geometry = data.get("geometry", (0.0, 0.0))
-            data.setdefault("x", round(geometry.x, 7))
-            data.setdefault("y", round(geometry.y, 7))
+            geometry = data.get("geometry", None)
+            if geometry is not None and hasattr(geometry, "x"):
+                data.setdefault("x", round(geometry.x, 7))
+                data.setdefault("y", round(geometry.y, 7))
+            else:
+                data.setdefault("x", 0.0)
+                data.setdefault("y", 0.0)
     return graph
 
 
