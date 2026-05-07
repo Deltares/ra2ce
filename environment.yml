@@ -1,0 +1,13 @@
+name: ra2ce_examples_env
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - conda-forge::python=3.11
+  - conda-forge::folium
+  - conda-forge::matplotlib
+  - conda-forge::mapclassify
+  - conda-forge::pip
+  - pip:
+    - git+https://github.com/Deltares/ra2ce.git
+    - osmnx
