@@ -22,13 +22,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Hashable, Optional
 
 import pandas as pd
+
 
 from ra2ce.analysis.damages.damage_functions.damage_fraction_uniform import (
     DamageFractionUniform,
 )
 from ra2ce.analysis.damages.damage_functions.max_damage import MaxDamage
+from ra2ce.analysis.damages.supported_assets import canonicalize_asset_name
 
 
 @dataclass(kw_only=True)
@@ -45,6 +48,7 @@ class DamageFunctionByRoadTypeByLane:
     max_damage: MaxDamage
     damage_fraction: DamageFractionUniform
     name: str
+    allowed_asset_types: set[str]
 
     @property
     def prefix(self) -> str:
@@ -52,7 +56,7 @@ class DamageFunctionByRoadTypeByLane:
 
     @classmethod
     def from_input_folder(
-        cls, name: str, folder_path: Path
+        cls, name: str, folder_path: Path, allowed_asset_types: Optional[set[str]]
     ) -> DamageFunctionByRoadTypeByLane:
         """Construct a set of damage functions from csv files located in the folder_path
 
@@ -92,22 +96,57 @@ class DamageFunctionByRoadTypeByLane:
 
         damage_fraction.create_interpolator()
 
-        return cls(max_damage=max_damage, damage_fraction=damage_fraction, name=name)
+        return cls(
+            max_damage=max_damage,
+            damage_fraction=damage_fraction,
+            name=name,
+            allowed_asset_types=set(allowed_asset_types or set()),
+        )
+
+    @staticmethod
+    def _normalize_asset_key(s: str) -> str:
+        return canonicalize_asset_name(s)
 
     # Todo: these two below functions are maybe better implemented at a lower level?
-    def add_max_damage(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
-        """ "Ads the max damage value to the dataframe"""
-        cols = df.columns
-        assert "road_type" in cols, "no column 'road type' in df"
-        assert "lanes" in cols, "no column 'lanes in df"
+    def add_max_damage(self, df: pd.DataFrame, prefix: str | None = None) -> pd.DataFrame:
+        """Adds the max damage value to the dataframe for each (road_type, lanes) pair."""
+        assert "road_type" in df.columns, "No column 'road_type' in df"
+        assert "lanes" in df.columns, "No column 'lanes' in df"
 
-        max_damage_data = self.max_damage.data
+        prefix = prefix or self.prefix
 
-        def _get_damage(row):
-            return max_damage_data.at[row["infra_type"], row["lanes"]]
+        # Work on a copy to avoid mutating original df
+        out = df.copy()
 
-        df["{}_temp_max_dam".format(prefix)] = df.apply(_get_damage, axis=1)
-        return df
+        # 1) Normalize road_type in df and ensure lanes are ints
+        out["_road_type_norm"] = out["road_type"].map(self._normalize_asset_key)
+        out["_lanes_int"] = out["lanes"].astype("Int64")  # allows NA; will convert to int where possible
+
+        # 2) Prepare / normalize max_damage table
+        max_damage_data = self.max_damage.data.copy()
+
+        # Normalize index (road types)
+        max_damage_data.index = [self._normalize_asset_key(idx) for idx in max_damage_data.index]
+
+        # Normalize/ensure lane columns are ints (if columns are numbers as strings)
+        max_damage_data.columns = max_damage_data.columns.astype(int)
+
+        # 3) Flatten to a Series indexed by (road_type, lanes)
+        max_damage_series = (
+            max_damage_data
+            .stack()
+            .rename("max_damage")
+        )
+        max_damage_series.index.set_names(["road_type", "lanes"], inplace=True)
+
+        # 4) Build a MultiIndex from df to map values
+        mi = pd.MultiIndex.from_arrays([out["_road_type_norm"], out["_lanes_int"]], names=["road_type", "lanes"])
+        out[f"{prefix}_temp_max_dam"] = mi.map(max_damage_series)
+
+        # Cleanup
+        out.drop(columns=["_road_type_norm", "_lanes_int"], inplace=True)
+
+        return out
 
     def calculate_damage(
         self,
@@ -115,39 +154,43 @@ class DamageFunctionByRoadTypeByLane:
         damage_function_prefix: str,
         hazard_prefix: str,
         event_prefix: str,
+        asset_type: Optional[str] = None,   # <-- NEW PARAM
     ) -> pd.DataFrame:
         """
-        Calculates the damage for one event. The prefixes are used to find/set the right df columns.
+        Calculates the damage for one event, but only for rows that match the asset filter:
+          - If `asset_type` ∈ {"bridge", "viaduct", "tunnel"}: only rows with that `infra_type`.
+          - Else (asset_type is None or other like 'standard'): only rows whose `infra_type`
+            is NOT in the allowed set.
 
-        Args:
-            df (pd.DataFrame): dataframe with road network data.
-            damage_function_prefix (str): prefix to identify the right damage function e.g. 'A'.
-            hazard_prefix (str): prefix to identify the right hazard e.g. 'F'.
-            event_prefix (str): prefix to identify the right event, e.g. 'EV1'
-
-        Returns:
-            pd.DataFrame: dataframe data with the damage calculation added as new column
+        The prefixes are used to find/set the right df columns.
         """
+        interpolator = self.damage_fraction.interpolator
 
-        interpolator = (
-            self.damage_fraction.interpolator
-        )  # get the interpolator function
+        result_col = f"dam_{event_prefix}_{damage_function_prefix}"
+        max_dam_col = f"{damage_function_prefix}_temp_max_dam"
+        hazard_severity_col = f"{hazard_prefix}_{event_prefix}_me"  # mean
+        hazard_fraction_col = f"{hazard_prefix}_{event_prefix}_fr"  # fraction
 
-        # Find correct columns in dataframe
-        result_col = "dam_{}_{}".format(event_prefix, damage_function_prefix)
-        max_dam_col = "{}_temp_max_dam".format(damage_function_prefix)
-        hazard_severity_col = "{}_{}_me".format(
-            hazard_prefix, event_prefix
-        )  # mean is hardcoded now
-        hazard_fraction_col = "{}_{}_fr".format(
-            hazard_prefix, event_prefix
-        )  # fraction column is hardcoded
+        infra = df["infra_type"].astype(str).str.lower()
+        current = (asset_type or "").strip().lower()
 
-        df[result_col] = round(
-            df[max_dam_col].astype(float)  # max damage (euro/m)
-            * interpolator(df[hazard_severity_col].astype(float))  # damage curve  (-)
-            * df["length"]  # segment length (m)
-            * df[hazard_fraction_col],
-            0,
-        )  # round to whole numbers
+        if current in self.allowed_asset_types:
+            row_mask = infra.eq(current)
+        else:
+            # 'standard' / 'non' / None => rows that are not bridge/viaduct/tunnel
+            row_mask = ~infra.isin(self.allowed_asset_types)
+
+        if not row_mask.any():
+            # No rows to compute for this asset filter
+            return df
+
+        # Compute only on the masked subset
+        values = (
+            df.loc[row_mask, max_dam_col].astype(float)
+            * interpolator(df.loc[row_mask, hazard_severity_col].astype(float))
+            * df.loc[row_mask, "length"]
+            * df.loc[row_mask, hazard_fraction_col]
+        ).round(0)
+
+        df.loc[row_mask, result_col] = values
         return df

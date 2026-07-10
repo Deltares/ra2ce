@@ -154,3 +154,7 @@ examples/cache/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+examples/sito_2025_asset_based_damage_examples/fictive_network/output
+examples/sito_2025_asset_based_damage_examples/illustrative_case/output
+examples/sito_2025_asset_based_damage_examples/illustrative_case/static

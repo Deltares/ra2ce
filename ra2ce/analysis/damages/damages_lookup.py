@@ -72,7 +72,7 @@ class LookUp:
             "pedestrian": "other",
             "primary": "primary",
             "primary_link": "primary",
-            "residential": "other",
+            "residential": "residential",
             "road": "other",
             "secondary": "secondary",
             "secondary_link": "secondary",

@@ -1,6 +1,7 @@
 import logging
 import re
 from pathlib import Path
+from typing import Mapping, Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDamages,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import AnalysisDamagesEnum
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -31,7 +33,17 @@ from ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader impo
     ManualDamageFunctionsReader,
 )
 from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
+from ra2ce.analysis.damages.supported_assets import (
+    BRIDGE_ASSET_MAP,
+    CANONICAL_ASSET_TYPES,
+    TUNNEL_ASSET_MAP,
+    canonicalize_asset_name,
+)
 from ra2ce.network.graph_files.network_file import NetworkFile
+
+
+
+logger = logging.getLogger(__name__)
 
 
 class Damages(AnalysisBase, AnalysisDamagesProtocol):
@@ -41,52 +53,192 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
     input_path: Path
     output_path: Path
     reference_base_graph_hazard: MultiGraph
-    manual_damage_functions: ManualDamageFunctions = None
+    manual_damage_functions: dict[str, ManualDamageFunctions] = None
+
+    hazard_prefix: str
+    road_gdf: pd.DataFrame
+    hazard_columns: list[str]
 
     def __init__(
-        self, analysis_input: AnalysisInputWrapper, base_graph_hazard: MultiGraph
+        self,
+        analysis_input: AnalysisInputWrapper,
+        base_graph_hazard: MultiGraph,
+        hazard_prefix: str = "F",
     ) -> None:
+        self.allowed_asset_types: set[str] = set(CANONICAL_ASSET_TYPES)
+
         self.analysis = analysis_input.analysis
         self.graph_file = None
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
         self.reference_base_graph_hazard = base_graph_hazard
+
+        self.hazard_prefix = hazard_prefix
         if self.analysis.damage_curve == DamageCurveEnum.MAN:
-            self.manual_damage_functions = ManualDamageFunctionsReader().read(
-                self.input_path.joinpath("damage_functions")
-            )
+            self.manual_damage_functions = self._load_manual_damage_functions()
+
+    def _prepare_road_gdf(self) -> None:
+        """
+        Load the network with hazard data once and rename hazard columns to RA2CE conventions.
+        Also computes and stores the hazard value columns for later use.
+        """
+        road_gdf = self.graph_file_hazard.get_graph()
+
+        # rename columns to RA2CE convention (e.g., RP100_fr -> F_RP100_fr, EV1_mi -> F_EV1_mi)
+        renamed_cols = self._rename_road_gdf_to_conventions(list(road_gdf.columns))
+        road_gdf.columns = renamed_cols
+
+        # identify hazard value columns (those starting with e.g. 'F_')
+        hazard_tag = f"{self.hazard_prefix}_"
+        hazard_cols = [c for c in road_gdf.columns if c.startswith(hazard_tag)]
+
+        self.road_gdf = road_gdf
+        self.hazard_columns = hazard_cols
+
+    def _rename_road_gdf_to_conventions(self, road_gdf_columns: list[str]) -> list[str]:
+        """
+        Rename columns in the road_gdf to RA2CE conventions:
+
+        e.g.
+            RP100_fr -> F_RP100_fr
+            EV1_mi   -> F_EV1_mi
+        """
+        new_cols: list[str] = []
+        for c in road_gdf_columns:
+            if c.startswith("RP") or c.startswith("EV"):
+                new_cols.append(f"{self.hazard_prefix}_" + c)
+            else:
+                new_cols.append(c)
+        return new_cols
+
+    @staticmethod
+    def _to_canonical_asset(
+            key: Any,
+        ) -> tuple[str, str]:
+        """
+        Normalize an asset key:
+          - trim whitespace
+          - case-insensitive
+          - spaces/hyphens -> underscores
+          - map aliases to canonical_asset (spelling/format variants only)
+          - handle simple plurals (sole place for plural handling)
+        Returns (canonical_asset | None, original_str).
+        """
+        original = str(key)
+        return canonicalize_asset_name(original), original
+
+    def _load_manual_damage_functions(self) -> dict[str, Any]:
+        """
+        Load, normalize, and validate manual damage function keys.
+        - Normalizes folder names (asset keys) to canonical asset types.
+        - Skips and warns on unsupported assets.
+        - If duplicates/aliases map to the same canonical, the last wins (warned).
+        Returns a dict[canonical_asset, damage_function_obj] (use in ManualDamageFunctions(...)).
+        """
+        raw = ManualDamageFunctionsReader().read(
+            self.input_path.joinpath("damage_functions"),
+            self.allowed_asset_types,  # reader-internal filtering (if any)
+        )
+        normalized: dict[str, Any] = {}
+        for k, v in raw.damage_functions.items():
+            canonical, original = self._to_canonical_asset(k)
+            if canonical in normalized:
+                logger.warning(
+                    "Duplicate/alias entries for asset '%s' encountered (e.g., '%s'). "
+                    "Overwriting previous value with the latest one.",
+                    canonical, original
+                )
+
+            normalized[canonical] = v
+
+        return normalized
+
+    def _assets_from_damage_functions(self) -> set[str]:
+        """
+        Collect canonical asset keys we have manual damage functions for.
+        Applies alias + plural normalization, then keeps only assets
+        we can emit via _BRIDGE_MAP/_TUNNEL_MAP (i.e., _CANONICAL_ASSET_TYPES).
+        """
+        if self.manual_damage_functions is None:
+            return set()
+
+        assets = set(self.manual_damage_functions.keys())
+
+        canon: set[str] = set()
+        for asset in assets:
+            c, _orig = self._to_canonical_asset(asset)
+            if c and c in CANONICAL_ASSET_TYPES:
+                canon.add(c)
+
+        return canon
+
+    def _rename_highway_by_assets(self) -> None:
+        """
+        Convert 'highway' to asset labels (bridge/tunnel variants) ONLY if:
+          - bridge/tunnel columns contain a recognized value in BRIDGE_ASSET_MAP/TUNNEL_ASSET_MAP, and
+          - that canonical asset is present among the loaded manual damage functions.
+
+        Otherwise, keep the existing 'highway' class.
+        """
+        df = self.road_gdf
+
+        def _norm(col: str) -> pd.Series:
+            """
+            Normalize a column without turning NaN into 'nan':
+              - keep pandas StringDtype (<NA>)
+              - strip + casefold
+              - spaces -> underscores
+            """
+            if col not in df.columns:
+                return pd.Series(pd.array([pd.NA] * len(df), dtype="string"), index=df.index)
+            s = df[col].astype("string")
+            s = s.str.strip().str.casefold()
+            s = s.str.replace(r"\s+", "_", regex=True)
+            return s
+
+        if not self.allowed_asset_types:
+            return
+
+        bridge = _norm("bridge")
+        tunnel = _norm("tunnel")
+
+        # Recognized inputs only (do not fall back to generic labels if unrecognized)
+        bridge_keys = set(BRIDGE_ASSET_MAP.keys())
+        tunnel_keys = set(TUNNEL_ASSET_MAP.keys())
+
+        # Map to canonical asset labels
+        bridge_norm = bridge.map(BRIDGE_ASSET_MAP)  # -> e.g., "viaduct", "bridge", ...
+        tunnel_norm = tunnel.map(TUNNEL_ASSET_MAP)  # -> e.g., "culvert", "tunnel", ...
+
+        loaded_assets = self._assets_from_damage_functions()
+        if not loaded_assets:
+            return
+
+        # Only apply where the normalized label is recognized AND exists in the loaded damage functions
+        m_bridge = bridge.isin(bridge_keys) & bridge_norm.isin(loaded_assets)
+        m_tunnel = tunnel.isin(tunnel_keys) & tunnel_norm.isin(loaded_assets)
+
+        out = df["highway"].astype("string").copy()
+
+        # 1) bridge-types first
+        out.loc[m_bridge] = bridge_norm[m_bridge]
+
+        # 2) tunnel-types where bridge hasn't already set it
+        m_tunnel_only = (~m_bridge) & m_tunnel
+        out.loc[m_tunnel_only] = tunnel_norm[m_tunnel_only]
+
+        df["highway"] = out
+        self.road_gdf = df
 
     def execute(self) -> AnalysisResultWrapper:
-        def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
-            """
-            Rename the columns in the road_gdf to the conventions of the ra2ce documentation
+        self._prepare_road_gdf()
 
-            'eg' RP100_fr -> F_RP100_me
-                        -> F_EV1_mi
+        if self.analysis.analysis == AnalysisDamagesEnum.DAMAGES_WITH_ASSETS:
+            self._rename_highway_by_assets()
 
-            """
-            cs = road_gdf_columns
-            ### Handle return period columns
-            new_cols = []
-            for c in cs:
-                if c.startswith("RP") or c.startswith("EV"):
-                    new_cols.append(f"{hazard_prefix}_" + c)
-                else:
-                    new_cols.append(c)
-
-            ### Todo add handling of events if this gives a problem
-            return new_cols
-
-        hazard_prefix = "F"
-        # Open the network with hazard data
-        road_gdf = self.graph_file_hazard.get_graph()
-        road_gdf.columns = _rename_road_gdf_to_conventions(road_gdf.columns)
-
-        # Find the hazard columns; these may be events or return periods
-        val_cols = [
-            col for col in road_gdf.columns if f"{hazard_prefix}" in col.split("_")
-        ]
+        road_gdf = self.road_gdf
+        val_cols = self.hazard_columns
 
         # Read the desired damage function
         damage_function = self.analysis.damage_curve

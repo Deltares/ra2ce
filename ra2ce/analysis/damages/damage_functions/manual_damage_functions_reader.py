@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
@@ -34,14 +35,16 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
     Reader class for the manual damage functions.
     """
 
-    def read(self, file_path: Path) -> ManualDamageFunctions:
+    def read(
+        self, file_path: Path, allowed_asset_types: Optional[set[str]] = None
+    ) -> ManualDamageFunctions:
         """
         Read the manual damage functions from the given folder.
         The folder should contain subfolders with the damage functions.
         Each damage functions is constructed by reading the csv files for the max damage and damage fraction.
 
         Args:
-            file_path (Path): Pathm to the folder containing the manual damage functions folders
+            file_path (Path): Path to the folder containing the manual damage functions folders
 
         Returns:
             ManualDamageFunctions: The manual damage functions
@@ -53,10 +56,12 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
             if subfolder.is_dir()
         }
 
-        # Read the damage functions from the subfolders
+        # Read all damage functions from the subfolders.
+        # Asset filtering is intentionally not applied at load-time because
+        # non-asset curves (e.g. standard cross-sections) must remain available.
         return ManualDamageFunctions(
             damage_functions={
-                _name: DamageFunctionByRoadTypeByLane.from_input_folder(_name, _path)
+                _name: DamageFunctionByRoadTypeByLane.from_input_folder(_name, _path, allowed_asset_types)
                 for _name, _path in _damage_function_folders.items()
             }
         )

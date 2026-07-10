@@ -231,6 +231,7 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
     )
+
     risk_calculation_mode: RiskCalculationModeEnum = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )

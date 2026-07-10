@@ -277,7 +277,7 @@ class TestDamages:
         )
         event_gdf.main(
             damage_function=damage_function,
-            manual_damage_functions=manual_damage_functions,
+            manual_damage_functions=manual_damage_functions.damage_functions,
         )
 
         # CHECK OUTCOMES OF DAMAGE CALCULATIONS

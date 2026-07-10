@@ -86,7 +86,8 @@ class AnalysisFactory:
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
-        if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
+        if (analysis.analysis == AnalysisDamagesEnum.DAMAGES or
+                analysis.analysis == AnalysisDamagesEnum.DAMAGES_WITH_ASSETS):
             return Damages(
                 _analysis_input,
                 analysis_config.graph_files.base_graph_hazard.get_graph(),

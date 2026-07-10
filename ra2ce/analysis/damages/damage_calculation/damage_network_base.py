@@ -21,6 +21,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -55,6 +56,7 @@ class DamageNetworkBase(ABC):
         # set of hazard info per event
         self.stats = set([x.split("_")[-1] for x in val_cols])
         self.representative_damage_percentage = representative_damage_percentage
+
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
         # TODO: also create constructors of the children of this class
 
@@ -128,9 +130,17 @@ class DamageNetworkBase(ABC):
 
             # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
             lane_nans_mask = self.gdf.lanes.isnull()
-            self.gdf.loc[lane_nans_mask, "lanes"] = self.gdf.loc[
-                lane_nans_mask, "road_type"
-            ].replace(lane_stats)
+
+            self.gdf["lanes"] = pd.to_numeric(self.gdf["lanes"], errors="coerce").astype("Int64")
+
+            fill_vals = (
+                self.gdf.loc[lane_nans_mask, "road_type"]
+                .astype("string").str.strip().str.casefold()
+                .map(lane_stats)
+                .astype("Int64")  # nullable ints, keeps <NA> for unknown road_type
+            )
+            self.gdf.loc[lane_nans_mask, "lanes"] = fill_vals
+
             logging.warning(
                 "Interpolated the missing lane data as follows: {}".format(lane_stats)
             )
@@ -177,7 +187,7 @@ class DamageNetworkBase(ABC):
 
     ### Damage handlers
     def calculate_damage_manual_functions(
-        self, events: list[str], manual_damage_functions: ManualDamageFunctions
+        self, events: list[str], manual_damage_functions: dict[str, ManualDamageFunctions]
     ) -> None:
         """
         Calculate the damage using the manual damage functions
@@ -193,24 +203,42 @@ class DamageNetworkBase(ABC):
         df = self._gdf_mask
 
         assert (
-            len(manual_damage_functions.damage_functions) > 0
+            len(manual_damage_functions) > 0
         ), "No damage functions were loaded"
 
-        for _damage_func in manual_damage_functions.damage_functions.values():
+        for _asset_key, _damage_func in manual_damage_functions.items():
             # Add max damage values to df
             df = _damage_func.add_max_damage(df, _damage_func.prefix)
+            asset_type = (str(_asset_key).lower() if _asset_key is not None else None)
             for event in events:
-                # Add apply interpolator objects
-                event_prefix = event
                 df = _damage_func.calculate_damage(
-                    df, _damage_func.prefix, hazard_prefix, event_prefix
+                    df=df,
+                    damage_function_prefix=_damage_func.prefix,
+                    hazard_prefix=hazard_prefix,
+                    event_prefix=event,
+                    asset_type=asset_type,
                 )
+
+        # Keep the per-folder outputs for comparison, and also provide one
+        # effective manual-damage column per event that combines (understand sums) the applicable
+        # road and asset curves row-wise.
+        for event in events:
+            event_damage_cols = [
+                col for col in df.columns if col.startswith(f"dam_{event}_")
+            ]
+            if not event_damage_cols:
+                continue
+
+            df[f"dam_{event}_{DamageCurveEnum.MAN.name}"] = df[event_damage_cols].sum(
+                axis=1,
+                min_count=1,
+            )
 
         # Only transfer the final results to the damage column
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = df[dam_cols]
         logging.info(
-            "Damage calculation with the manual damage functions was succesfull."
+            "Damage calculation with the manual damage functions was successful."
         )
 
     def calculate_damage_HZ(self, events: list[str]) -> None:

@@ -20,12 +20,15 @@
 """
 from __future__ import annotations
 
+from typing import Optional
+
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions import ManualDamageFunctions
 
 
 class DamageNetworkEvents(DamageNetworkBase):
@@ -51,8 +54,8 @@ class DamageNetworkEvents(DamageNetworkBase):
         if not any(self.events):
             raise ValueError("No event cols present in hazard data")
 
-    ### Controler for Event-based damage calculation
-    def main(self, damage_function: DamageCurveEnum, manual_damage_functions=None):
+    ### Controller for Event-based damage calculation
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions: dict[str, ManualDamageFunctions]=None):
         assert len(self.events) > 0, "no return periods identified"
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
@@ -67,15 +70,6 @@ class DamageNetworkEvents(DamageNetworkBase):
 
         if damage_function == DamageCurveEnum.MAN:
             self.calculate_damage_manual_functions(
-                events=self.events, manual_damage_functions=manual_damage_functions
+                events=self.events,
+                manual_damage_functions=manual_damage_functions
             )
-
-
-# class DamageNetworkEventsBuilder:
-#     @staticmethod
-#     def from_csv_file(file_path) -> DamageNetworkEvents:
-#         pass
-#
-#     @staticmethod
-#     def from_pandas(pd_dataframe) -> DamageNetworkEvents:
-#         pass

@@ -376,6 +376,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 x, MultiLinkOriginClosestDestinationConfigData
             ),
             AnalysisDamagesEnum.DAMAGES.config_value: self._get_damages_config_data,
+            AnalysisDamagesEnum.DAMAGES_WITH_ASSETS.config_value: self._get_damages_config_data,
             AnalysisEnum.ADAPTATION.config_value: self._get_adaptation_config_data,
         }
         # Equity was not supported before, it was being dected whenever 'save_traffic' was true.
