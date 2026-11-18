@@ -41,6 +41,7 @@ Real-world applications of RA2CE demonstrating how hazard exposure, network crit
         top: 72px;
       }
       #ra2ce-map { height: 540px; }
+      #ra2ce-map .leaflet-tile-pane { filter: grayscale(1); opacity: 0.6; }
 
       /* Leaflet popup overrides */
       .leaflet-popup-content-wrapper {
@@ -306,8 +307,9 @@ Real-world applications of RA2CE demonstrating how hazard exposure, network crit
           maxBoundsViscosity: 1.0
         });
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '\u00a9 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> \u00a9 <a href="https://carto.com/attributions">CARTO</a>',
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles \u00a9 Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom',
+          maxNativeZoom: 18,
           maxZoom: 19,
           noWrap: true
         }).addTo(map);
